@@ -4,7 +4,8 @@
 ;; (load "quicklisp.lisp")
 ;; (quicklisp-quickstart:install)
 ;; (ql:quickload "restas-directory-publisher")
-
+(require 'swank)
+(swank:create-server :coding-system "utf-8-unix" :dont-close t)
 (load "lib.lisp")
 (load "ent.lisp")
 (load "gen.lisp")
