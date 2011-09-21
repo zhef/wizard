@@ -1,9 +1,13 @@
-(require 'RESTAS)
-(require 'CLOSURE-TEMPLATE)
-(require 'RESTAS-DIRECTORY-PUBLISHER)
-(require 'CL-JSON)
 
-
+(defun reload ()
+  (load "lib.lisp")
+  (load "ent.lisp")
+  (load "gen.lisp")
+  (load "grid.lisp")
+  (load "fld.lisp")
+  (load "perm.lisp")
+  (load "defmodule.lisp")
+  (load "init.lisp"))
 
 (restas:define-module #:WIZARD
     (:use #:CL #:ITER ))
