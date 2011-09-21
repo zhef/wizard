@@ -4,8 +4,9 @@
 ;; (load "quicklisp.lisp")
 ;; (quicklisp-quickstart:install)
 ;; (ql:quickload "restas-directory-publisher")
-(require 'swank)
-(swank:create-server :coding-system "utf-8-unix" :dont-close t)
+(let ((swank (ignore-errors (asdf:find-system :swank))))
+  (when swank
+    (swank:create-server :coding-system "utf-8-unix" :dont-close t)))
 (require 'RESTAS)
 (require 'CLOSURE-TEMPLATE)
 (require 'RESTAS-DIRECTORY-PUBLISHER)
