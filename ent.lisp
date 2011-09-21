@@ -502,7 +502,7 @@
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'EXPERT)) (cons-hash-list *USER*))
         :fields            '(name login
                              (:btn  "Страница эксперта"
-                              :perm (or :admin :self)
+                              :perm :all ;; (or :admin :self)
                               :act  (to "/expert/~A" (caar (form-data))))
                              (:btn  "Доп кнопка"
                               :perm (or :admin :self)
