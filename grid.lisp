@@ -141,7 +141,8 @@
                                      ("editable" . nil))))
                     (push in-name col-names)
                     (push model col-model)
-                    (push `(,in-name . ,btn-str) col-replace)))
+                    ;; (push `(,in-name . ,btn-str) col-replace) ;; commented for change algorithm
+                    ))
        :popbtn  ""
        :calc    "")
      (let* ((grid-complete-js
@@ -275,36 +276,51 @@
                                     ;; "<a href=\"sss\">fdd</a>"
                                     (cdr row)
                                     ;; )
-                                ))))))) ;; <------
+                                ))))))) ;; <------ here inserted
 
 
 (defun pager (val fields page rows-per-page)
   "[debugged 29.08.2011]"
-  (let* ((rows            (funcall val))
-         (cnt-rows        (length rows))
-         (slice-cons)
-         (fld-accessors))
-    ;; slice-cons
+  (let* ((rows             (funcall val))
+         (cnt-rows         (length rows))
+         (slice-cons)      ;; many of (id . #<object>)
+         (field-cons))     ;; manu of (#<function-accessor> . plist-permlist)
+    ;; slice-cons (overloop)
     (loop :for num :from (* page rows-per-page) :below (* (+ 1 page) rows-per-page) :do
        (let ((row (nth num rows)))
          (unless (null row)
            (push (nth num rows) slice-cons))))
-    ;; fld-accessors
-    (loop :for fld :in fields :collect
+    ;; field-cons (innerloop)
+    (loop :for fld :in fields :do
        (let ((name (getf fld :fld)))
-         (unless (null name)
-           (when (equal '(:str) (getf fld :typedata)) ;; todo: perm check
-             (push (intern (format nil "A-~A" name) (find-package "WIZARD")) fld-accessors)))))
+         (if (null name)
+             ;; btn
+             (let* ((btn       (getf fld :btn))
+                    (perm      (getf fld :perm))
+                    (value     (getf fld :value))
+                    (accessor  (lambda (x)
+                                 (format nil "<form method='post'><input type='submit' name='~A~~%|id|%' value='~A~~%|id|%' /></form>"
+                                         btn
+                                         value))))
+               (push (cons accessor perm) field-cons))
+             ;; fld
+             (let ((perm (getf (getf fld :permlist) :view)))
+               (cond ((equal '(:str) (getf fld :typedata))
+                      (let ((accessor  (find-symbol (format nil "A-~A" name) (find-package "WIZARD"))))
+                        (push (cons accessor perm) field-cons)))
+                     (t ;; default - print unknown type message in grid field
+                      (let ((accessor  (lambda (x) "unknown typedata in grid pager")))
+                        (push (cons accessor perm) field-cons))))))))
     (values
      ;; result: get values from obj
-     (loop :for cons :in (reverse slice-cons) :collect
-        (let* ((id  (car cons))
-               (obj (cdr cons))
-               (res (loop :for accessor :in (reverse fld-accessors) :collect
-                       (if (null accessor)
-                           "---"
-                           (funcall accessor obj)))))
-          (push id res)))
+     (loop :for (id . obj) :in (reverse slice-cons) :collect
+        (list* id
+               (loop :for (accessor . perm) :in (reverse field-cons) :collect
+                  (if (check-perm perm (cur-user) obj)
+                      (replace-all (funcall accessor obj)
+                                   "%|id|%"
+                                   (format nil "~A" id))
+                      "permission denied in grid pager"))))
      ;; cnt-rows - two result
      cnt-rows)))
 
