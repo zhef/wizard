@@ -34,8 +34,9 @@
     :list-of-links        ;; список связанных сущностей
     :list-of-keys         ;; выпадающий список ключей, с выбором одного из них
     :text-box             ;; текстовое поле
-    :date                 ;; дата
+    :date                 ;; дата и время
     :interval             ;; диапазоны дат, относящиеся к тендеру
+    :img                  ;; изображения, картинки
     ))
 
 ;; Сущности, используемые в программе, по ним строятся объекты и контейнеры, в которых они хранятся.
@@ -66,6 +67,23 @@
       :delete              :admin
       :view                (or :admin :self)
       :update              (or :admin :self)))
+
+  ;; Новости  
+    (:entity               post
+     :container            post
+     :fields
+     ((title               "Название новости"           (:str))
+      (date                "Дата и время"               (:date))
+      (photo-announce      "Фото в анонсе"              (:img))
+      (announce            "Анонс"                      (:str))
+      (photo-text          "Фото в тексте"              (:img))
+      (text                "Текст"                      (:str))
+      (category            "Категория новости"          (:str)))
+     :perm
+     (:create              :admin
+      :delete              :admin
+      :view                :all
+      :update              :admin))
 
     ;; Поставщик
     (:entity               supplier
@@ -335,10 +353,74 @@
      :actions
      '((:caption           "Главная страница"
         :perm              :all)))
+
     ;; Новости
-    (:place                news
-     :url                  "/news"
-     :navpoint             "Новости"
+    (:place                posts
+     :url                  "/posts"
+     :navpoint             "Новости строительной индустрии"
+     :actions
+     '((:caption           "Новости"
+        :perm              :all)))
+
+    ;; Новости/Новости строительной индустрии
+    (:place                posts
+     :url                  "/posts"
+     :navpoint             "Новости строительной индустрии"
+     :actions
+     '((:caption           "Новости строительной индустрии"
+        :grid              t
+        :perm              :all
+        :entity            post
+        :val               (remove-if-not #'(lambda (x)
+                                              (equal (category (cdr x))
+                                                     (gethash (id) *CATEGORY*)))
+                            (cons-hash-list *POST*))
+        :fields            '(title date photo-announce announce 
+                             (:btn  "Страница новости"
+                              :perm :all
+                              :act  (to "/post/~A" (caar (form-data))))))))
+   
+    ;; Новости/Новости законодательства
+    (:place                posts
+     :url                  "/posts"
+     :navpoint             "Новости законодательства"
+     :actions
+     '((:caption           "Новости законодательства"
+        :grid              t
+        :perm              :all
+        :entity            post
+        :val               (remove-if-not #'(lambda (x)
+                                              (equal (category (cdr x))
+                                                     (gethash (id) *CATEGORY*)))
+                            (cons-hash-list *POST*))
+        :fields            '(title date photo-announce announce
+                             (:btn  "Страница новости"
+                              :perm :all
+                              :act  (to "/post/~A" (caar (form-data))))))))
+
+    ;; Новости/Новые технологии
+    (:place                posts
+     :url                  "/posts"
+     :navpoint             "Новые технологии"
+     :actions
+     '((:caption           "Новые технологии"
+        :grid              t
+        :perm              :all
+        :entity            post
+        :val               (remove-if-not #'(lambda (x)
+                                              (equal (category (cdr x))
+                                                     (gethash (id) *CATEGORY*)))
+                            (cons-hash-list *POST*))
+        :fields            '(title date photo-announce announce
+                             (:btn  "Страница новости"
+                              :perm :all
+                              :act  (to "/post/~A" (caar (form-data))))))))
+
+
+    ;; Новость
+    (:place                post
+     :url                  "/post/:id"
+     :navpoint             "Содержимое новости"
      :actions
      '((:caption           "Новости"
         :perm              :all)))
@@ -498,7 +580,6 @@
         :grid              t
         :perm              :all
         :entity            expert
-        :grid              t
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'EXPERT)) (cons-hash-list *USER*))
         :fields            '(name login
                              (:btn  "Страница эксперта"

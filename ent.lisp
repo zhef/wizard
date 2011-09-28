@@ -77,7 +77,8 @@
       (photo-announce      "Фото в анонсе"              (:img))
       (announce            "Анонс"                      (:str))
       (photo-text          "Фото в тексте"              (:img))
-      (text                "Текст"                      (:str)))
+      (text                "Текст"                      (:str))
+      (category            "Категория новости"          (:str)))
      :perm
      (:create              :admin
       :delete              :admin
@@ -356,18 +357,66 @@
     ;; Новости
     (:place                posts
      :url                  "/posts"
-     :navpoint             "Новости"
+     :navpoint             "Новост"
      :actions
-     '((:caption           "Анонсы"
+     '((:caption           "Новости"
+        :perm              :all)))
+
+    ;; Новости/Новости строительной индустрии
+    (:place                posts
+     :url                  "/posts"
+     :navpoint             "Новости строительной индустрии"
+     :actions
+     '((:caption           "Новости строительной индустрии"
         :grid              t
         :perm              :all
         :entity            post
-        :val               (cons-hash-list *POST*)
+        :val               (remove-if-not #'(lambda (x)
+                                              (equal (category (cdr x))
+                                                     (gethash (id) *CATEGORY*)))
+                            (cons-hash-list *POST*))
         :fields            '(title date photo-announce announce 
                              (:btn  "Страница новости"
                               :perm :all
                               :act  (to "/post/~A" (caar (form-data))))))))
    
+    ;; Новости/Новости законодательства
+    (:place                posts
+     :url                  "/posts"
+     :navpoint             "Новости законодательства"
+     :actions
+     '((:caption           "Новости законодательства"
+        :grid              t
+        :perm              :all
+        :entity            post
+        :val               (remove-if-not #'(lambda (x)
+                                              (equal (category (cdr x))
+                                                     (gethash (id) *CATEGORY*)))
+                            (cons-hash-list *POST*))
+        :fields            '(title date photo-announce announce
+                             (:btn  "Страница новости"
+                              :perm :all
+                              :act  (to "/post/~A" (caar (form-data))))))))
+
+    ;; Новости/Новые технологии
+    (:place                posts
+     :url                  "/posts"
+     :navpoint             "Новые технологии"
+     :actions
+     '((:caption           "Новые технологии"
+        :grid              t
+        :perm              :all
+        :entity            post
+        :val               (remove-if-not #'(lambda (x)
+                                              (equal (category (cdr x))
+                                                     (gethash (id) *CATEGORY*)))
+                            (cons-hash-list *POST*))
+        :fields            '(title date photo-announce announce
+                             (:btn  "Страница новости"
+                              :perm :all
+                              :act  (to "/post/~A" (caar (form-data))))))))
+
+
     ;; Новость
     (:place                post
      :url                  "/post/:id"
