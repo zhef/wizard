@@ -44,9 +44,6 @@
      :password (format nil "exp~A" i)))
 
 (push-hash *POST* 'POST
-	   :title "fuck off config emacs"
-	   :text "i hate this shit"
-	   :announce "motherfucking")
   
 
 ;; BUILDERS

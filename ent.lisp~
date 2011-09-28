@@ -34,9 +34,8 @@
     :list-of-links        ;; список связанных сущностей
     :list-of-keys         ;; выпадающий список ключей, с выбором одного из них
     :text-box             ;; текстовое поле
-    :date                 ;; дата и время
+    :date                 ;; дата
     :interval             ;; диапазоны дат, относящиеся к тендеру
-    :img                  ;; изображения, картинки
     ))
 
 ;; Сущности, используемые в программе, по ним строятся объекты и контейнеры, в которых они хранятся.
@@ -67,22 +66,6 @@
       :delete              :admin
       :view                (or :admin :self)
       :update              (or :admin :self)))
-
-  ;; Новости  
-    (:entity               post
-     :container            post
-     :fields
-     ((title               "Название новости"           (:str))
-      (date                "Дата и время"               (:date))
-      (photo-announce      "Фото в анонсе"              (:img))
-      (announce            "Анонс"                      (:str))
-      (photo-text          "Фото в тексте"              (:img))
-      (text                "Текст"                      (:str)))
-     :perm
-     (:create              :admin
-      :delete              :admin
-      :view                :all
-      :update              :admin))
 
     ;; Поставщик
     (:entity               supplier
@@ -352,26 +335,10 @@
      :actions
      '((:caption           "Главная страница"
         :perm              :all)))
-
     ;; Новости
-    (:place                posts
-     :url                  "/posts"
+    (:place                news
+     :url                  "/news"
      :navpoint             "Новости"
-     :actions
-     '((:caption           "Анонсы"
-        :grid              t
-        :perm              :all
-        :entity            post
-        :val               (cons-hash-list *POST*)
-        :fields            '(title date photo-announce announce 
-                             (:btn  "Страница новости"
-                              :perm :all
-                              :act  (to "/post/~A" (caar (form-data))))))))
-   
-    ;; Новость
-    (:place                post
-     :url                  "/post/:id"
-     :navpoint             "Содержимое новости"
      :actions
      '((:caption           "Новости"
         :perm              :all)))
@@ -531,10 +498,11 @@
         :grid              t
         :perm              :all
         :entity            expert
+        :grid              t
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'EXPERT)) (cons-hash-list *USER*))
         :fields            '(name login
                              (:btn  "Страница эксперта"
-                              :perm (or :admin :self)
+                              :perm :all ;; (or :admin :self)
                               :act  (to "/expert/~A" (caar (form-data))))
                              (:btn  "Доп кнопка"
                               :perm (or :admin :self)
