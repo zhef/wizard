@@ -17,6 +17,16 @@
 ;; Разрешения полей перекрывают разрешения определенные для сущности, если они есть, иначе поля получают разрешения общие для сущности.
 
 
+;; Возможные действия над объектами
+(defparameter *perm-actions*
+    '(:create   ;; Создание
+      :delete   ;; Удаление
+      :view     ;; Отображение
+      :show     ;; Отображение в составе коллекции
+      :update   ;; Изменение
+      ))
+
+
 (defun perm-check (perm subj obj)
   (cond ((consp    perm)
          (loop :for item :in perm :collect (perm-check item subj obj)))
@@ -63,18 +73,20 @@
           do (sleep *safe-write-sleep*))
     (close stream)))
 
+(defclass DYMMY (entity)
+  ((DYMMY                  :initarg :LOGIN               :initform nil :accessor A-LOGIN)))
 
-(defun check-perm (perm subj obj)
+
+(defun check-perm (perm subj &optional (obj (make-instance 'DYMMY)))
   (let ((rs (perm-check perm subj obj)))
     (safe-write (path "perm-log.txt") (format nil "~A := ~A (~A : ~A)~%" perm rs subj obj))
     (eval rs)
   ;; t
   ))
 
-;; (check-perm '(or :ADMIN :SELF) (gethash 0 *USER*) (gethash 1 *USER*))
-
 
 ;; TEST
+;; (check-perm '(or :ADMIN :SELF) (gethash 0 *USER*) (gethash 1 *USER*))
 ;; (perm-check '(or :admin (and :all :nobody)) 1 2)
 ;; (check-perm '(or :admin (or :all :nobody)) 1 2)
 ;; (check-perm ':nobody 1 2)

@@ -66,9 +66,10 @@
      (:create              :admin
       :delete              :admin
       :view                (or :admin :self)
+      :show                (or :admin :self)
       :update              (or :admin :self)))
 
-  ;; Новости  
+  ;; Новости
     (:entity               post
      :container            post
      :fields
@@ -359,15 +360,15 @@
      :navpoint             "Новости"
      :actions
      '((:caption           "Анонсы"
-        :grid              t
+        :showtype          :grid
         :perm              :all
         :entity            post
         :val               (cons-hash-list *POST*)
-        :fields            '(title date photo-announce announce 
+        :fields            '(title date photo-announce announce
                              (:btn  "Страница новости"
                               :perm :all
                               :act  (to "/post/~A" (caar (form-data))))))))
-   
+
     ;; Новость
     (:place                post
      :url                  "/post/:id"
@@ -421,7 +422,7 @@
      :actions
      '((:caption           "Ресурсы"
         :perm              :all
-        :grid              t
+        :showtype          :grid
         :entity            resource
         :val               (cons-hash-list *RESOURCE*)
         :fields            '(name resource-type unit
@@ -481,6 +482,7 @@
         :val               (remove-if-not #'(lambda (x)
                                               (equal 'expert (type-of (cdr x))))
                             (cons-hash-list *USER*))
+        :showtype          :grid
         :fields            '(name login
                              (:btn "Удалить"
                               :popup '(:caption            "Действительно удалить?"
@@ -503,7 +505,8 @@
                               :perm :all)
                              (:btn "Страница эксперта"
                               :act (to "/expert/~A" (caar (form-data)))
-                              :perm :all)))
+                              :perm :all)
+                             ))
        (:caption           "Заявки поставщиков на добросовестность"
         :perm              :admin
         :entity            supplier
@@ -528,7 +531,7 @@
      :navpoint             "Эксперты"
      :actions
      '((:caption           "Эксперты"
-        :grid              t
+        :showtype          :grid
         :perm              :all
         :entity            expert
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'EXPERT)) (cons-hash-list *USER*))
@@ -555,7 +558,7 @@
      :navpoint             "Поставщики"
      :actions
      '((:caption           "Организации-поставщики"
-        :grid              t
+        :showtype          :grid
         :perm              :all
         :entity            supplier
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'SUPPLIER))  (cons-hash-list *USER*))
@@ -687,7 +690,7 @@
      :navpoint             "Распродажи"
      :actions
      '((:caption           "Распродажи"
-        :grid              t
+        :showtype          :grid
         :perm              :all
         :entity            sale
         :val               (cons-hash-list *SALE*)
@@ -750,7 +753,7 @@
      :navpoint             "Застройщики"
      :actions
      '((:caption           "Организации-застройщики"
-        :grid              t
+        :showtype          :grid
         :perm              :all
         :entity            builder
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'BUILDER)) (cons-hash-list *USER*))
@@ -810,7 +813,7 @@
      :navpoint             "Тендеры"
      :actions
      '((:caption           "Тендеры"
-        :grid              t
+        :showtype          :grid
         :perm              :all
         :entity            tender
         :val               (cons-hash-list *TENDER*)
@@ -991,7 +994,7 @@
      :navpoint             "Заявки на участие в тендере"
      :actions
      '((:caption           "Заявки на участие в тендере"
-        :grid              t
+        :showtype          :grid
         :perm              :all
         :entity            offer
         :val               (cons-hash-list *OFFER*)

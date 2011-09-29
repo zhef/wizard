@@ -86,7 +86,8 @@
 (defun gen-action (action)
   (let* ((controllers)
          (ajaxdataset)
-         (grid     (when (getf action :grid) (string-downcase (symbol-name (gensym "JG")))))
+         (grid     (when (equal (getf action :showtype) :grid)
+                     (string-downcase (symbol-name (gensym "JG")))))
          (perm     (subseq (with-output-to-string (*standard-output*) (pprint (getf action :perm))) 1))
          (caption  (getf action :caption))
          (val      (subseq (with-output-to-string (*standard-output*) (pprint (getf action :val))) 1))
@@ -190,8 +191,7 @@
                             (car controller)
                             (subseq (with-output-to-string (*standard-output*) (pprint (cadr controller))) 1)
                             )))
-         ;; (loop :for aja :in ajaxdataset :do                  ;;
-         ;;    (format t "~%~A | ~A" (car aja) (cadr aja)))     ;;
+         ;; (format t "~%~A" ajaxdataset)                       ;;
          (unless (null ajaxdataset)
            (format out "~%~%(restas:define-route ~A-page/ajax (\"/~A\")"
                    (string-downcase (getf place :place))
