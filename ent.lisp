@@ -366,7 +366,7 @@
         :val               (cons-hash-list *POST*)
         :fields            '(title date photo-announce announce
                              (:btn  "Страница новости"
-                              :perm :all
+                              :permlist '(:show :all :view :all)
                               :act  (to "/post/~A" (caar (form-data))))))))
 
     ;; Новость
@@ -388,8 +388,8 @@
         :val               (cons-hash-list *CATEGORY*)
         :fields            '(name ;; parent child-categoryes
                              (:btn "Показать ресурсы"
-                              :act (to "/category/~A" (caar (form-data)))
-                              :perm :all)))))
+                              :permlist '(:show :all :view :all)
+                              :act (to "/category/~A" (caar (form-data))))))))
 
     ;; Каталог ресурсов - содержимое категории
     (:place                category
@@ -402,8 +402,8 @@
         :fields            '(name
                              ;; parent child-categoryes
                              (:btn "Показать ресурсы"
-                              :act (to "/category/~A" (caar (form-data)))
-                              :perm :all)))
+                              :permlist '(:show :all :view :all)
+                              :act (to "/category/~A" (caar (form-data))))))
        (:caption           "Ресурсы категории"
         :perm              :all
         :entity            resource
@@ -413,8 +413,8 @@
                             (cons-hash-list *RESOURCE*))
         :fields            '(name resource-type unit
                              (:btn "Страница ресурса"
-                              :act (to "/resource/~A" (caar (form-data)))
-                              :perm :all)))))
+                              :permlist '(:show :all :view :all)
+                              :act (to "/resource/~A" (caar (form-data))))))))
     ;; Линейный список ресурсов
     (:place                resources
      :url                  "/resource"
@@ -427,16 +427,16 @@
         :val               (cons-hash-list *RESOURCE*)
         :fields            '(name resource-type unit
                              (:btn "Страница категории"
+                              :permlist '(:show :all :view :all)
                               :act (HUNCHENTOOT:REDIRECT
                                     (FORMAT NIL "/category/~A"
                                             (let ((etalon (a-category (gethash (GET-BTN-KEY (CAAR (form-data))) *RESOURCE*))))
                                               (car (find-if #'(lambda (category-cons)
                                                                 (equal (cdr category-cons) etalon))
-                                                            (cons-hash-list *CATEGORY*))))))
-                              :perm :all)
+                                                            (cons-hash-list *CATEGORY*)))))))
                              (:btn "Страница ресурса"
-                              :act (to "/resource/~A" (caar (form-data)))
-                              :perm :all)))))
+                              :permlist '(:show :all :view :all)
+                              :act (to "/resource/~A" (caar (form-data))))))))
     ;; Страница ресурса (ресурсы редактированию не подвергаются)
     (:place                resource
      :url                  "/resource/:id"
@@ -458,24 +458,24 @@
         :val               (cur-user)
         :fields            '(login password
                              (:btn "Изменить пароль"
+                              :permlist '(:show :all :view :all)
                               :act (let ((obj (cur-user)))
                                      (with-obj-save obj
                                        LOGIN
-                                       PASSWORD))
-                              :perm :all)))
+                                       PASSWORD)))))
        (:caption           "Создать аккаунт эксперта"
         :perm              :admin
         :entity            expert
         :val               :clear
         :fields            '(login password name
                              (:btn "Создать новый аккаунт эксперта"
+                              :permlist '(:show :all :view :all)
                               :act (progn
                                      (push-hash *USER* 'EXPERT
                                        :login (cdr (assoc "LOGIN" (form-data) :test #'equal))
                                        :password (cdr (assoc "PASSWORD" (form-data) :test #'equal))
                                        :name (cdr (assoc "NAME" (form-data) :test #'equal)))
-                                     (hunchentoot:redirect (hunchentoot:request-uri*)))
-                              :perm :all)))
+                                     (hunchentoot:redirect (hunchentoot:request-uri*))))))
        (:caption           "Эксперты"
         :perm              :admin
         :entity            expert
@@ -485,15 +485,17 @@
         :showtype          :grid
         :fields            '(name login
                              (:btn "Удалить"
+                              :permlist '(:show :all :view :all)
                               :popup '(:caption            "Действительно удалить?"
                                        :entity             expert
-                                       :perm               :admin
+                                       :permlist           '(:show :admin
+                                                             :view :admin)
                                        :fields             '((:btn "Подтверждаю удаление"
                                                               :act (let ((key (get-btn-key (caar (form-data)))))
                                                                      (remhash key *USER*)
-                                                                     (hunchentoot:redirect (hunchentoot:request-uri*))))))
-                              :perm :all)
+                                                                     (hunchentoot:redirect (hunchentoot:request-uri*)))))))
                              (:btn "Сменить пароль"
+                              :permlist '(:show :all :view :all)
                               :popup '(:caption           "Смена пароля эксперта"
                                        :entity            expert
                                        :perm              :admin
@@ -501,29 +503,29 @@
                                                             (:btn "Изменить пароль эксперта"
                                                              :act (let ((obj (gethash (get-btn-key (caar (last (form-data)))) *USER*)))
                                                                     (with-obj-save obj
-                                                                      PASSWORD)))))
-                              :perm :all)
+                                                                      PASSWORD))))))
                              (:btn "Страница эксперта"
-                              :act (to "/expert/~A" (caar (form-data)))
-                              :perm :all)
+                              :permlist '(:show :all :view :all)
+                              :act (to "/expert/~A" (caar (form-data))))
                              ))
        (:caption           "Заявки поставщиков на добросовестность"
         :perm              :admin
         :entity            supplier
+        :showtype          :grid
         :val               (remove-if-not #'(lambda (x)
                                               (and (equal 'supplier (type-of (cdr x)))
                                                    (equal (a-status (cdr x)) :request)))
                             (cons-hash-list *USER*))
         :fields            '(name login
                              (:btn "Подтвердить заявку"
+                              :permlist '(:show :all :view :all)
                               :popup '(:caption           "Подтвердить заявку поставщика"
                                        :perm               :admin
                                        :entity             supplier
                                        :fields             '((:btn "Сделать добросовестным"
                                                               :act (let ((key (get-btn-key (caar (form-data)))))
                                                                      (setf (a-status (gethash key *USER*)) :fair)
-                                                                     (hunchentoot:redirect (hunchentoot:request-uri*))))))
-                              :perm :all)))))
+                                                                     (hunchentoot:redirect (hunchentoot:request-uri*)))))))))))
 
     ;; Список экспертов
     (:place                experts
@@ -537,10 +539,10 @@
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'EXPERT)) (cons-hash-list *USER*))
         :fields            '(name login
                              (:btn  "Страница эксперта"
-                              :perm (or :admin :self)
+                              :permlist '(:show (or :admin :self) :view (or :admin :self))
                               :act  (to "/expert/~A" (caar (form-data))))
                              (:btn  "Доп кнопка"
-                              :perm (or :admin :self)
+                              :permlist '(:show (or :admin :self) :view (or :admin :self))
                               :act  (to "/expert/~A" (caar (form-data))))))))
     ;; Страница эксперта
     (:place                expert
@@ -564,8 +566,8 @@
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'SUPPLIER))  (cons-hash-list *USER*))
         :fields            '(name login
                              (:btn "Страница поставщика"
-                              :act (to "/supplier/~A" (caar (form-data)))
-                              :perm :all)))))
+                              :permlist '(:show :all :view :all)
+                              :act (to "/supplier/~A" (caar (form-data))))))))
     ;; Страница поставщика
     (:place                supplier
      :url                  "/supplier/:id"
@@ -576,23 +578,23 @@
         :val               (cur-user)
         :fields            '(login password
                              (:btn "Изменить пароль"
+                              :permlist '(:show :all :view :all)
                               :act (let ((obj (cur-user)))
                                      (with-obj-save obj
                                        LOGIN
-                                       PASSWORD))
-                              :perm :all)))
+                                       PASSWORD)))))
        (:caption           "Поставщик"
         :entity            supplier
         :val               (gethash (cur-id) *USER*)
         :fields            '(name status juridical-address actual-address contacts email site heads inn kpp ogrn
                              bank-name bik corresp-account client-account addresses contact-person
                              (:btn "Сохранить"
+                              :permlist '(:show :all :view :all)
                               :act (let ((obj (gethash (cur-id) *USER*)))
                                      (with-obj-save obj
                                        NAME JURIDICAL-ADDRESS ACTUAL-ADDRESS CONTACTS EMAIL SITE HEADS INN KPP OGRN BANK-NAME
                                        BIK CORRESP-ACCOUNT CLIENT-ACCOUNT ADDRESSES CONTACT-PERSON)
-                                     (hunchentoot:redirect (hunchentoot:request-uri*)))
-                              :perm :all)
+                                     (hunchentoot:redirect (hunchentoot:request-uri*))))
                              ;; resources
                              (:col               "Список поставляемых ресурсов"
                               :perm              222
@@ -600,21 +602,23 @@
                               :val               (cons-inner-objs *SUPPLIER-RESOURCE-PRICE* (a-resources (gethash (cur-id) *USER*)))
                               :fields            '(resource price
                                                    (:btn "Удалить"
+                                                    :permlist '(:show :all :view :all)
                                                     :popup '(:caption           "Удаление ресурса"
                                                              :perm              :admin
                                                              :entity            supplier-resource-price
                                                              :fields            '((:btn "Удалить ресурс"
+                                                                                   :permlist '(:show :all :view :all)
                                                                                    :act (del-inner-obj
                                                                                          (caar (form-data))
                                                                                          *SUPPLIER-RESOURCE-PRICE*
-                                                                                         (a-resources (gethash (cur-id) *USER*)))
-                                                                                   :perm :all)))
-                                                    :perm :all)))
+                                                                                         (a-resources (gethash (cur-id) *USER*)))))))))
                              (:btn "Добавить ресурс"
+                              :permlist '(:show :all :view :all)
                               :popup '(:caption            "Добавление ресурса"
                                        :perm               111
                                        :entity             supplier-resource-price
                                        :fields             '((:btn "Добавить ресурс"
+                                                              :permlist '(:show :all :view :all)
                                                               :act
                                                               (progn
                                                                 (push-hash *SUPPLIER-RESOURCE-PRICE* 'SUPPLIER-RESOURCE-PRICE
@@ -623,9 +627,7 @@
                                                                              (cdr (assoc "res" (form-data) :test #'equal))
                                                                              *RESOURCE*)
                                                                   :price (cdr (assoc "PRICE" (form-data) :test #'equal)))
-                                                                (hunchentoot:redirect (hunchentoot:request-uri*)))
-                                                              :perm :all)))
-                              :perm :all)
+                                                                (hunchentoot:redirect (hunchentoot:request-uri*)))))))
                               ;; offers
                              (:col               "Список заявок на тендеры"
                               :perm              222
@@ -633,19 +635,19 @@
                               :val               (cons-inner-objs *OFFER* (a-offers (gethash (cur-id) *USER*)))
                               :fields            '(tender
                                                    (:btn "Страница заявки"
-                                                    :act (to "/offer/~A" (caar (form-data)))
-                                                    :perm :all)
+                                                    :permlist '(:show :all :view :all)
+                                                    :act (to "/offer/~A" (caar (form-data))))
                                                    (:btn "Удалить заявку"
+                                                    :permlist '(:show :all :view :all)
                                                     :popup '(:caption           "Удаление заявки"
                                                              :perm              :admin
                                                              :entity            supplier-resource-price
                                                              :fields            '((:btn "Удалить заявку"
+                                                                                   :permlist '(:show :all :view :all)
                                                                                    :act (del-inner-obj
                                                                                          (caar (form-data))
                                                                                          *OFFER*
-                                                                                         (a-offers (gethash (cur-id) *USER*)))
-                                                                                   :perm :all)))
-                                                    :perm :all)))
+                                                                                         (a-offers (gethash (cur-id) *USER*)))))))))
                              ;; sale
                              (:col               "Список распродаж"
                               :perm              222
@@ -653,36 +655,36 @@
                               :val               (cons-inner-objs *SALE* (a-sales (gethash (cur-id) *USER*)))
                               :fields            '(name
                                                    (:btn "Страница распродажи"
-                                                    :act (to "/sale/~A"  (caar (form-data)))
-                                                    :perm :all)
+                                                    :permlist '(:show :all :view :all)
+                                                    :act (to "/sale/~A"  (caar (form-data))))
                                                    (:btn "Удалить распродажу"
+                                                    :permlist '(:show :all :view :all)
                                                     :popup '(:caption           "Удаление распродажи"
                                                              :perm              :admin
                                                              :entity            supplier-resource-price
                                                              :fields            '((:btn "Удалить распродажу"
+                                                                                   :permlist '(:show :all :view :all)
                                                                                    :act (del-inner-obj
                                                                                          (caar (form-data))
                                                                                          *SALE*
-                                                                                         (a-sales (gethash (cur-id) *USER*)))
-                                                                                   :perm :all)))
-                                                    :perm :all)))
+                                                                                         (a-sales (gethash (cur-id) *USER*)))))))))
                              (:btn "Добавить распродажу"
+                              :permlist '(:show :all :view :all)
                               :popup '(:caption            "Добавление расподажи"
                                        :perm               222
                                        :entity             sale
                                        :fields             '((:btn "Добавить распродажу"
-                                                              :act (create-sale)
-                                                              :perm :all)))
-                              :perm :all)))
+                                                              :permlist '(:show :all :view :all)
+                                                              :act (create-sale)))))))
        (:caption           "Отправить заявку на добросовестность" ;; заявка на статус добросовестного поставщика (изменяет статус поставщика)
         :perm              (and :self :unfair)
         :entity            supplier
         :val               (gethash (cur-id) *USER*)
         :fields            '((:btn "Отправить заявку на добросовестность"
+                              :permlist '(:show :all :view :all)
                               :act (progn
                                      (setf (a-status (gethash (cur-id) *USER*)) :request)
-                                     (hunchentoot:redirect (hunchentoot:request-uri*)))
-                              :perm :all)))))
+                                     (hunchentoot:redirect (hunchentoot:request-uri*))))))))
 
     ;; Распродажи
     (:place                sales
@@ -696,8 +698,8 @@
         :val               (cons-hash-list *SALE*)
         :fields            '(name
                              (:btn "Страница распродажи"
-                              :act (to "/sale/~A" (caar (form-data)))
-                              :perm :all)))))
+                              :permlist '(:show :all :view :all)
+                              :act (to "/sale/~A" (caar (form-data))))))))
 
     ;; Страница распродажи
     (:place                sale
@@ -741,11 +743,11 @@
                              ;;                                    (hunchentoot:redirect (hunchentoot:request-uri*)))
                              ;;                                  ))))
                               (:btn "Сохранить"
-                               :act (save-sale)
-                               :perm :all)
+                               :permlist '(:show :all :view :all)
+                               :act (save-sale))
                               (:btn "Удалить распродажу"
-                               :act (delete-sale)
-                               :perm :all)))))
+                               :permlist '(:show :all :view :all)
+                               :act (delete-sale))))))
 
     ;; Список застройщиков
     (:place                builders
@@ -759,8 +761,8 @@
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'BUILDER)) (cons-hash-list *USER*))
         :fields            '(name login
                              (:btn  "Страница застройщика"
-                              :act  (to "/builder/~A" (caar (form-data)))
-                              :perm :all)))))
+                              :permlist '(:show :all :view :all)
+                              :act  (to "/builder/~A" (caar (form-data))))))))
     ;; Страница застройщика
     (:place                builder
      :url                  "/builder/:id"
@@ -770,24 +772,25 @@
         :val               (gethash (cur-id) *USER*)
         :fields            '(name juridical-address inn kpp ogrn bank-name bik corresp-account client-account rating
                              (:btn "Сохранить"
+                              :permlist '(:show :all :view :all)
                               :act (let ((obj (gethash (cur-id) *USER*)))
                                      (with-obj-save obj
-                                       NAME JURIDICAL-ADDRESS INN KPP OGRN BANK-NAME BIK CORRESP-ACCOUNT CLIENT-ACCOUNT RATING))
-                              :perm :all)
+                                       NAME JURIDICAL-ADDRESS INN KPP OGRN BANK-NAME BIK CORRESP-ACCOUNT CLIENT-ACCOUNT RATING)))
                              ;; tenders
                              (:col              "Тендеры застройщика"
                               :perm             222
                               :entity           tender
                               :val              (cons-inner-objs *TENDER* (a-tenders (gethash 11 *USER*)))
                               :fields           '(name (:btn "Страница тендера"
-                                                        :act (to "/tender/~A" (caar (last (form-data))))
-                                                        :perm :all)))))
+                                                        :permlist '(:show :all :view :all)
+                                                        :act (to "/tender/~A" (caar (last (form-data)))))))))
        (:caption           "Объявить новый тендер"
         :perm              :self
         :entity            tender
         :val               :clear
         :fields            '(name all claim analize interview result
                              (:btn "Объявить тендер (+)"
+                              :permlist '(:show :all :view :all)
                               :act
                               ;; (format nil "~A" (form-data))
                               (let ((id (hash-table-count *TENDER*)))
@@ -804,7 +807,6 @@
                                                           ))
                                      (hunchentoot:redirect
                                       (format nil "/tender/~A" id)))
-                              :perm :all
                               )))))
 
     ;; Список тендеров
@@ -819,8 +821,8 @@
         :val               (cons-hash-list *TENDER*)
         :fields            '(name status owner
                              (:btn "Страница тендера"
-                              :act (to "/tender/~A" (caar (form-data)))
-                              :perm :all)
+                              :permlist '(:show :all :view :all)
+                              :act (to "/tender/~A" (caar (form-data))))
                              ))))
     ;; Страница тендера (поставщик может откликнуться)
     (:place                tender
@@ -831,10 +833,10 @@
         :val               (gethash (cur-id) *TENDER*)
         :fields            '(name status owner active-date all claim analize interview result ;; winner price
                              (:btn "Сохранить"
+                              :permlist '(:show :all :view :all)
                               :act (let ((obj (gethash (cur-id) *TENDER*)))
                                      (with-obj-save obj
-                                       name active-date all claim analize interview result))
-                              :perm :all)
+                                       name active-date all claim analize interview result)))
                              ;; resources
                              (:col              "Ресурсы тендера"
                               :perm             222
@@ -842,17 +844,18 @@
                               :val              (cons-inner-objs *RESOURCE* (a-resources (gethash (cur-id) *TENDER*)))
                               :fields '(name
                                         (:btn   "Удалить из тендера"
+                                         :permlist '(:show :all :view :all)
                                          :act   (let ((etalon (gethash (get-btn-key (caar (last (form-data)))) *RESOURCE*)))
                                                   (setf (a-resources (gethash (cur-id) *TENDER*))
                                                         (remove-if #'(lambda (x)
                                                                        (equal x etalon))
                                                                    (a-resources (gethash (cur-id) *TENDER*))))
-                                                  (hunchentoot:redirect (hunchentoot:request-uri*)))
-                                         :perm  :all)
+                                                  (hunchentoot:redirect (hunchentoot:request-uri*))))
                                         (:btn   "Страница ресурса"
-                                         :act   (to "/resource/~A" (caar (last (form-data))))
-                                         :perm  :all)))
+                                         :permlist '(:show :all :view :all)
+                                         :act   (to "/resource/~A" (caar (last (form-data)))))))
                              (:btn "Добавить ресурс"
+                              :permlist '(:show :all :view :all)
                               :popup '(:caption           "Выберите ресурсы"
                                        :perm              (and :active :fair)
                                        :entity            resource
@@ -864,17 +867,14 @@
                                                              :val (cons-hash-list *RESOURCE*)
                                                              :fields '(name
                                                                        (:btn "Добавить ресурс"
+                                                                        :permlist '(:show :all :view :all)
                                                                         :act
                                                                         ;; (format nil "~A" (get-btn-key (caar (last (form-data)))))
                                                                         (progn
                                                                           (push
                                                                            (gethash (get-btn-key (caar (last (form-data)))) *RESOURCE*)
                                                                            (a-resources (gethash (cur-id) *TENDER*)))
-                                                                          (hunchentoot:redirect (hunchentoot:request-uri*)))
-                                                                        ))
-                                                             )))
-                              :perm :all)
-
+                                                                          (hunchentoot:redirect (hunchentoot:request-uri*)))))))))
 
                              ;; documents
                              (:col              "Документы тендера"
@@ -883,12 +883,13 @@
                               :val              (cons-inner-objs *DOCUMENT* (a-documents (gethash (cur-id) *TENDER*)))
                               :fields '(name
                                         (:btn   "Удалить из тендера"
-                                         :act   (delete-doc-from-tender)
-                                         :perm  :all)
+                                         :permlist '(:show :all :view :all)
+                                         :act   (delete-doc-from-tender))
                                         (:btn   "Страница документа"
-                                         :act   (to "/document/~A" (caar (last (form-data))))
-                                         :perm  :all)))
+                                         :permlist '(:show :all :view :all)
+                                         :act   (to "/document/~A" (caar (last (form-data)))))))
                              (:btn "Добавить документ"
+                              :permlist '(:show :all :view :all)
                               :popup '(:caption           "Загрузите документ"
                                        :perm              (and :active :fair)
                                        :entity            resource
@@ -900,6 +901,7 @@
                                                              :val (cons-hash-list *RESOURCE*)
                                                              :fields '(name
                                                                        (:btn "Добавить ресурс"
+                                                                        :permlist '(:show :all :view :all)
                                                                         :act
                                                                         ;; (format nil "~A" (get-btn-key (caar (last (form-data)))))
                                                                         (progn
@@ -907,9 +909,7 @@
                                                                            (gethash (get-btn-key (caar (last (form-data)))) *RESOURCE*)
                                                                            (a-resources (gethash (cur-id) *TENDER*)))
                                                                           (hunchentoot:redirect (hunchentoot:request-uri*)))
-                                                                        ))
-                                                             )))
-                              :perm :all)
+                                                                        ))))))
 
 
 
@@ -946,28 +946,29 @@
                                                   rs)
                               :fields '(name
                                         (:btn "Отправить приглашение"
-                                         :act (delete-from-tender)
-                                         :perm :all)
+                                         :permlist '(:show :all :view :all)
+                                         :act (delete-from-tender))
                                         (:btn "Страница поставщика"
-                                         :act (to "/supplier/~A"  (caar (last (form-data))))
-                                         :perm :all)))
+                                         :permlist '(:show :all :view :all)
+                                         :act (to "/supplier/~A"  (caar (last (form-data)))))))
                              (:btn "Добавить своего поставщика"
-                              :act (add-document-to-tender)
-                              :perm :all)
+                              :permlist '(:show :all :view :all)
+                              :act (add-document-to-tender))
                              ;; oferts
                              (:col              "Заявки на тендер"
                               :perm             111
                               :entity           offer
                               :val              (cons-inner-objs *OFFER* (a-offers (gethash (cur-id) *TENDER*)))
                               :fields '((:btn "Страница заявки"
-                                         :act (to "/offer/~A"  (caar (last (form-data))))
-                                         :perm :all)))
+                                         :permlist '(:show :all :view :all)
+                                         :act (to "/offer/~A"  (caar (last (form-data)))))))
                              ;;
                              (:btn "Ответить заявкой на тендер"
                               :popup '(:caption           "Выберите ресурсы"
                                        :perm              (and :active :fair)
                                        :entity            resource
                                        :fields            '((:btn "Участвовать в тендере"
+                                                             :permlist '(:show :all :view :all)
                                                              :act
                                                              (let* ((id    (hash-table-count *OFFER*))
                                                                     (offer (setf (gethash id *OFFER*)
@@ -975,18 +976,16 @@
                                                                                                 :owner (cur-user)
                                                                                                 :tender (gethash (cur-id) *TENDER*)))))
                                                                (push offer (a-offers (gethash (cur-id) *TENDER*)))
-                                                               (hunchentoot:redirect (format nil "/offer/~A" id))))
-                                                            :perm :all)))
+                                                               (hunchentoot:redirect (format nil "/offer/~A" id)))))))
                              ;;
                              (:btn "Отменить тендер"
+                              :permlist '(:show :all :view :all)
                               :popup '(:caption           "Действительно отменить?"
                                        :perm               :owner
                                        :entity             tender
                                        :fields             '((:btn "Подтверждаю отмену"
                                                               :act (hunchentoot:redirect (format nil "/tender"))
-                                                              :perm :all)))
-                              :perm  :all)
-                             ))))
+                                                              :perm :all))))))))
 
     ;; Заявки на тендер
     (:place                offers
@@ -1000,8 +999,8 @@
         :val               (cons-hash-list *OFFER*)
         :fields            '(owner tender
                              (:btn "Страница заявки"
-                              :act (to "/offer/~A" (caar (form-data)))
-                              :perm :all)))))
+                              :permlist '(:show :all :view :all)
+                              :act (to "/offer/~A" (caar (form-data))))))))
 
     ;; Страница заявки на тендер
     (:place                offer
@@ -1018,11 +1017,11 @@
                               :val              (cons-inner-objs *OFFER-RESOURCE* (a-resources (gethash (cur-id) *OFFER*)))
                               :fields '(resource price
                                         (:btn   "Удалить из оферты"
+                                         :permlist '(:show :all :view :all)
                                          :act   (del-inner-obj
                                                  (caar (last (form-data)))
                                                  *OFFER-RESOURCE*
-                                                 (a-resources (gethash (cur-id) *OFFER*)))
-                                         :perm  :all)
+                                                 (a-resources (gethash (cur-id) *OFFER*))))
                                          ;; (let* ((id (get-btn-key (caar (last (form-data)))))
                                          ;;               (etalon (gethash id *OFFER-RESOURCE*)))
                                          ;;          (setf (a-resources (gethash (cur-id) *OFFER*))
@@ -1031,9 +1030,10 @@
                                          ;;                           (a-resources (gethash (cur-id) *OFFER*)))
 
                                         (:btn   "Страница ресурса"
-                                         :act   (to "/resource/~A" (caar (last (form-data))))
-                                         :perm  :all)))
+                                         :permlist '(:show :all :view :all)
+                                         :act   (to "/resource/~A" (caar (last (form-data)))))))
                              (:btn "Добавить ресурс"
+                              :permlist '(:show :all :view :all)
                               :popup '(:caption           "Выберите ресурсы"
                                        :perm              (and :active :fair)
                                        :entity            resource
@@ -1045,12 +1045,14 @@
                                                              :val (cons-hash-list *RESOURCE*)
                                                              :fields '(name
                                                                        (:btn "Добавить ресурс"
+                                                                        :permlist '(:show :all :view :all)
                                                                         :popup '(:caption "Укажите цену"
                                                                                  :perm    1111
                                                                                  :entity  resource
                                                                                  :val     :clear
                                                                                  :fields  '((:calc "<input type=\"text\" name=\"INPRICE\" />")
                                                                                             (:btn "Задать цену"
+                                                                                             :permlist '(:show :all :view :all)
                                                                                              :act
                                                                                              (let ((res-id (get-btn-key(caar (last (form-data)))))
                                                                                                    (in (cdr (assoc "INPRICE" (form-data) :test #'equal)))
@@ -1064,10 +1066,7 @@
                                                                                                                      :price in))
                                                                                                 (a-resources (gethash (cur-id) *OFFER*)))
                                                                                                (hunchentoot:redirect (hunchentoot:request-uri*)))
-                                                                                             :perm :all
-                                                                                             )))
-                                                                        :perm :all)))))
-                              :perm :all)))))
+                                                                                             )))))))))))))
 
     ;; Рейтинг компаний
     (:place                rating

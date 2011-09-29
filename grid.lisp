@@ -130,7 +130,7 @@
                                                                      t
                                                                      nil)))))) ;; rulez
                       (push model col-model)))
-       :btn     (when (check-perm (getf infld :perm) (cur-user))
+       :btn     (when (check-perm (getf (getf infld :permlist) :show) (cur-user))
                   (let* ((in-name  (getf infld :btn))
                          (in-capt  (getf infld :value))
                          (btn-str  (format nil "\"<form method='post'><input type='submit' name='~A~~\"+cl+\"' value='~A' /></form>\"" in-name in-capt))
@@ -292,25 +292,24 @@
            (push (nth num rows) slice-cons))))
     ;; field-cons (innerloop)
     (loop :for fld :in fields :do
-       (let ((name (getf fld :fld)))
-         (if (null name)
-             ;; btn
-             (let* ((btn       (getf fld :btn))
-                    (perm      (getf fld :perm))
-                    (value     (getf fld :value))
-                    (accessor  (lambda (x)
-                                 (format nil "<form method='post'><input type='submit' name='~A~~%|id|%' value='~A~~%|id|%' /></form>"
-                                         btn
-                                         value))))
-               (push (cons accessor perm) field-cons))
-             ;; fld
-             (let ((perm (getf (getf fld :permlist) :view)))
-               (cond ((equal '(:str) (getf fld :typedata))
-                      (let ((accessor  (find-symbol (format nil "A-~A" name) (find-package "WIZARD"))))
-                        (push (cons accessor perm) field-cons)))
-                     (t ;; default - print unknown type message in grid field
-                      (let ((accessor  (lambda (x) "unknown typedata in grid pager")))
-                        (push (cons accessor perm) field-cons))))))))
+       (when (getf fld :fld)   ;; == when fld
+           (let ((perm (getf (getf fld :permlist) :show)))
+             (cond ((equal '(:str) (getf fld :typedata))
+                    (let ((accessor  (find-symbol (format nil "A-~A" (getf fld :fld)) (find-package "WIZARD"))))
+                      (push (cons accessor perm) field-cons)))
+                   (t ;; default - print unknown type message in grid field
+                    (let ((accessor  (lambda (x) "unknown typedata in grid pager")))
+                      (push (cons accessor perm) field-cons))))))
+       (when (getf fld :btn)   ;; == when btn
+         (let* ((perm      (getf (getf fld :permlist) :show))
+                (btn       (getf fld :btn))                    ;; тут важно чтобы вычисление происходило вне лямбды
+                (value     (getf fld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
+                (accessor  (lambda (x)
+                             (format nil "<form method='post'><input type='submit' name='~A~~%|id|%' value='~A~~%|id|%' /></form>"
+                                     btn
+                                     value))))
+           (push (cons accessor perm) field-cons)))
+         ) ;; end loop field cons (innerloop)
     (values
      ;; result: get values from obj
      (loop :for (id . obj) :in (reverse slice-cons) :collect
