@@ -83,7 +83,7 @@
 
 (defun cur-id ()
   "get current obj"
-  (parse-integer (caddr (request-list))))
+  (parse-integer (car (last (request-list)))))
 
 (defun form-data ()
   "get form data (get/post/ajax unification)"

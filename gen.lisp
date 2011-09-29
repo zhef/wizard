@@ -88,9 +88,9 @@
          (ajaxdataset)
          (grid     (when (equal (getf action :showtype) :grid)
                      (string-downcase (symbol-name (gensym "JG")))))
-         (perm     (subseq (with-output-to-string (*standard-output*) (pprint (getf action :perm))) 1))
+         (perm     (bprint (getf action :perm)))
          (caption  (getf action :caption))
-         (val      (subseq (with-output-to-string (*standard-output*) (pprint (getf action :val))) 1))
+         (val      (bprint (getf action :val)))
          (entity   (getf action :entity))
          (fields   (eval (getf action :fields))))
     (multiple-value-bind (str ctrs)
@@ -103,9 +103,10 @@
                                 str)))
       ;; RET
       (values
-       (format nil "~%~14T (list :perm '~A ~%~20T :grid ~A ~%~20T :title \"~A\"~% ~20T :val (lambda () ~A)~% ~20T :fields ~A)"
+       (format nil "~%~14T (list :showtype ~A ~%~20T :perm '~A ~A ~%~20T :title \"~A\"~% ~20T :val (lambda () ~A)~% ~20T :fields ~A)"
+               (bprint (getf action :showtype))
                perm
-               (unless (null grid) (format nil "\"~A\"" grid))
+               (if (null grid) "" (format nil "~%~20T :grid \"~A\"" grid))
                caption val str)
        controllers
        ajaxdataset))))
@@ -165,7 +166,7 @@
          (push (list :link (getf place :url) :title (getf place :navpoint)) menu))
        (let ((controllers)
              (ajaxdataset))
-         ;; (format t "~%--------::place::[~A]" (getf place :place)) ;;
+         (format t "~%--------::place::[~A]" (getf place :place)) ;;
          (format out "~%~%(restas:define-route ~A-page (\"~A\")"
                  (string-downcase (getf place :place))
                  (getf place :url))
@@ -177,35 +178,33 @@
                         (gen-action action) ;; <-------------------
                       (loop :for ctr :in ctrs :do
                          (setf controllers (append controllers ctr)))
-                      (setf ajaxdataset (append ajaxdataset ajax))
+                      ;; (print ajax) ;;
+                      (unless (null ajax)
+                        (setf ajaxdataset (append ajaxdataset (list ajax))))
                       str)))
                  (format nil  "~%    (show-acts acts))"))
-         ;; (loop :for ctr :in controllers :do                  ;;
-         ;;    (format t "~%~A | ~A" (car ctr) (cadr ctr)))     ;;
-         (format out "~%~%(restas:define-route ~A-page/post (\"~A\" :method :post)"
-                 (string-downcase (getf place :place))
-                 (getf place :url))
-         (format out  "~%  (let ((session (hunchentoot:start-session))~%~7T (acts `(~{~%~A~}))) ~%       (activate acts)))"
-                 (loop :for controller :in controllers :collect
-                    (format nil "(\"~A\" . ,(lambda () ~A))"
-                            (car controller)
-                            (subseq (with-output-to-string (*standard-output*) (pprint (cadr controller))) 1)
-                            )))
-         ;; (format t "~%~A" ajaxdataset)                       ;;
-         (unless (null ajaxdataset)
-           (format out "~%~%(restas:define-route ~A-page/ajax (\"/~A\")"
+         (unless (null controllers) ;; CONTROLLERS
+           ;; (loop :for ctr :in controllers :do                  ;;
+           ;;    (format t "~%~A | ~A" (car ctr) (cadr ctr)))     ;;
+           (format out "~%~%(restas:define-route ~A-page/post (\"~A\" :method :post)"
                    (string-downcase (getf place :place))
-                   (string-downcase (nth 0 ajaxdataset)))
-           (format out "~%  (example-json ~%~2T ~A ~%~2T ~A))"
-                   (nth 1 ajaxdataset)
-                   (nth 2 ajaxdataset))
-           )
-         ;; (format out  "~%  (let ((session (hunchentoot:start-session))~%~7T (acts `(~{~%~A~}))) ~%       (activate acts)))"
-         ;;         (loop :for controller :in controllers :collect
-         ;;            (format nil "(\"~A\" . ,(lambda () ~A))"
-         ;;                    (car controller)
-         ;;                    (subseq (with-output-to-string (*standard-output*) (pprint (cadr controller))) 1)
-         ;;                    )))
+                   (getf place :url))
+           (format out  "~%  (let ((session (hunchentoot:start-session))~%~7T (acts `(~{~%~A~}))) ~%       (activate acts)))"
+                   (loop :for controller :in controllers :collect
+                      (format nil "(\"~A\" . ,(lambda () ~A))"
+                              (car controller)
+                              (bprint (cadr controller))
+                              ))))
+         ;; (format t "~%~A" (bprint ajaxdataset))                   ;;
+         (unless (null ajaxdataset) ;; AJAXDATASET
+           (loop :for ajax :in ajaxdataset :do
+                (format out "~%~%(restas:define-route ~A-page/ajax (\"/~A\")"
+                        (string-downcase (getf place :place))
+                        (string-downcase (nth 0 ajax)))
+                (format out "~%  (example-json ~%~2T ~A ~%~2T ~A))"
+                        (nth 1 ajax)
+                        (nth 2 ajax))
+           ))
          ))
     (format out "~%~%~%(defun menu ()  '")
     (pprint (reverse menu) out)

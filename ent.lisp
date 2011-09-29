@@ -264,6 +264,7 @@
      (:create :system
       :delete :system
       :view   :all
+      :show   :all
       :update :system))
 
 
@@ -280,6 +281,7 @@
      (:create :system
       :delete :system
       :view   :all
+      :show   :all
       :update :system))
 
 
@@ -356,6 +358,7 @@
      :navpoint             "Главная страница"
      :actions
      '((:caption           "Главная страница"
+        :showtype          :none
         :perm              :all)))
 
     ;; Новости
@@ -376,10 +379,13 @@
     ;; Новость
     (:place                post
      :url                  "/post/:id"
-     :navpoint             "Содержимое новости"
      :actions
-     '((:caption           "Новости"
-        :perm              :all)))
+     '((:caption           "Тут будет подставляться заголовок новости или просто оставить пустую строку"
+        :showtype          :linear
+        :perm              :all
+        :entity            post
+        :val               (gethash (cur-id) *POST*)
+        :fields            '(title date photo-text text))))
 
     ;; Каталог ресурсов - категории
     (:place                catalog
@@ -387,6 +393,7 @@
      :navpoint             "Каталог ресурсов"
      :actions
      '((:caption           "Категории"
+        :showtype          :grid
         :perm              :all
         :entity            category
         :val               (cons-hash-list *CATEGORY*)
@@ -400,6 +407,7 @@
      :url                  "/category/:id"
      :actions
      '((:caption           "Категории"
+        :showtype          :grid
         :perm              :all
         :entity            category
         :val               (cons-hash-list *CATEGORY*)
@@ -409,6 +417,7 @@
                               :permlist '(:show :all :view :all)
                               :act (to "/category/~A" (caar (form-data))))))
        (:caption           "Ресурсы категории"
+        :showtype          :grid
         :perm              :all
         :entity            resource
         :val               (remove-if-not #'(lambda (x)
@@ -419,6 +428,7 @@
                              (:btn "Страница ресурса"
                               :permlist '(:show :all :view :all)
                               :act (to "/resource/~A" (caar (form-data))))))))
+
     ;; Линейный список ресурсов
     (:place                resources
      :url                  "/resource"

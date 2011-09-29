@@ -97,10 +97,10 @@
                                                           (cons-hash-list *RESOURCE*)))))
                                  :btn    (tpl:btn (list :name (format nil "~A" (getf infld :btn))
                                                         :value (format nil "~A" (getf infld :value))))
-                                 :col    (tpl:col (list :title (getf infld :col)
-                                                        :content (tpl:frmtbl
-                                                                  (list :objs (show-collection (funcall (getf infld :val))
-                                                                                               (getf infld :fields))))))
+                                 ;; :col    (tpl:col (list :title (getf infld :col)
+                                 ;;                        :content (tpl:frmtbl
+;;;;||||==============>>>>>      ;;                                  (list :objs (show-collection (funcall (getf infld :val))
+                                 ;;                                                               (getf infld :fields))))))
                                  )))
                    (push (list :id popid  :title (getf infld :title)  :left 200  :width 730
                                :content (tpl:frmobj (list :flds popup)))
@@ -164,7 +164,7 @@
        (grid-helper grid-id pager-id
                     (replace-all
                      (json:encode-json-to-string
-                      `(("url"          . ,,url)
+                      `(("url"          . ,(format nil "/~A" ,url)) ;; absolute uri
                         ("datatype"     . "json")
                         ("colNames"     . ,(reverse col-names))
                         ("colModel"     . ,(reverse col-model))
@@ -231,21 +231,26 @@
                      (list :id "popupLogin" :title "Вход"        :content (tpl:popuplogin) :left 720 :width 196)))
          (content   (loop :for act :in acts :when (check-perm (getf act :perm) (cur-user) (getf act :val)) :collect
                        (list :title (getf act :title)
-                             :content
-                             (let ((val (funcall (getf act :val))))
-                               (cond ((or (equal :clear val)
-                                          (equal 'ADMIN (type-of val))     ;; ADMIN
-                                          (equal 'SUPPLIER (type-of val))  ;; SUPPLIER
-                                          (equal 'TENDER (type-of val))    ;; TENDER
-                                          (equal 'BUILDER (type-of val))   ;; BUILDER
-                                          (equal 'EXPERT (type-of val))    ;; EXPERT
-                                          (equal 'RESOURCE (type-of val))  ;; RESOURCE
-                                          (equal 'OFFER (type-of val))     ;; OFFER
-                                          (equal 'SALE (type-of val)))     ;; SALE
-                                      (tpl:frmobj (list :flds (show-linear (getf act :fields)))))
-                                     ((equal 'cons (type-of val))          ;; COLLECTION
-                                      (show-grid val (getf act :fields) (getf act :grid))) ;; <----
-                                     (t "<div style=\"padding-left: 2px\">Нет объектов</div>")))))))
+                             :content (let ((val (funcall (getf act :val))))
+                                        (ecase (getf act :showtype)
+                                          (:none   "warning: [none (show-acts)]")
+                                          (:linear (tpl:frmobj (list :flds (show-linear (getf act :fields)))))
+                                          (:grid   (show-grid  val (getf act :fields) (getf act :grid)))))
+                             ;; (let ((val (funcall (getf act :val))))
+                             ;;   (cond ((or (equal :clear val)
+                             ;;              (equal 'ADMIN (type-of val))     ;; ADMIN
+                             ;;              (equal 'SUPPLIER (type-of val))  ;; SUPPLIER
+                             ;;              (equal 'TENDER (type-of val))    ;; TENDER
+                             ;;              (equal 'BUILDER (type-of val))   ;; BUILDER
+                             ;;              (equal 'EXPERT (type-of val))    ;; EXPERT
+                             ;;              (equal 'RESOURCE (type-of val))  ;; RESOURCE
+                             ;;              (equal 'OFFER (type-of val))     ;; OFFER
+                             ;;              (equal 'SALE (type-of val)))     ;; SALE
+                             ;;          (tpl:frmobj (list :flds (show-linear (getf act :fields)))))
+                             ;;         ((equal 'cons (type-of val))          ;; COLLECTION
+                             ;;          (show-grid val (getf act :fields) (getf act :grid))) ;; <----
+                             ;;         (t "<div style=\"padding-left: 2px\">Нет объектов</div>")))
+                             ))))
     (tpl:root
      (list
       :personal personal
