@@ -47,7 +47,7 @@
 	   :title "fuck off config emacs"
 	   :text "i hate this shit"
 	   :announce "motherfucking")
-  
+
 
 ;; BUILDERS
 (loop :for i :from 0 :to 9 :do

@@ -74,12 +74,15 @@
 (defun path (relative)
   (merge-pathnames relative *basedir*))
 
+(defun cur-user-id ()
+  (hunchentoot:session-value 'userid))
+
 (defun cur-user ()
   "get current user obj form session"
-  (gethash (hunchentoot:session-value 'userid) *USER*))
+  (gethash (cur-user-id) *USER*))
 
 (defun cur-id ()
-  "get current user obj *TODO* !!!"
+  "get current obj"
   (parse-integer (caddr (request-list))))
 
 (defun form-data ()

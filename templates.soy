@@ -32,11 +32,10 @@
       <script src="/jquery.jqGrid.min.js" type="text/javascript"></script>{\n}
       <script src="/my.js" type="text/javascript"></script>{\n}
       <style>{\n}
-        html, body {  margin: 0;   padding: 0;    font-size: 75%;  } {\n}
+        html, body {sp}{lb}{sp}  margin: 0;   padding: 0;    font-size: 75%;  {sp}{rb}{sp} {\n}
       </style>{\n}
     </head>{\n}
     <body>{\n}
-
 
       <div class="main" id="main">{\n}
         <div class="bannerTop">{\n}
@@ -67,7 +66,7 @@
               </a>{\n}
               <a href="/"{\n}
                  title="ГдеСтройТорг.ру"{\n}
-                 onclick="try{window.external.AddFavorite(this.href, this.title); return false;} catch(e) {}"{\n}
+                 onclick="try{lb}window.external.AddFavorite(this.href, this.title); return false;{rb}{sp} catch(e) {lb}{rb}"{\n}
                  rel="sidebar">{\n}
                 <img src="/add_favorite.png" alt="добавить в избранное" />{\n}
               </a>{\n}
@@ -292,6 +291,7 @@
 
             </div><!-- sidebarBox search -->{\n}
 
+
             <div class="sidebarBox banners">{\n}
               <div class="sidebarBox">{\n}
                 <div class="sidebarBoxBG">{\n}
@@ -342,6 +342,7 @@
                 </div><!-- sidebarBoxBG -->{\n}
               </div><!-- sidebarBox -->{\n}
             </div><!-- sidebarBox banners -->{\n}
+
 
             <div class="sidebarBox support">{\n}
               <span>{\n}
@@ -450,7 +451,6 @@
 {/template}
 
 
-
 {template contentBlock}
   <div class="contentBox">{\n}
     <div class="contentBoxBG">{\n}
@@ -495,6 +495,8 @@
 {/template}
 
 
+
+
 {template strview}
   {$value |noAutoescape} <br />{\n}
 {/template}
@@ -519,6 +521,8 @@
 {template textupd}
   <textarea name="{$name}" rows="5" col="120" />{$value}</textarea> <br />{\n}
 {/template}
+
+
 
 
 {template pswdupd}
@@ -556,6 +560,8 @@
   </form>
 {/template}
 
+
+
 {template popbtn}
   <div class="button" onclick="ShowHide('{$popid}');">
     <div class="left"></div>
@@ -587,6 +593,8 @@
     {/foreach}
   </table>
 {/template}
+
+
 
 {template popup}
   <div id="{$id}"{\n}
@@ -631,5 +639,3 @@
   </div>
 </div>
 {/template}
-
-

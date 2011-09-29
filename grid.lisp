@@ -42,8 +42,8 @@
                ((:str)      (show-fld captfld #'tpl:strupd  namefld (a-fld namefld val)))
                ((:pswd)     (show-fld captfld #'tpl:pswdupd namefld (a-fld namefld val)))
                ((:num)      (show-fld captfld #'tpl:strupd  namefld (a-fld namefld val)))
-               ((:interval) (show-fld captfld #'tpl:strupd namefld (a-fld namefld val)))
-               ((:date)     (show-fld captfld #'tpl:strupd namefld (a-fld namefld val)))
+               ((:interval) (show-fld captfld #'tpl:strupd  namefld (a-fld namefld val)))
+               ((:date)     (show-fld captfld #'tpl:strupd  namefld (a-fld namefld val)))
                ((:list-of-keys supplier-status)
                 (tpl:fld
                  (list :fldname captfld

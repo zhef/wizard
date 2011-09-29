@@ -32,13 +32,13 @@
          (loop :for item :in perm :collect (perm-check item subj obj)))
         ((keywordp perm)
          (ecase perm
-           (:all         t)   ;; "Все пользователи"
-           (:nobody      nil) ;; "Никто"
+           (:all         t)                                          ;; "Все пользователи"
+           (:nobody      nil)                                        ;; "Никто"
            (:system      nil) ;; "Система (загрузка данных на старте и изменение статуса поставщиков, когда время добросовестности истеклл)"
-           (:notlogged   nil) ;; "Незалогиненный пользователь (может зарегистрироваться как поставщик)"
-           (:logged      nil) ;; "Залогиненный пользователь"
-           (:admin       (if (equal (type-of subj) 'ADMIN) t nil)) ;; "Администратор"
-           (:expert      nil) ;; "Незалогиненный пользователь"
+           (:notlogged   (when   (cur-user) t))                      ;; "Незалогиненный пользователь (может зарегистрироваться как поставщик)"
+           (:logged      (unless (cur-user) t))                      ;; "Залогиненный пользователь"
+           (:admin       (if (equal (type-of subj) 'ADMIN) t nil))   ;; "Администратор"
+           (:expert      nil) ;; "Пользователь-Эксперт"
            (:builder     nil) ;; "Пользователь-Застройщик"
            (:supplier    nil) ;; "Пользователь-Поставщик"
            ;; Objects
@@ -51,7 +51,9 @@
            (:finished    nil) ;; "Объект является завершенным тендером"
            (:cancelled   nil) ;; "Объект является отмененным тендером"
            ;; Mixed
-           (:self        nil) ;; "Объект олицетворяет пользователя, который совершает над ним действие"
+           (:self        (progn
+                           ;; (safe-write (path "perm-log.txt") (format nil "cur-user: ~A; cur-id ~A; ~%" (cur-user-id) (cur-id)))
+                           (equal (cur-user-id) (cur-id))))          ;; "Объект олицетворяет пользователя, который совершает над ним действие"
            (:owner       nil) ;; "Объект, над которым совершается действие имеет поле owner содержащее ссылку на объект текущего пользователя"
            ))
         (t perm)))
@@ -73,13 +75,14 @@
           do (sleep *safe-write-sleep*))
     (close stream)))
 
+
 (defclass DYMMY (entity)
-  ((DYMMY                  :initarg :LOGIN               :initform nil :accessor A-LOGIN)))
+  ((DYMMY :initarg :DYMMY :initform nil :accessor A-DYMMY)))
 
 
 (defun check-perm (perm subj &optional (obj (make-instance 'DYMMY)))
   (let ((rs (perm-check perm subj obj)))
-    (safe-write (path "perm-log.txt") (format nil "~A := ~A (~A : ~A)~%" perm rs subj obj))
+    (safe-write (path "perm-log.txt") (format nil "perm: ~A; result: ~A; subj: ~A; obj: ~A~%" perm rs subj obj))
     (eval rs)
   ;; t
   ))

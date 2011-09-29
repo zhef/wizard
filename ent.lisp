@@ -1,8 +1,6 @@
 (in-package #:WIZARD)
 
-;; (closure-template:compile-template :common-lisp-backend (path "templates.soy"))
-
-(closure-template:compile-template :common-lisp-backend #P"test.soy")
+(closure-template:compile-template :common-lisp-backend #P"templates.soy")
 
 (restas:mount-submodule -static- (#:restas.directory-publisher)
   (restas.directory-publisher:*directory* (path "static/")))
@@ -83,6 +81,7 @@
      (:create              :admin
       :delete              :admin
       :view                :all
+      :show                :all
       :update              :admin))
 
     ;; Поставщик
@@ -140,6 +139,7 @@
      (:create             (or :admin :not-logged)
       :delete             :admin
       :view               :all
+      :show               :all
       :update             (or :admin :self)))
 
 
@@ -157,6 +157,7 @@
      (:create (and :active :supplier) ;; создается связанный объект offer-resource, содержащие ресурсы заявки
       :delete (and :owner  :active)   ;; удаляются связанный объект offer-resource
       :view   :all
+      :show   :all
       :update (and :active :owner)    ;; Заявка модет быть отредактирвана пока срок приема заявок не истек.
       ))
 
@@ -195,6 +196,7 @@
      (:create :supplier
       :delete :owner
       :view   :all
+      :show   :all
       :update :owner))
 
 
@@ -243,6 +245,7 @@
      (:create :admin
       :delete :admin
       :view   :all
+      :show   :all
       :update (or :admin :self)))
 
 
@@ -322,6 +325,7 @@
      (:create :builder
       :delete :admin
       :view   (and :logged (or :stale (and :fresh :fair)))
+      :show   :all
       :update (or :admin :owner)))
 
 
@@ -573,17 +577,18 @@
      :url                  "/supplier/:id"
      :actions
      '((:caption           "Изменить себе пароль"
-        :perm              :admin
+        :perm              :self
         :entity            supplier
         :val               (cur-user)
         :fields            '(login password
                              (:btn "Изменить пароль"
-                              :permlist '(:show :all :view :all)
+                              ;; :permlist '(:show :all :view :all)
                               :act (let ((obj (cur-user)))
                                      (with-obj-save obj
                                        LOGIN
                                        PASSWORD)))))
        (:caption           "Поставщик"
+        :perm              :self
         :entity            supplier
         :val               (gethash (cur-id) *USER*)
         :fields            '(name status juridical-address actual-address contacts email site heads inn kpp ogrn
@@ -706,6 +711,7 @@
      :url                  "/sale/:id"
      :actions
      '((:caption           "Распродажа"
+        :perm              :all
         :entity            sale
         :val               (gethash (cur-id) *SALE*)
         :fields            '(name owner procent price notes
@@ -768,6 +774,7 @@
      :url                  "/builder/:id"
      :actions
      '((:caption           "Застройщик"
+        :perm              :all
         :entity            builder
         :val               (gethash (cur-id) *USER*)
         :fields            '(name juridical-address inn kpp ogrn bank-name bik corresp-account client-account rating
@@ -829,6 +836,7 @@
      :url                  "/tender/:id"
      :actions
      '((:caption           "Тендер"
+        :perm              :all
         :entity            tender
         :val               (gethash (cur-id) *TENDER*)
         :fields            '(name status owner active-date all claim analize interview result ;; winner price
@@ -1008,6 +1016,7 @@
      :actions
      '((:caption           "Заявка на тендер"
         :entity            offer
+        :perm              :all
         :val               (gethash (cur-id) *OFFER*)
         :fields            '(tender
                              ;; resources
