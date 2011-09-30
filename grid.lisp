@@ -79,7 +79,8 @@
                 (tpl:fld
                  (list :fldname captfld
                        :fldcontent (tpl:textupd (list :name namefld
-                                                      :value (a-fld namefld val)))))))
+                                                      :value (a-fld namefld val))))))
+               )
      :btn    (tpl:btnlin (list :name (getf infld :btn) :value (getf infld :value)))
      :popbtn (with-let-infld
                  (let* ((popid (getf infld :popbtn))
@@ -97,10 +98,10 @@
                                                           (cons-hash-list *RESOURCE*)))))
                                  :btn    (tpl:btn (list :name (format nil "~A" (getf infld :btn))
                                                         :value (format nil "~A" (getf infld :value))))
-                                 ;; :col    (tpl:col (list :title (getf infld :col)
-                                 ;;                        :content (tpl:frmtbl
-;;;;||||==============>>>>>      ;;                                  (list :objs (show-collection (funcall (getf infld :val))
-                                 ;;                                                               (getf infld :fields))))))
+                                 :col    (tpl:col (list :title (getf infld :col)
+                                                        :content (tpl:frmtbl
+                                                                  (list :objs (show-collection (funcall (getf infld :val))
+                                                                                               (getf infld :fields))))))
                                  )))
                    (push (list :id popid  :title (getf infld :title)  :left 200  :width 730
                                :content (tpl:frmobj (list :flds popup)))

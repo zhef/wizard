@@ -416,6 +416,7 @@
                              (:btn "Показать ресурсы"
                               :permlist '(:show :all :view :all)
                               :act (to "/category/~A" (caar (form-data))))))
+       ;; Тут ошибка в гриде, так как надо передавать параметр-группу, но скоро там будет дерево, так что можно не исправлять
        (:caption           "Ресурсы категории"
         :showtype          :grid
         :perm              :all
@@ -457,6 +458,7 @@
      :actions
      '((:caption           "Ресурс"
         :perm              :all
+        :showtype          :linear
         :entity            resource
         :val               (gethash (cur-id) *RESOURCE*)
         :fields            '(name category resource-type unit))))
@@ -587,9 +589,10 @@
      :url                  "/supplier/:id"
      :actions
      '((:caption           "Изменить себе пароль"
-        :perm              :self
+        :showtype          :linear
+        :perm              (or :admin :self)
         :entity            supplier
-        :val               (cur-user)
+        :val               (gethash (cur-id) *USER*)
         :fields            '(login password
                              (:btn "Изменить пароль"
                               ;; :permlist '(:show :all :view :all)
@@ -598,7 +601,8 @@
                                        LOGIN
                                        PASSWORD)))))
        (:caption           "Поставщик"
-        :perm              :self
+        :showtype          :linear
+        :perm              (or :admin :self)
         :entity            supplier
         :val               (gethash (cur-id) *USER*)
         :fields            '(name status juridical-address actual-address contacts email site heads inn kpp ogrn
