@@ -100,3 +100,14 @@ SB-POSIX> (defun get-username (&aux (pid (getpid))) ;(getenv "USERNAME"))
 asdf:*central-registry*)
 [17:39] jsv> а чего через окружение, а не в
 ~/.config/common-lisp/source-registry.conf?
+
+
+Хочется странного: отметить блок в буфере, нажать на какую-нибудь
+кнопку так, чтобы блок подался некоему скрипту на stdin, затем то что
+скрипт выдаст в stdout, emacs вставил в буфер вместо выделенного
+блока.
+Запускать скрипты awk, и прочие.
+Есть уже подобная фича?
+
+C-u M-|
+http://www.emacswiki.org/emacs/ExecuteExternalCommand

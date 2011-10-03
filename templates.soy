@@ -379,9 +379,7 @@
 			  </object>{\n}
             </div>{\n}
 
-            {foreach $contentBlock in $content}
-              {call contentBlock data="$contentBlock" /}
-            {/foreach}
+            {$content |noAutoescape}
 
             <div class="componentheading">{\n}
 	          gdetorg.ru</div>{\n}
@@ -572,9 +570,7 @@
 
 {template frmobj}
   <form method="post">
-    {foreach $fld in $flds}
-      {$fld |noAutoescape}
-    {/foreach}
+    {$content |noAutoescape}
   </form>
 {/template}
 

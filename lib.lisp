@@ -55,6 +55,10 @@
 (defmacro bprint (var)
   `(subseq (with-output-to-string (*standard-output*)  (pprint ,var)) 1))
 
+(defmacro with-gensyms ((&rest names) &body body)
+    `(let ,(loop for n in names collect `(,n (gensym)))
+            ,@body))
+
 (defun get-username (&aux (pid (sb-posix:getpid)))
   (sb-posix:passwd-name
    (sb-posix:getpwuid
