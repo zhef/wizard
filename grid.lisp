@@ -80,13 +80,20 @@
   (tpl:btnlin (list :name (getf infld :btn) :value (getf infld :value))))
 
 
+(defun show-popbtn (infld act)
+  (let ((in-action (getf infld :action)))
+    (push
+     (list :id (getf infld :popbtn) :title (getf in-action :action) :content (show-act in-action) :left 200 :width 500)
+     *popups*))
+  (tpl:popbtnlin (list :popid (getf infld :popbtn) :value (getf infld :value))))
+
+
 (defun show-linear (act val)
   (let ((flds (with-in-fld-case (getf act :fields) ;; infld variable
                 :fld     (show-fld infld act val)
                 :btn     (show-btn infld act)
                 :action  (format nil "<div style=\"border: 1px solid red:\"> ~A</div>" (show-act infld))
-                :col     "<br />(show-col infld)"
-                :popbtn  "(show-popbtn infld act)")))
+                :popbtn  (show-popbtn infld act))))
     (tpl:frmobj (list :content (format nil "~{~A~}" flds)))))
 
 

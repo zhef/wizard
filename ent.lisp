@@ -469,6 +469,7 @@
      :navpoint             "Администратор"
      :actions
      '((:action            "Изменить себе пароль"
+        :showtype          :linear
         :perm              :admin
         :entity            admin
         :val               (cur-user)
@@ -478,8 +479,25 @@
                               :act (let ((obj (cur-user)))
                                      (with-obj-save obj
                                        LOGIN
-                                       PASSWORD)))))
+                                       PASSWORD)))
+                             (:btn   "Кнопка всплывающего окна"
+                              :perm  :all
+                              :popup '(:action            "Заголовок всплывающего окна"
+                                       :showtype          :linear
+                                       :perm              :admin
+                                       :entity            admin
+                                       :val               (cur-user)
+                                       :fields            '(login password
+                                                            (:btn "Изменить пароль"
+                                                            :perm :all
+                                                             :act (let ((obj (cur-user)))
+                                                                    (with-obj-save obj
+                                                                      LOGIN
+                                                                      PASSWORD))))))
+                             ))
+
        (:action            "Создать аккаунт эксперта"
+        :showtype          :linear
         :perm              :admin
         :entity            expert
         :val               :clear
@@ -526,25 +544,26 @@
                               :perm :all
                               :act (to "/expert/~A" (caar (form-data))))
                              ))
-       (:action            "Заявки поставщиков на добросовестность"
-        :perm              :admin
-        :entity            supplier
-        :showtype          :grid
-        :val               (remove-if-not #'(lambda (x)
-                                              (and (equal 'supplier (type-of (cdr x)))
-                                                   (equal (a-status (cdr x)) :request)))
-                            (cons-hash-list *USER*))
-        :fields            '(name login
-                             (:btn "Подтвердить заявку"
-                              :perm :all
-                              :popup '(:action            "Подтвердить заявку поставщика"
-                                       :perm               :admin
-                                       :entity             supplier
-                                       :fields             '((:btn "Сделать добросовестным"
-                                                              :perm :all
-                                                              :act (let ((key (get-btn-key (caar (form-data)))))
-                                                                     (setf (a-status (gethash key *USER*)) :fair)
-                                                                     (hunchentoot:redirect (hunchentoot:request-uri*)))))))))))
+       ;; (:action            "Заявки поставщиков на добросовестность"
+       ;;  :perm              :admin
+       ;;  :entity            supplier
+       ;;  :showtype          :grid
+       ;;  :val               (remove-if-not #'(lambda (x)
+       ;;                                        (and (equal 'supplier (type-of (cdr x)))
+       ;;                                             (equal (a-status (cdr x)) :request)))
+       ;;                      (cons-hash-list *USER*))
+       ;;  :fields            '(name login
+       ;;                       (:btn "Подтвердить заявку"
+       ;;                        :perm :all
+       ;;                        :popup '(:action            "Подтвердить заявку поставщика"
+       ;;                                 :perm               :admin
+       ;;                                 :entity             supplier
+       ;;                                 :fields             '((:btn "Сделать добросовестным"
+       ;;                                                        :perm :all
+       ;;                                                        :act (let ((key (get-btn-key (caar (form-data)))))
+       ;;                                                               (setf (a-status (gethash key *USER*)) :fair)
+       ;;                                                               (hunchentoot:redirect (hunchentoot:request-uri*)))))))))
+       ))
 
     ;; Список экспертов
     (:place                experts
