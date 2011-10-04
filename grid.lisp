@@ -86,7 +86,7 @@
                 :btn     (show-btn infld act)
                 :action  (format nil "<div style=\"border: 1px solid red:\"> ~A</div>" (show-act infld))
                 :col     "<br />(show-col infld)"
-                :popbtn  "<br />(show-popbtn infld act)")))
+                :popbtn  "(show-popbtn infld act)")))
     (tpl:frmobj (list :content (format nil "~{~A~}" flds)))))
 
 
@@ -135,8 +135,21 @@ function(){
                (push model col-model)
                ;; (push `(,in-name . ,btn-str) col-replace) ;; commented for change algorithm
                ))
-      :popbtn ""
-      :calc "")
+      :popbtn (when (check-perm (getf infld :perm) (cur-user))
+                (let* ((in-name (getf infld :popbtn))
+                       (in-capt (getf infld :value))
+                       (model `(("name" . ,in-name)
+                                ("index" . ,in-name)
+                                ("width" . "200")
+                                ("sortable" . nil)
+                                ("editable" . nil))))
+                  (push in-name col-names)
+                  (push model col-model)
+                  (let ((in-action (getf infld :action)))
+                    (push
+                     (list :id (getf infld :popbtn) :title (getf in-action :action) :content (show-act in-action) :left 200 :width 500)
+                     *popups*))))
+      :calc (error "dumb error calc"))
     (grid-helper grid-id pager-id (replace-all
                                    (json:encode-json-to-string
                                     `(("url" . ,(format nil "/~A" (getf act :grid))) ;; absolute uri
@@ -151,7 +164,7 @@ function(){
                                       ("sortorder" . "desc")
                                       ("editurl" . "/edit_url")
                                       ("gridComplete" . "-=|=-")
-                                      ("caption" . "")))
+                                      ("caption" . ,(getf act :action))))
                                    "\"-=|=-\"" ;; замена после кодирования в json - иначе никак не вставить js :)
                                    (grid-replace-helper grid-id col-replace)))))
 
@@ -170,24 +183,26 @@ function(){
 
 
 (defun show-acts (acts)
-  (let* ((personal  (let ((userid (hunchentoot:session-value 'userid)))
-                      (if (null userid)
-                          (tpl:loginform)
-                          (tpl:logoutform (list :user (a-login (gethash userid *USER*)))))))
-         (popups    (list
-                     (list :id "trest"      :title "Регистрация" :content "TODO"           :left 200 :width 500)
-                     (list :id "popupLogin" :title "Вход"        :content (tpl:popuplogin) :left 720 :width 196)))
-         (content   (format nil "~{~A~}"
-                            (loop :for act :in acts #|:when (check-perm (getf act :perm) (cur-user) (getf act :val)) |# :collect
-                               (tpl:content-block
-                                (list :title (getf act :action)
-                                      :content (show-act act))))))) ;; <---- TODO: Возвращать popups (!)
-    (tpl:root
-     (list
-      :personal personal
-      :popups popups
-      :navpoints (menu)
-      :content content))))
+    (let* ((personal  (let ((userid (hunchentoot:session-value 'userid)))
+                        (if (null userid)
+                            (tpl:loginform)
+                            (tpl:logoutform (list :user (a-login (gethash userid *USER*)))))))
+           (*popups*  (list
+                       (list :id "trest"      :title "Регистрация" :content "TODO"           :left 200 :width 500)
+                       (list :id "popupLogin" :title "Вход"        :content (tpl:popuplogin) :left 720 :width 196)))
+           (content   (format nil "~{~A~}"
+                              (loop :for act :in acts #|:when (check-perm (getf act :perm) (cur-user) (getf act :val)) |# :collect
+                                 (tpl:content-block
+                                  (list :title (getf act :action)
+                                        :content (show-act act)))))))
+      (declare (special *popups*))
+      (tpl:root
+       (list
+        :personal  personal
+        :popups    *popups*
+        :navpoints (menu)
+        :content  content))))
+
 
 
 (defun grid-helper (grid-id pager-id json-code)
@@ -227,24 +242,31 @@ function(){
          (unless (null row)
            (push (nth num rows) slice-cons))))
     ;; field-cons (innerloop)
-    (loop :for fld :in fields :do
-       (when (getf fld :fld)   ;; == when fld
-           (let ((perm (getf (getf fld :permlist) :show)))
-             (cond ((equal '(:str) (getf fld :typedata))
-                    (let ((accessor  (find-symbol (format nil "A-~A" (getf fld :fld)) (find-package "WIZARD"))))
-                      (push (cons accessor perm) field-cons)))
-                   (t ;; default - print unknown type message in grid field
-                    (let ((accessor  (lambda (x) "unknown typedata in grid pager")))
-                      (push (cons accessor perm) field-cons))))))
-       (when (getf fld :btn)   ;; == when btn
-         (let* ((perm      (getf fld :perm))
-                (btn       (getf fld :btn))                    ;; тут важно чтобы вычисление происходило вне лямбды
-                (value     (getf fld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
-                (accessor  (lambda (x)
-                             (format nil "<form method='post'><input type='submit' name='~A~~%|id|%' value='~A~~%|id|%' /></form>"
-                                     btn
-                                     value))))
-           (push (cons accessor perm) field-cons)))
+    (with-in-fld-case fields ;; infld variable
+      :fld       (let ((perm (getf (getf infld :permlist) :show)))
+                   (cond ((equal '(:str) (getf infld :typedata))
+                          (let ((accessor  (find-symbol (format nil "A-~A" (getf infld :fld)) (find-package "WIZARD"))))
+                            (push (cons accessor perm) field-cons)))
+                         (t ;; default - print unknown type message in grid field
+                          (let ((accessor  (lambda (x) "unknown typedata in grid pager")))
+                            (push (cons accessor perm) field-cons)))))
+      :btn       (let* ((perm      (getf infld :perm))
+                        (btn       (getf infld :btn))                    ;; тут важно чтобы вычисление происходило вне лямбды
+                        (value     (getf infld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
+                        (accessor  (lambda (x)
+                                     (format nil "<form method='post'><input type='submit' name='~A~~%|id|%' value='~A~~%|id|%' /></form>"
+                                             btn
+                                             value))))
+                   (push (cons accessor perm) field-cons))
+      :popbtn    (let* ((perm      (getf infld :perm))
+                        (btn       (getf infld :popbtn))                 ;; тут важно чтобы вычисление происходило вне лямбды
+                        (value     (getf infld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
+                        (accessor  (lambda (x)
+                                     (format nil "<input type='button' name='~A~~%|id|%' value='~A~~%|id|%' onclick='ShowHide(\"~A\")' />"
+                                             btn
+                                             value
+                                             btn))))
+                   (push (cons accessor perm) field-cons))
          ) ;; end loop field cons (innerloop)
     (values
      ;; result: get values from obj

@@ -627,12 +627,15 @@
                                                    (:btn  "Страница эксперта"
                                                     :perm (or :admin :self)
                                                     :act  (to "/expert/~A" (caar (form-data))))
-                                                   (:btn  "Доп кнопка"
+                                                   (:btn  "Поп-ап кнопка"
                                                     :perm (or :admin :self)
-                                                    :act  (to "/expert/~A" (caar (form-data))))))
+                                                    :popup '(:action            "Главная страница"
+                                                            :showtype          :none
+                                                            :perm              :all))))
                              ;; resources
-                             (:col               "Список поставляемых ресурсов"
-                              :perm              222
+                             (:action            "Список поставляемых ресурсов"
+                              :showtype          :grid
+                              :perm              :all
                               :entity            supplier-resource-price
                               :val               (cons-inner-objs *SUPPLIER-RESOURCE-PRICE* (a-resources (gethash (cur-id) *USER*)))
                               :fields            '(resource price

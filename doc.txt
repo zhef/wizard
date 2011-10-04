@@ -111,3 +111,8 @@ asdf:*central-registry*)
 
 C-u M-|
 http://www.emacswiki.org/emacs/ExecuteExternalCommand
+
+
+[19:47] edgbla> а как сделать чтобы диред не открывал стопицот буферов
+когда шастаешь по каталогам? мене вроде одного достаточно...
+[20:01] Ioda> edgbla: dired-single.el
