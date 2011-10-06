@@ -10,7 +10,7 @@
   (load "init.lisp"))
 
 (restas:define-module #:WIZARD
-    (:use #:CL #:ITER ))
+    (:use #:CL #:ITER #:cl-mysql #:alexandria #:anaphora))
 
 (in-package #:WIZARD)
 
@@ -22,6 +22,7 @@
 (defmacro push-hash (hash class &body init)
   `(setf (gethash (hash-table-count ,hash) ,hash)
          (make-instance ,class ,@init)))
+
 
 (defmacro cons-inner-objs (hash inner-lst)
   `(let ((inner-lst ,inner-lst)
@@ -55,9 +56,6 @@
 (defmacro bprint (var)
   `(subseq (with-output-to-string (*standard-output*)  (pprint ,var)) 1))
 
-(defmacro with-gensyms ((&rest names) &body body)
-    `(let ,(loop for n in names collect `(,n (gensym)))
-            ,@body))
 
 (defun get-username (&aux (pid (sb-posix:getpid)))
   (sb-posix:passwd-name

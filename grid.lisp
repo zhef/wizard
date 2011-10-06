@@ -13,11 +13,9 @@
 
 (defmacro with-in-fld-case (fields &rest cases)
   `(loop :for infld :in ,fields :collect
-      (with-gensyms (typefld)
-        (setf typefld (car infld))
-        (ecase typefld
-          ,@(loop :for case :in cases :by #'cddr :collect
-               (list case (getf cases case)))))))
+      (ecase (car infld)
+        ,@(loop :for case :in cases :by #'cddr :collect
+             (list case (getf cases case))))))
 
 
 (defun show-fld-helper (captfld tplfunc namefld valuefld)
@@ -236,7 +234,6 @@ function(){
                                     ;; )
                                 ))))))) ;; <------ here inserted
 
-
 (defun pager (val fields page rows-per-page)
   "[debugged 29.08.2011]"
   (let* ((rows             (funcall val))
@@ -295,3 +292,18 @@ function(){
     (multiple-value-bind (slice cnt-rows)
         (pager val fields page rows-per-page)
       (json-assembly  (+ page 1)  (ceiling cnt-rows rows-per-page)  (length slice) slice))))
+
+;; (defmacro gensym-lambda (lambda-list &body body)
+;;   (let ((name (gensym "LAMBDA")))
+;;     `(labels ((,name ,lambda-list ,@body))
+;;        #',name)))
+
+;; (funcall
+;;  (gensym-lambda (x)
+;;    (error x))
+;;  "ddd")
+
+;; (funcall
+;;  (alexandria:named-lambda mylamb (x)
+;;    (error x))
+;;  "ddd")

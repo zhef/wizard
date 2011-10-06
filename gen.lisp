@@ -67,7 +67,7 @@
 (defun gen-action (action)
   (format t "~%--------------------action: ~A" (getf action :action)) ;;
   (let ((pre-generated-fields (gen-fields (eval (getf action :fields)) (getf action :entity))))
-    (format nil "~%~14T (list :action \"~A\" ~%~20T :showtype ~A ~%~20T :perm '~A ~A ~%~20T :val (lambda () ~A)~% ~20T :fields ~A)"
+    (format nil "~%~14T (list :action \"~A\" ~%~20T :showtype ~A ~%~20T :perm '~A ~A ~%~20T :val (named-lambda ~A () ~A)~% ~20T :fields ~A)"
             (getf action :action)
             (bprint (getf action :showtype))
             (bprint (getf action :perm))
@@ -77,9 +77,12 @@
                   (setf *ajaxdataset*
                         (append *ajaxdataset*
                                 (list (list grid
-                                            (format nil "(lambda () ~A)" (getf action :val))
+                                            (format nil "(named-lambda ~A () ~A)"
+                                                    (symbol-name (gensym "GRDNL-"))
+                                                    (getf action :val))
                                             pre-generated-fields))))
                   (format nil "~%~20T :grid \"~A\"" grid)))
+            (symbol-name (gensym "ACTNL-"))
             (bprint (getf action :val))
             pre-generated-fields)))
 
@@ -129,16 +132,17 @@
                 (gen-action action) ;; append *controllers* and *ajaxdataset* (!)
                 ))
      ;; CONTROLLERS for this place
-     (unless (null *controllers*)
+     ;; (unless (null *controllers*) ;; всегда нужно иметь контроллеры, т.к. есть логин на всех страницах
        (format out "~%~%(restas:define-route ~A/ctrs (\"~A\" :method :post)"
                (string-downcase (getf place :place))
                (getf place :url))
        (format out  "~%  (let ((session (hunchentoot:start-session))~%~7T (acts `(~{~%~A~}))) ~%       (activate acts)))"
                (loop :for (gen act) :in *controllers* :collect
-                  (format nil "(\"~A\" . ,(lambda () ~A))"
+                  (format nil "(\"~A\" . ,(named-lambda ~A () ~A))"
                           gen
+                          (symbol-name (gensym "CTRNL-"))
                           (bprint act)
-                          )))))
+                          ))))
   ;; AJAXDATASET for all places
   (unless (null *ajaxdataset*)
     (loop :for (grid val fields) :in *ajaxdataset* :do
