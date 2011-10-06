@@ -23,7 +23,6 @@
   `(setf (gethash (hash-table-count ,hash) ,hash)
          (make-instance ,class ,@init)))
 
-
 (defmacro cons-inner-objs (hash inner-lst)
   `(let ((inner-lst ,inner-lst)
          (cons-hash (cons-hash-list ,hash)))

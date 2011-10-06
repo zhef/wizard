@@ -419,7 +419,7 @@
         :showtype          :grid
         :perm              :all
         :entity            category
-        :val               (cons-hash-list *CATEGORY*)
+        :val               (cons-inner-objs *CATEGORY* (a-child-categoryes (gethash 1 *CATEGORY*)))
         :fields            '(name
                              ;; parent child-categoryes
                              (:btn "Показать ресурсы"

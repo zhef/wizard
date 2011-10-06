@@ -67,16 +67,29 @@
 
 ;; Извлекаем группы ресурсов, которые у нас называются категориями
 (progn
-  ;; Очищаем категории
+  ;; Очищаем категории и ресурсы
   (defparameter *CATEGORY* (make-hash-table :test #'equal))
-  ;; Забираем сырые данные из базы
+  (defparameter *RESOURCE* (make-hash-table :test #'equal))
+  ;; Забираем сырые данные по категориям из базы
   (with-query-select ("SELECT |:::| FROM `jos_gt_resource_group`"
                     ("id" "name" "type" "parent_id"))
-    (setf (gethash id *CATEGORY*)
-          (make-instance 'CATEGORY
-                         :name name
-                         :parent parent_id)))
-  ;; Связываем ресурсы в дерево
+    (let ((this-category (setf (gethash id *CATEGORY*)
+                               (make-instance 'CATEGORY
+                                              :name name
+                                              :parent parent_id))))
+      ;; Забираем ресурсы, принадлежащие этой категории
+      (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_resource` WHERE `group_id` = '~A'" id)
+                          ("id" "name" "type" "unit_id"))
+        (let ((this-resource (setf (gethash id *RESOURCE*)
+                                   (make-instance 'RESOURCE
+                                                  :name name
+                                                  :category this-category
+                                                  :resource-type (if (equal 1 type) :machine :material)
+                                                  :unit  (if (equal 1 unit_id) "шт." "ед.изм")))))
+          (setf (a-resources this-category)
+                (append (a-resources this-category)
+                        (list this-resource)))))))
+  ;; Связываем категории в дерево
   (maphash #'(lambda (key category)
                (let ((parent-category (gethash (a-parent category) *CATEGORY*)))
                  (setf (a-parent category) parent-category)
@@ -86,7 +99,3 @@
                                  (list category))))))
            *CATEGORY*))
 
-;; test
-;; (maphash #'(lambda (key category)
-;;              (format t "~%~A : ~A" key (a-parent category)))
-;;              *CATEGORY*)
