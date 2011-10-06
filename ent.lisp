@@ -225,6 +225,10 @@
       (password            "Пароль"                     (:pswd))
       (name                "Организация-застройщик"     (:str))
       (juridical-address   "Юридический адрес"          (:str))
+      (actual-address      "Фактический адрес"          (:str))
+      (contacts            "Контактные телефоны"        (:list-of-str))    ;; cписок телефонов с возможностью ввода
+      (email               "Email"                      (:str))            ;; отображение как ссылка mailto://....
+      (site                "Сайт организации"           (:str))            ;; отображение как ссылка http://....
       (inn                 "Инн"                        (:str)
                            '(:view   (or :logged :fair)))                   ;; Незалогиненные видят только добросовестных
       (kpp                 "КПП"                        (:str)
@@ -242,7 +246,8 @@
       (tenders             "Тендеры"                    (:list-of-links tender)
                            '(:view   :all))
       (rating              "Рейтинг"                    (:num)
-                           '(:update :system)))
+                           '(:update :system))
+      (id                  "Идентификатор в базе"       (:str)))
      :perm
      (:create :admin
       :delete :admin
@@ -398,7 +403,9 @@
         :showtype          :grid
         :perm              :all
         :entity            category
-        :val               (cons-hash-list *CATEGORY*)
+        :val               (remove-if-not #'(lambda (x)
+                                              (null (a-parent (cdr x))))
+                            (cons-hash-list *CATEGORY*))
         :fields            '(name ;; parent child-categoryes
                              (:btn "Показать ресурсы"
                               :perm :all

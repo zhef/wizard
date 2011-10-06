@@ -292,18 +292,3 @@ function(){
     (multiple-value-bind (slice cnt-rows)
         (pager val fields page rows-per-page)
       (json-assembly  (+ page 1)  (ceiling cnt-rows rows-per-page)  (length slice) slice))))
-
-;; (defmacro gensym-lambda (lambda-list &body body)
-;;   (let ((name (gensym "LAMBDA")))
-;;     `(labels ((,name ,lambda-list ,@body))
-;;        #',name)))
-
-;; (funcall
-;;  (gensym-lambda (x)
-;;    (error x))
-;;  "ddd")
-
-;; (funcall
-;;  (alexandria:named-lambda mylamb (x)
-;;    (error x))
-;;  "ddd")
