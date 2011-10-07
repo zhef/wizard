@@ -254,6 +254,13 @@ function(){
                    (cond ((equal '(:str) (getf infld :typedata))
                           (let ((accessor  (find-symbol (format nil "A-~A" (getf infld :fld)) (find-package "WIZARD"))))
                             (push (cons accessor perm) field-cons)))
+                         ((equal '(:num) (getf infld :typedata))
+                          (let* ((subname (format nil "A-~A" (getf infld :fld))) ;; вне лямбды (!)
+                                 (accessor (lambda (x) (format nil "~A" (funcall (find-symbol subname (find-package "WIZARD")) x)))))
+                            (push (cons accessor perm) field-cons)))
+                         ((equal '(:link resource) (getf infld :typedata))
+                          (let ((accessor  (lambda (x) (format nil "~A" (a-name (a-resource x))))))
+                            (push (cons accessor perm) field-cons)))
                          (t ;; default - print unknown type message in grid field
                           (let ((accessor  (lambda (x) "unknown typedata in grid pager")))
                             (push (cons accessor perm) field-cons)))))

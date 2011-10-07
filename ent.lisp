@@ -639,23 +639,17 @@
                               :entity            supplier-resource-price
                               :val               (cons-inner-objs *SUPPLIER-RESOURCE-PRICE* (a-resources (gethash (cur-id) *USER*)))
                               :fields            '(resource price
-                                                   ;; (:btn "Удалить"
-                                                   ;;  :perm :all
-                                                   ;;  :popup '(:action            "Удаление ресурса"
-                                                   ;;           :showtype          :linear
-                                                   ;;           :perm              :admin
-                                                   ;;           :entity            supplier-resource-price
-                                                   ;;           :fields            '((:btn "Удалить ресурс"
-                                                   ;;                                 :perm :all
-                                                   ;;                                 :act (del-inner-obj
-                                                   ;;                                       (caar (form-data))
-                                                   ;;                                       *SUPPLIER-RESOURCE-PRICE*
-                                                   ;;                                       (a-resources (gethash 23 *USER*)))))))
-                                                   ))
+                                                   (:btn   "Удалить"
+                                                    :perm  :all
+                                                    :act (del-inner-obj
+                                                          (caar (form-data))
+                                                          *SUPPLIER-RESOURCE-PRICE*
+                                                          (a-resources (gethash (cur-id) *USER*))))))
                              (:btn "Добавить ресурс"
                               :perm :all
                               :popup '(:action             "Добавление ресурса"
-                                       :perm               111
+                                       :showtype           :linear
+                                       :perm               :all
                                        :entity             supplier-resource-price
                                        :fields             '((:btn "Добавить ресурс"
                                                               :perm :all
