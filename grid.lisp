@@ -71,6 +71,11 @@
             (list :fldname captfld
                   :fldcontent (tpl:textupd (list :name namefld
                                                  :value (a-fld namefld val))))))
+          ((equal typedata '(:link supplier-resource-price))
+           (tpl:fld
+            (list :fldname captfld
+                  :fldcontent (tpl:strview (list :name namefld
+                                                 :value (a-name (a-fld namefld val)))))))
           (t (format nil "<br />err:unk2 typedata: ~A | ~A" namefld typedata)))))
 
 
@@ -250,20 +255,24 @@ function(){
            (push (nth num rows) slice-cons))))
     ;; field-cons (innerloop)
     (with-in-fld-case fields ;; infld variable
-      :fld       (let ((perm (getf (getf infld :permlist) :show)))
-                   (cond ((equal '(:str) (getf infld :typedata))
-                          (let ((accessor  (find-symbol (format nil "A-~A" (getf infld :fld)) (find-package "WIZARD"))))
-                            (push (cons accessor perm) field-cons)))
-                         ((equal '(:num) (getf infld :typedata))
-                          (let* ((subname (format nil "A-~A" (getf infld :fld))) ;; вне лямбды (!)
-                                 (accessor (lambda (x) (format nil "~A" (funcall (find-symbol subname (find-package "WIZARD")) x)))))
-                            (push (cons accessor perm) field-cons)))
-                         ((equal '(:link resource) (getf infld :typedata))
-                          (let ((accessor  (lambda (x) (format nil "~A" (a-name (a-resource x))))))
-                            (push (cons accessor perm) field-cons)))
+      :fld       (let ((perm  (getf (getf infld :permlist) :show))
+                       (symb  (find-symbol (format nil "A-~A" (getf infld :fld)) (find-package "WIZARD")))
+                       (accessor))
+                   (cond ((equal '(:str)              (getf infld :typedata))
+                          (setf accessor symb))
+                         ((equal '(:num)              (getf infld :typedata))
+                          (setf accessor (lambda (x) (format nil "~A" (funcall symb x)))))
+                         ((equal '(:link resource)    (getf infld :typedata))
+                          (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
+                         ((equal '(:link tender)      (getf infld :typedata))
+                          (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
+                         ((equal '(:list-of-keys tender-status)      (getf infld :typedata))
+                          (setf accessor (lambda (x) (format nil "~A" (getf *tender-status* (funcall symb x))))))
+                         ((equal '(:link builder)     (getf infld :typedata))
+                          (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
                          (t ;; default - print unknown type message in grid field
-                          (let ((accessor  (lambda (x) "unknown typedata in grid pager")))
-                            (push (cons accessor perm) field-cons)))))
+                          (setf accessor (lambda (x) "unknown typedata in grid pager"))))
+                   (push (cons accessor perm) field-cons))
       :btn       (let* ((perm      (getf infld :perm))
                         (btn       (getf infld :btn))                    ;; тут важно чтобы вычисление происходило вне лямбды
                         (value     (getf infld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
