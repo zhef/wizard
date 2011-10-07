@@ -127,8 +127,6 @@
                            '(:view   (or :logged :fair)))                   ;; Гость не видит у недобросовестных
       (contact-person      "Контактное лицо"           (:str)
                            '(:view   (or :logged :fair)))                   ;; Гость не видит у недобросовестных
-      (id                  "Идентификатор в базе"      (:str)
-                           '(:view   :all))
       (resources           "Поставляемые ресурсы"      (:list-of-links supplier-resource-price)
                            '(:add-resource :self   ;; создается связующий объект supplier-resource-price содержащий установленную поставщиком цену
                              :del-resource :self   ;; удаляется связующий объект
@@ -214,6 +212,7 @@
      (:create :owner
       :delete :owner
       :view   :all
+      :show   :all
       :update :owner))
 
 
@@ -246,8 +245,7 @@
       (tenders             "Тендеры"                    (:list-of-links tender)
                            '(:view   :all))
       (rating              "Рейтинг"                    (:num)
-                           '(:update :system))
-      (id                  "Идентификатор в базе"       (:str)))
+                           '(:update :system)))
      :perm
      (:create :admin
       :delete :admin
@@ -415,17 +413,16 @@
     (:place                category
      :url                  "/category/:id"
      :actions
-     '((:action            "Категории"
+     '((:action            "Подкатегории"
         :showtype          :grid
         :perm              :all
         :entity            category
-        :val               (cons-inner-objs *CATEGORY* (a-child-categoryes (gethash 1 *CATEGORY*)))
+        :val               (cons-inner-objs *CATEGORY* (a-child-categoryes (gethash (cur-id) *CATEGORY*)))
         :fields            '(name
                              ;; parent child-categoryes
                              (:btn "Показать ресурсы"
                               :perm :all
                               :act (to "/category/~A" (caar (form-data))))))
-       ;; Тут ошибка в гриде, так как надо передавать параметр-группу, но скоро там будет дерево, так что можно не исправлять
        (:action            "Ресурсы категории"
         :showtype          :grid
         :perm              :all
@@ -449,7 +446,7 @@
         :showtype          :grid
         :entity            resource
         :val               (cons-hash-list *RESOURCE*)
-        :fields            '(name resource-type unit
+        :fields            '(name unit
                              (:btn "Страница категории"
                               :perm :all
                               :act (HUNCHENTOOT:REDIRECT
@@ -502,9 +499,7 @@
                                                              :act (let ((obj (cur-user)))
                                                                     (with-obj-save obj
                                                                       LOGIN
-                                                                      PASSWORD))))))
-                             ))
-
+                                                                      PASSWORD))))))))
        (:action            "Создать аккаунт эксперта"
         :showtype          :linear
         :perm              :admin
@@ -551,28 +546,22 @@
                                                                       PASSWORD))))))
                              (:btn "Страница эксперта"
                               :perm :all
-                              :act (to "/expert/~A" (caar (form-data))))
-                             ))
-       ;; (:action            "Заявки поставщиков на добросовестность"
-       ;;  :perm              :admin
-       ;;  :entity            supplier
-       ;;  :showtype          :grid
-       ;;  :val               (remove-if-not #'(lambda (x)
-       ;;                                        (and (equal 'supplier (type-of (cdr x)))
-       ;;                                             (equal (a-status (cdr x)) :request)))
-       ;;                      (cons-hash-list *USER*))
-       ;;  :fields            '(name login
-       ;;                       (:btn "Подтвердить заявку"
-       ;;                        :perm :all
-       ;;                        :popup '(:action            "Подтвердить заявку поставщика"
-       ;;                                 :perm               :admin
-       ;;                                 :entity             supplier
-       ;;                                 :fields             '((:btn "Сделать добросовестным"
-       ;;                                                        :perm :all
-       ;;                                                        :act (let ((key (get-btn-key (caar (form-data)))))
-       ;;                                                               (setf (a-status (gethash key *USER*)) :fair)
-       ;;                                                               (hunchentoot:redirect (hunchentoot:request-uri*)))))))))
-       ))
+                              :act (to "/expert/~A" (caar (form-data))))))
+       (:action            "Заявки поставщиков на добросовестность"
+        :perm              :admin
+        :entity            supplier
+        :showtype          :grid
+        :val               (remove-if-not #'(lambda (x)
+                                              (and (equal 'supplier (type-of (cdr x)))
+                                                   (equal (a-status (cdr x)) :request)
+                                                   ))
+                            (cons-hash-list *USER*))
+        :fields            '(name login
+                             (:btn "Сделать добросовестным"
+                              :perm :all
+                              :act (let ((key (get-btn-key (caar (form-data)))))
+                                     (setf (a-status (gethash key *USER*)) :fair)
+                                     (hunchentoot:redirect (hunchentoot:request-uri*))))))))
 
     ;; Список экспертов
     (:place                experts
@@ -587,9 +576,6 @@
         :fields            '(name login
                              (:btn  "Страница эксперта"
                               :perm (or :admin :self)
-                              :act  (to "/expert/~A" (caar (form-data))))
-                             (:btn  "Доп кнопка"
-                              :perm (or :admin :self)
                               :act  (to "/expert/~A" (caar (form-data))))))))
     ;; Страница эксперта
     (:place                expert
@@ -600,7 +586,7 @@
         :perm              :all
         :entity            expert
         :val               (gethash (cur-id) *USER*)
-        :fields            '(name))))
+        :fields            '(name login))))
 
     ;; Список поставщиков
     (:place                suppliers
@@ -646,20 +632,6 @@
                                        NAME JURIDICAL-ADDRESS ACTUAL-ADDRESS CONTACTS EMAIL SITE HEADS INN KPP OGRN BANK-NAME
                                        BIK CORRESP-ACCOUNT CLIENT-ACCOUNT ADDRESSES CONTACT-PERSON)
                                      (hunchentoot:redirect (hunchentoot:request-uri*))))
-                             (:action            "Эксперты"
-                              :showtype          :grid
-                              :perm              :all
-                              :entity            expert
-                              :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'EXPERT)) (cons-hash-list *USER*))
-                              :fields            '(name login
-                                                   (:btn  "Страница эксперта"
-                                                    :perm (or :admin :self)
-                                                    :act  (to "/expert/~A" (caar (form-data))))
-                                                   (:btn  "Поп-ап кнопка"
-                                                    :perm (or :admin :self)
-                                                    :popup '(:action            "Главная страница"
-                                                            :showtype          :none
-                                                            :perm              :all))))
                              ;; resources
                              (:action            "Список поставляемых ресурсов"
                               :showtype          :grid
@@ -667,17 +639,19 @@
                               :entity            supplier-resource-price
                               :val               (cons-inner-objs *SUPPLIER-RESOURCE-PRICE* (a-resources (gethash (cur-id) *USER*)))
                               :fields            '(resource price
-                                                   (:btn "Удалить"
-                                                    :perm :all
-                                                    :popup '(:action            "Удаление ресурса"
-                                                             :perm              :admin
-                                                             :entity            supplier-resource-price
-                                                             :fields            '((:btn "Удалить ресурс"
-                                                                                   :perm :all
-                                                                                   :act (del-inner-obj
-                                                                                         (caar (form-data))
-                                                                                         *SUPPLIER-RESOURCE-PRICE*
-                                                                                         (a-resources (gethash (cur-id) *USER*)))))))))
+                                                   ;; (:btn "Удалить"
+                                                   ;;  :perm :all
+                                                   ;;  :popup '(:action            "Удаление ресурса"
+                                                   ;;           :showtype          :linear
+                                                   ;;           :perm              :admin
+                                                   ;;           :entity            supplier-resource-price
+                                                   ;;           :fields            '((:btn "Удалить ресурс"
+                                                   ;;                                 :perm :all
+                                                   ;;                                 :act (del-inner-obj
+                                                   ;;                                       (caar (form-data))
+                                                   ;;                                       *SUPPLIER-RESOURCE-PRICE*
+                                                   ;;                                       (a-resources (gethash 23 *USER*)))))))
+                                                   ))
                              (:btn "Добавить ресурс"
                               :perm :all
                               :popup '(:action             "Добавление ресурса"

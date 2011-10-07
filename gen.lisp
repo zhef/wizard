@@ -3,6 +3,7 @@
 (defparameter *menu*               nil)
 (defparameter *controllers*        nil)
 (defparameter *ajaxdataset*        nil)
+(defparameter *param-id-flag*      nil)
 
 
 (defun gen-fld-symb (fld entity-param)
@@ -79,9 +80,12 @@
                                 (list (list grid
                                             (format nil "(named-lambda ~A () ~A)"
                                                     (symbol-name (gensym "GRDNL-"))
-                                                    (getf action :val))
-                                            pre-generated-fields))))
-                  (format nil "~%~20T :grid \"~A\"" grid)))
+                                                    (bprint (getf action :val)))
+                                            pre-generated-fields
+                                            *param-id-flag*))))
+                  (format nil "~%~20T :grid \"~A\" ~%~20T :param-id ~A"
+                          grid
+                          *param-id-flag*)))
             (symbol-name (gensym "ACTNL-"))
             (bprint (getf action :val))
             pre-generated-fields)))
@@ -118,6 +122,9 @@
   (setf *menu* nil)
   (setf *ajaxdataset* nil)
   (loop :for place :in *places* :do
+     ;; *param-id-flag*
+     (setf *param-id-flag* (not (null (search "/:id" (getf place :url) :test #'equal))))
+     ;; clear *controllers*
      (setf *controllers* nil)
      ;; menu
      (unless (null (getf place :navpoint))
@@ -145,10 +152,11 @@
                           ))))
   ;; AJAXDATASET for all places
   (unless (null *ajaxdataset*)
-    (loop :for (grid val fields) :in *ajaxdataset* :do
-       (format out "~%~%(restas:define-route ~A/ajax (\"/~A\")"
+    (loop :for (grid val fields param-id) :in *ajaxdataset* :do
+       (format out "~%~%(restas:define-route ~A/ajax (\"/~A~A\")"
                grid
-               grid)
+               grid
+               (if param-id "/:id" ""))
        (format out "~%  (example-json ~%~2T ~A ~%~2T ~A))"
                val
                fields)))

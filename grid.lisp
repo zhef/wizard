@@ -157,12 +157,15 @@ function(){
       :calc (error "dumb error calc"))
     (grid-helper grid-id pager-id (replace-all
                                    (json:encode-json-to-string
-                                    `(("url" . ,(format nil "/~A" (getf act :grid))) ;; absolute uri
+                                    `(("url" . ,(format nil "/~A~A"
+                                                        (getf act :grid)
+                                                        (if (getf act :param-id) (format nil "/~A" (cur-id)) "")
+                                                        )) ;; absolute uri
                                       ("datatype" . "json")
                                       ("colNames" . ,(reverse col-names))
                                       ("colModel" . ,(reverse col-model))
-                                      ("rowNum" . 3)
-                                      ("rowList" . (2 3 5))
+                                      ("rowNum" . 10)
+                                      ("rowList" . (10 20 30))
                                       ("pager" . ,(format nil "#~A" pager-id))
                                       ("sortname" . "id")
                                       ("viewrecords" . t)
@@ -181,7 +184,7 @@ function(){
       ;; else
       (let ((val (funcall (getf act :val))))
         (case (getf act :showtype)
-          (:none     "showtype is null in defun show-acts")
+          (:none     "showtype is null in defun show-act")
           (:linear   (show-linear act val))
           (:grid     (show-grid   act val))
           (otherwise (format nil "unknown showtype in defun show-act: ~A" (bprint act)))))))
