@@ -113,12 +113,14 @@
   ""
   (multiple-value-bind (request-str request-list request-get-plist)
       (request-str)
+    (declare (ignore request-str request-list))
     request-get-plist))
 
 (defun request-list ()
   ""
   (multiple-value-bind (request-str request-list request-get-plist)
       (request-str)
+    (declare (ignore request-str request-get-plist))
     request-list))
 
 (defun get-btn-key (btn)

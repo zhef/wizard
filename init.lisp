@@ -147,3 +147,6 @@
 ;;    (print
 ;;     (list (car ten) (a-offers (cdr ten)))))
 ;; (a-name (gethash 60 *tender*))
+
+
+(print "RELOAD FINISHED")

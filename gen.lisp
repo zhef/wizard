@@ -66,7 +66,7 @@
 
 
 (defun gen-action (action)
-  (format t "~%--------------------action: ~A" (getf action :action)) ;;
+  ;; (format t "~%--------------------action: ~A" (getf action :action)) ;;
   (let ((pre-generated-fields (gen-fields (eval (getf action :fields)) (getf action :entity))))
     (format nil "~%~14T (list :action \"~A\" ~%~20T :showtype ~A ~%~20T :perm '~A ~A ~%~20T :val (named-lambda ~A () ~A)~% ~20T :fields ~A)"
             (getf action :action)
@@ -95,8 +95,7 @@
   ;; Required
   (format out "(in-package #:~A)"  (package-name *package*))
   ;; Containers
-  (let ((containers)
-        (classes (make-hash-table :test #'equal)))
+  (let ((containers))
     ;; Containers
     (loop :for entity :in *entityes* :do
        (let ((container (getf entity :container)))
@@ -110,14 +109,12 @@
     ;; Classes
     (format out "~%~%;; Classes")
     (loop :for entity :in *entityes* :do
-       (let ((super (getf entity :super)))
-         (format out "~%~%~%~<(defclass ~A (entity)~%(~{~A~^~%~}))~:>"
-                 `(,(getf entity :entity)
-                    ,(loop :for field :in (getf entity :fields) :collect
-                        (let ((fld (car field))
-                              (tpi (car (nth 2 field))))
-                          (format nil "~<(~A ~23:T :initarg :~A ~53:T :initform nil :accessor ~A)~:>"
-                                  `(,fld ,fld ,(format nil "A-~A" fld))))))))))
+       (format out "~%~%~%~<(defclass ~A (entity)~%(~{~A~^~%~}))~:>"
+               `(,(getf entity :entity)
+                  ,(loop :for field :in (getf entity :fields) :collect
+                      (let ((fld (car field)))
+                        (format nil "~<(~A ~23:T :initarg :~A ~53:T :initform nil :accessor ~A)~:>"
+                                `(,fld ,fld ,(format nil "A-~A" fld)))))))))
   ;; Places
   (setf *menu* nil)
   (setf *ajaxdataset* nil)
@@ -130,26 +127,28 @@
      (unless (null (getf place :navpoint))
        (push (list :link (getf place :url) :title (getf place :navpoint)) *menu*))
      ;; base route
-     (format t "~%--------::place::[~A]" (getf place :place)) ;;
+     ;; (format t "~%--------::place::[~A]" (getf place :place)) ;;
      (format out "~%~%(restas:define-route ~A-page (\"~A\")"
              (string-downcase (getf place :place))
              (getf place :url))
-     (format out "~%  (let ((session (hunchentoot:start-session))~%~7T (acts (list ~{~A~})))~%~5T(show-acts acts)))"
+     (format out "~A~%  (let ((session (hunchentoot:start-session))~%~7T (acts (list ~{~A~})))~%~5T(declare (ignore session))~%~5T(show-acts acts)))"
+             (if *param-id-flag* (format nil "~%  (declare (ignore id))") "")
              (loop :for action :in (eval (getf place :actions)) :collect
                 (gen-action action) ;; append *controllers* and *ajaxdataset* (!)
                 ))
      ;; CONTROLLERS for this place
      ;; (unless (null *controllers*) ;; всегда нужно иметь контроллеры, т.к. есть логин на всех страницах
-       (format out "~%~%(restas:define-route ~A/ctrs (\"~A\" :method :post)"
-               (string-downcase (getf place :place))
-               (getf place :url))
-       (format out  "~%  (let ((session (hunchentoot:start-session))~%~7T (acts `(~{~%~A~}))) ~%       (activate acts)))"
-               (loop :for (gen act) :in *controllers* :collect
-                  (format nil "(\"~A\" . ,(named-lambda ~A () ~A))"
-                          gen
-                          (symbol-name (gensym "CTRNL-"))
-                          (bprint act)
-                          ))))
+     (format out "~%~%(restas:define-route ~A/ctrs (\"~A\" :method :post)"
+             (string-downcase (getf place :place))
+             (getf place :url))
+     (format out  "~A~%  (let ((session (hunchentoot:start-session))~%~7T (acts `(~{~%~A~}))) ~%~5T(declare (ignore session))~%~5T(activate acts)))"
+             (if *param-id-flag* (format nil "~%  (declare (ignore id))") "")
+             (loop :for (gen act) :in *controllers* :collect
+                (format nil "(\"~A\" . ,(named-lambda ~A () ~A))"
+                        gen
+                        (symbol-name (gensym "CTRNL-"))
+                        (bprint act)
+                        ))))
   ;; AJAXDATASET for all places
   (unless (null *ajaxdataset*)
     (loop :for (grid val fields param-id) :in *ajaxdataset* :do
@@ -157,7 +156,8 @@
                grid
                grid
                (if param-id "/:id" ""))
-       (format out "~%  (example-json ~%~2T ~A ~%~2T ~A))"
+       (format out "~A~%  (example-json ~%~2T ~A ~%~2T ~A))"
+               (if param-id (format nil "~%  (declare (ignore id))") "")
                val
                fields)))
   ;; out *menu*

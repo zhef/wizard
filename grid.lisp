@@ -1,5 +1,7 @@
 (in-package #:WIZARD)
 
+(defparameter *popups* nil)
+
 
 (defmacro a-fld (name obj)
   `(if (equal val :clear)
@@ -26,10 +28,12 @@
 
 
 (defun show-fld (infld act val)
+  (declare (ignore act))
   (let ((namefld   (getf infld :fld))
         (captfld   (getf infld :name))
         (permfld   (getf infld :perm))
         (typedata  (getf infld :typedata)))
+    (declare (ignore permfld))
     (cond ((equal typedata '(:str))      (show-fld-helper captfld #'tpl:strupd  namefld (a-fld namefld val)))
           ((equal typedata '(:pswd))     (show-fld-helper captfld #'tpl:pswdupd namefld (a-fld namefld val)))
           ((equal typedata '(:num))      (show-fld-helper captfld #'tpl:strupd  namefld (a-fld namefld val)))
@@ -80,10 +84,12 @@
 
 
 (defun show-btn (infld act)
+  (declare (ignore act))
   (tpl:btnlin (list :name (getf infld :btn) :value (getf infld :value))))
 
 
 (defun show-popbtn (infld act)
+  (declare (ignore act))
   (let ((in-action (getf infld :action)))
     (push
      (list :id (getf infld :popbtn) :title (getf in-action :action) :content (show-act in-action) :left 200 :width 500)
@@ -115,11 +121,13 @@ function(){
 
 
 (defun show-grid (act val)
+  (declare (ignore val))
   (let ((grid-id  (gensym "J"))
         (pager-id (gensym "P"))
         (col-names)
         (col-model)
         (col-replace))
+    (declare (special *popups*))
     (with-in-fld-case (getf act :fields) ;; infld variable
       :fld (when (check-perm (getf (getf infld :permlist) :show) (cur-user))
              (push (getf infld :name) col-names)
@@ -134,8 +142,9 @@ function(){
                (push model col-model)))
       :btn (when (check-perm (getf infld :perm) (cur-user))
              (let* ((in-name (getf infld :btn))
-                    (in-capt (getf infld :value))
-                    (btn-str (format nil "\"<form method='post'><input type='submit' name='~A~~\"+cl+\"' value='~A' /></form>\"" in-name in-capt))
+                    ;; commented for change algorithm
+                    ;; (in-capt (getf infld :value))
+                    ;; (btn-str (format nil "\"<form method='post'><input type='submit' name='~A~~\"+cl+\"' value='~A' /></form>\"" in-name in-capt))
                     (model `(("name" . ,in-name)
                              ("index" . ,in-name)
                              ("width" . "200")
@@ -147,7 +156,6 @@ function(){
                ))
       :popbtn (when (check-perm (getf infld :perm) (cur-user))
                 (let* ((in-name (getf infld :popbtn))
-                       (in-capt (getf infld :value))
                        (model `(("name" . ,in-name)
                                 ("index" . ,in-name)
                                 ("width" . "200")
@@ -273,12 +281,15 @@ function(){
                          ((equal '(:link supplier)                    (getf infld :typedata))
                           (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
                          (t ;; default - print unknown type message in grid field
-                          (setf accessor (lambda (x) "unknown typedata in grid pager"))))
+                          (setf accessor (lambda (x)
+                                           (declare (ignore x))
+                                           "unknown typedata in grid pager"))))
                    (push (cons accessor perm) field-cons))
       :btn       (let* ((perm      (getf infld :perm))
                         (btn       (getf infld :btn))                    ;; тут важно чтобы вычисление происходило вне лямбды
                         (value     (getf infld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
                         (accessor  (lambda (x)
+                                     (declare (ignore x))
                                      (format nil "<form method='post'><input type='submit' name='~A~~%|id|%' value='~A~~%|id|%' /></form>"
                                              btn
                                              value))))
@@ -287,6 +298,7 @@ function(){
                         (btn       (getf infld :popbtn))                 ;; тут важно чтобы вычисление происходило вне лямбды
                         (value     (getf infld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
                         (accessor  (lambda (x)
+                                     (declare (ignore x))
                                      (format nil "<input type='button' name='~A~~%|id|%' value='~A~~%|id|%' onclick='ShowHide(\"~A\")' />"
                                              btn
                                              value

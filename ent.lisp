@@ -177,6 +177,7 @@
      (:create :owner
       :delete :owner
       :view   :all
+      :show   :all
       :update (and :active :owner)))
 
 
@@ -1004,8 +1005,6 @@
                                                                   (GETHASH (GET-BTN-KEY (CAAR (FORM-DATA)))
                                                                            *OFFER*))))))))))))
 
-    ;; <<------------------------ verifyed 08.10.2011
-
     ;; Страница заявки на тендер
     (:place                offer
      :url                  "/offer/:id"
@@ -1015,65 +1014,67 @@
         :entity            offer
         :perm              :all
         :val               (gethash (cur-id) *OFFER*)
-        :fields            '(tender
+        :fields            '(owner tender
                              ;; resources
-                             ;; (:col              "Ресурсы оферты"
-                             ;;  :perm             111
-                             ;;  :entity           offer-resource
-                             ;;  :val              (cons-inner-objs *OFFER-RESOURCE* (a-resources (gethash (cur-id) *OFFER*)))
-                             ;;  :fields '(resource price
-                             ;;            (:btn   "Удалить из оферты"
-                             ;;             :perm  :all
-                             ;;             :act   (del-inner-obj
-                             ;;                     (caar (last (form-data)))
-                             ;;                     *OFFER-RESOURCE*
-                             ;;                     (a-resources (gethash (cur-id) *OFFER*))))
+                             (:action           "Ресурсы заявки"
+                              :showtype         :grid
+                              :perm             :all
+                              :entity           offer-resource
+                              :val              (cons-inner-objs *OFFER-RESOURCE* (a-resources (gethash (cur-id) *OFFER*)))
+                              :fields '(resource price
+                                        (:btn "Удалить из заявки"
+                                         :perm :all
+                                         :act (del-inner-obj
+                                                 (caar (last (form-data)))
+                                                 *OFFER-RESOURCE*
+                                                 (a-resources (gethash (cur-id) *OFFER*))))
+                                        ))))))
                              ;;             ;; (let* ((id (get-btn-key (caar (last (form-data)))))
                              ;;             ;;               (etalon (gethash id *OFFER-RESOURCE*)))
                              ;;             ;;          (setf (a-resources (gethash (cur-id) *OFFER*))
                              ;;             ;;                (remove-if #'(lambda (x)
                              ;;             ;;                               (equal etalon x))
                              ;;             ;;                           (a-resources (gethash (cur-id) *OFFER*)))
-
                              ;;            (:btn   "Страница ресурса"
                              ;;             :perm  :all
                              ;;             :act   (to "/resource/~A" (caar (last (form-data)))))))
-                             (:btn "Добавить ресурс"
-                              :perm :all
-                              :popup '(:action            "Выберите ресурсы"
-                                       :perm              (and :active :fair)
-                                       :entity            resource
-                                       :val               (cons-hash-list *RESOURCE*)
-                                       :fields            '(
-                                                            ;; (:col "Выберите ресурс"
-                                                            ;;  :perm 222
-                                                            ;;  :entity resource
-                                                            ;;  :val (cons-hash-list *RESOURCE*)
-                                                            ;;  :fields '(name
-                                                            ;;            (:btn "Добавить ресурс"
-                                                            ;;             :perm :all
-                                                            ;;             :popup '(:action  "Укажите цену"
-                                                            ;;                      :perm    1111
-                                                            ;;                      :entity  resource
-                                                            ;;                      :val     :clear
-                                                            ;;                      :fields  '((:calc "<input type=\"text\" name=\"INPRICE\" />")
-                                                            ;;                                 (:btn "Задать цену"
-                                                            ;;                                  :perm :all
-                                                            ;;                                  :act
-                                                            ;;                                  (let ((res-id (get-btn-key(caar (last (form-data)))))
-                                                            ;;                                        (in (cdr (assoc "INPRICE" (form-data) :test #'equal)))
-                                                            ;;                                        (id (hash-table-count *OFFER-RESOURCE*)))
-                                                            ;;                                    (push
-                                                            ;;                                     (setf (gethash id *OFFER-RESOURCE*)
-                                                            ;;                                           (make-instance 'OFFER-RESOURCE
-                                                            ;;                                                          :owner (cur-user)
-                                                            ;;                                                          :offer (gethash (cur-id) *OFFER*)
-                                                            ;;                                                          :resource (gethash res-id *RESOURCE*)
-                                                            ;;                                                          :price in))
-                                                            ;;                                     (a-resources (gethash (cur-id) *OFFER*)))
-                                                            ;;                                    (hunchentoot:redirect (hunchentoot:request-uri*)))
-                                                            ;;                                  ))))))
-                                                            )))))))
+                             ;; (:btn "Добавить ресурс"
+                             ;;  :perm :all
+                             ;;  :popup '(:action            "Выберите ресурсы"
+                             ;;           :perm              :all (and :active :fair)
+                             ;;           :entity            resource
+                             ;;           :val               (cons-hash-list *RESOURCE*)
+                             ;;           :fields            '(
+                             ;;                                ;; (:col "Выберите ресурс"
+                             ;;                                ;;  :perm 222
+                             ;;                                ;;  :entity resource
+                             ;;                                ;;  :val (cons-hash-list *RESOURCE*)
+                             ;;                                ;;  :fields '(name
+                             ;;                                ;;            (:btn "Добавить ресурс"
+                             ;;                                ;;             :perm :all
+                             ;;                                ;;             :popup '(:action  "Укажите цену"
+                             ;;                                ;;                      :perm    1111
+                             ;;                                ;;                      :entity  resource
+                             ;;                                ;;                      :val     :clear
+                             ;;                                ;;                      :fields  '((:calc "<input type=\"text\" name=\"INPRICE\" />")
+                             ;;                                ;;                                 (:btn "Задать цену"
+                             ;;                                ;;                                  :perm :all
+                             ;;                                ;;                                  :act
+                             ;;                                ;;                                  (let ((res-id (get-btn-key(caar (last (form-data)))))
+                             ;;                                ;;                                        (in (cdr (assoc "INPRICE" (form-data) :test #'equal)))
+                             ;;                                ;;                                        (id (hash-table-count *OFFER-RESOURCE*)))
+                             ;;                                ;;                                    (push
+                             ;;                                ;;                                     (setf (gethash id *OFFER-RESOURCE*)
+                             ;;                                ;;                                           (make-instance 'OFFER-RESOURCE
+                             ;;                                ;;                                                          :owner (cur-user)
+                             ;;                                ;;                                                          :offer (gethash (cur-id) *OFFER*)
+                             ;;                                ;;                                                          :resource (gethash res-id *RESOURCE*)
+                             ;;                                ;;                                                          :price in))
+                             ;;                                ;;                                     (a-resources (gethash (cur-id) *OFFER*)))
+                             ;;                                ;;                                    (hunchentoot:redirect (hunchentoot:request-uri*)))
+                             ;;                                ;;                                  ))))))
+                             ;;                                )))
+                             ;; ))))
 
     ;; Рейтинг компаний
     (:place                rating
@@ -1117,5 +1118,3 @@
         :perm              :all)))
 
     ))
-
-(print "ent.list finished")

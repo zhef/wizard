@@ -37,4 +37,5 @@
 ;; возвращает T, иначе NIL
 (defmethod controller ((fld field))
   (lambda (value)
+    (declare (ignore value))
     t))
