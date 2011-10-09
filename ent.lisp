@@ -650,10 +650,12 @@
                              (:btn "Добавить ресурс"
                               :perm :all
                               :popup '(:action             "Добавление ресурса"
-                                       :showtype           :linear
+                                       :showtype           :grid
                                        :perm               :all
-                                       :entity             supplier-resource-price
-                                       :fields             '((:btn "Добавить ресурс" ;; <-------------------- TODO: добавить поля
+                                       :entity             resource
+                                       :val                (cons-hash-list *RESOURCE*)
+                                       :fields             '(name
+                                                             (:btn "Добавить ресурс" ;; <-------------------- TODO: добавить поля
                                                               :perm :all
                                                               :act
                                                               (progn
@@ -1028,23 +1030,18 @@
                                                  (caar (last (form-data)))
                                                  *OFFER-RESOURCE*
                                                  (a-resources (gethash (cur-id) *OFFER*))))
-                                        ))))))
-                             ;;             ;; (let* ((id (get-btn-key (caar (last (form-data)))))
-                             ;;             ;;               (etalon (gethash id *OFFER-RESOURCE*)))
-                             ;;             ;;          (setf (a-resources (gethash (cur-id) *OFFER*))
-                             ;;             ;;                (remove-if #'(lambda (x)
-                             ;;             ;;                               (equal etalon x))
-                             ;;             ;;                           (a-resources (gethash (cur-id) *OFFER*)))
-                             ;;            (:btn   "Страница ресурса"
-                             ;;             :perm  :all
-                             ;;             :act   (to "/resource/~A" (caar (last (form-data)))))))
-                             ;; (:btn "Добавить ресурс"
-                             ;;  :perm :all
-                             ;;  :popup '(:action            "Выберите ресурсы"
-                             ;;           :perm              :all (and :active :fair)
-                             ;;           :entity            resource
-                             ;;           :val               (cons-hash-list *RESOURCE*)
-                             ;;           :fields            '(
+                                        (:btn   "Страница ресурса"
+                                         :perm  :all
+                                         :act   (to "/resource/~A" (caar (last (form-data)))))))
+                             (:btn "Добавить ресурс"
+                              :perm :all
+                              :popup '(:action            "Выберите ресурсы"
+                                       :showtype          :grid
+                                       :perm              :all ;; (and :active :fair)
+                                       :entity            resource
+                                       :val               (cons-hash-list *RESOURCE*)
+                                       :fields            '(name ;; тут нужно добавить чекбокс
+                                                            )))))))
                              ;;                                ;; (:col "Выберите ресурс"
                              ;;                                ;;  :perm 222
                              ;;                                ;;  :entity resource

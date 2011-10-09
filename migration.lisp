@@ -27,23 +27,37 @@
   (with-query-select ("SELECT |:::| FROM `jos_gt_company_group_bind`"
                       ("company_id" "group_id"))
     (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company` WHERE `id`='~A'" company_id)
-                        ("juridical_address_id" "actual_address_id" "name" "email" "site" "is_diligent"))
+                        ("juridical_address_id" "actual_address_id" "head_id" "name" "email" "site" "is_diligent"))
       (let ((juridical-address)
             (actual-address)
-            (contacts))
+            (contacts)
+            (heads)
+            (divisions))
         (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_address` WHERE `id`='~A'" juridical_address_id)
                             ("street" "house"))
           (setf juridical-address (format nil "~A ~A" street house)))
         (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_address` WHERE `id`='~A'" actual_address_id)
                             ("street" "house"))
           (setf actual-address (format nil "~A ~A" street house)))
+        (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_employee` WHERE `id`='~A'" head_id)
+                            ("second_name" "name" "patronymic" "post" "phone" "email" "user_id"))
+          (setf heads (format nil "~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] "
+                              post second_name name patronymic phone email)))
+        (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_division` WHERE `company_id`='~A'" company_id)
+                            ("city_id" "name" "post_index" "street" "house" "office" "phone"))
+          (let ((save-name name))
+            (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_city` WHERE `id`='~A'" city_id)
+                                ("name"))
+              (push (format nil "~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~]"
+                            name save-name post_index street house office phone)
+                    divisions))))
         (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_phone` WHERE `company_id`='~A'" company_id)
                             ("number"))
           (setf contacts (append contacts (list number))))
         (if (< group_id 5)
+            ;; Поставщики - это первые четыре группы
             (progn
-              (format t "~%[SUPPLIER]: ~A" name)
-              ;; Поставщики - это первые четыре группы
+              (format t "~%[SUPPLIER]: ~A | ~A" name company_id)
               (setf (gethash company_id *USER*)
                     (make-instance 'SUPPLIER
                                    :login (symbol-name (gensym "LOGIN"))
@@ -51,13 +65,15 @@
                                    :name name
                                    :email email
                                    :site site
+                                   :heads heads
+                                   :addresses (format nil "~{~A ~}" #|"~{~@[~A~%~]~}"~|# divisions)
                                    :status (if (equal 1 is_diligent)  :fair  :unfair)
                                    :juridical-address juridical-address
                                    :actual-address actual-address
                                    :contacts contacts)))
             ;; Застройщики - это все остальные
             (progn
-              (format t "~%[BUILDER]: ~A" name )
+              ;; (format t "~%[BUILDER]: ~A" name )
               (setf (gethash company_id *USER*)
                     (make-instance 'BUILDER
                                    :login (symbol-name (gensym "LOGIN"))
@@ -75,6 +91,12 @@
        :login (format nil "exp~A" i)
        :password (format nil "exp~A" i))))
 
+
+;; test
+;; (loop :for (id . obj) :in (remove-if-not #'(lambda (x)
+;;                                     (equal 'supplier (type-of (cdr x))))
+;;                                 (cons-hash-list *USER*)) :do
+;;    (format t "~%~A | ~A" id (a-addresses obj)))
 
 
 ;; Извлекаем группы ресурсов, которые у нас называются категориями
