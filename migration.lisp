@@ -7,14 +7,234 @@
   (let* ((fld-str (format nil "~{`~A`~^, ~}" fields))
          (fld-sym (loop :for fld :in fields :collect (intern (string-upcase fld) (find-package "WIZARD")))))
     (with-gensyms (res row)
-      `(progn
-         (setf ,res (caar (query (replace-all ,query-str "|:::|" ,fld-str))))
+      `(let ((,res (caar (query (replace-all ,query-str "|:::|" ,fld-str)))))
          (aif ,res
               (loop :for ,row :in ,res :collect
                  (destructuring-bind ,fld-sym
                      ,row
                    ,@body))
               nil)))))
+
+
+;; Таблицы
+'(jos_gt_city
+  :jos_gt_company
+  :jos_gt_company_address
+  :jos_gt_company_details
+  :jos_gt_company_division
+  :jos_gt_company_employee
+  ;; jos_gt_company_group
+  :jos_gt_company_group_bind
+  :jos_gt_company_phone
+  jos_gt_company_resource
+  ;; jos_gt_company_right_form
+  jos_gt_discount
+  :jos_gt_measure_unit
+  jos_gt_notification
+  jos_gt_notification_type
+  :jos_gt_resource
+  :jos_gt_resource_code
+  jos_gt_resource_duplicate
+  :jos_gt_resource_group
+  :jos_gt_resource_price
+  :jos_gt_resource_price_level
+  jos_gt_resource_request
+  jos_gt_tender
+  jos_gt_tender_form
+  jos_gt_tender_form_answer_variant
+  jos_gt_tender_form_question
+  jos_gt_tender_offer
+  jos_gt_tender_order
+  jos_gt_tender_order_answer
+  jos_gt_tender_order_resource
+  jos_gt_tender_order_uploaded_file
+  jos_gt_tender_resource
+  jos_gt_tender_status
+  jos_gt_tender_supplier
+  jos_gt_tender_uploaded_file
+  jos_gt_uploaded_file
+  jos_gt_user_notification_type)
+
+
+;; jos_gt_resource :
+;; :id
+;; :name
+;; :unit_id    measure_unit
+;; :group_id   resource_group
+;; :type       mashine : matherial
+
+
+(defun categoryes-and-resources ()
+  "Переносим ресурсы и категории"
+  (defparameter *CATEGORY* (make-hash-table :test #'equal))
+  (defparameter *RESOURCE* (make-hash-table :test #'equal))
+
+  ;; Забираем все единицы измерения
+  (let ((measures (make-hash-table :test #'equal)))
+    (with-query-select ("SELECT |:::| FROM `jos_gt_measure_unit`"
+                        ("id" "name"))
+      (setf (gethash id measures) name))
+
+    ;; Забираем сырые данные по категориям из базы
+    (defparameter gr-cnt 0)
+    (with-query-select ("SELECT |:::| FROM `jos_gt_resource_group`"
+                        ("id" "name" "type" "parent_id"))
+      (let ((save-group-id     id)
+            (save-group-name   name)
+            (this-category     (setf (gethash id *CATEGORY*)
+                                     (make-instance 'CATEGORY
+                                                    :name name
+                                                    ;; здесь parent еще числовой
+                                                    :parent parent_id))))
+        ;; Забираем ресурсы, принадлежащие этой категории
+        (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_resource` WHERE `group_id` = '~A'" id)
+                            ("id" "name" "unit_id" "group_id" "type"))
+
+          ;; Создаем ресурс, связывая его с категорией
+          (let ((this-resource (setf (gethash id *RESOURCE*)
+                                     (make-instance 'RESOURCE
+                                                    :name name
+                                                    :category this-category
+                                                    :resource-type (if (equal 1 type) :material :machine)
+                                                    :unit (gethash unit_id measures)))))
+
+            ;; Выдаем warning если в базе связь ресурс-категория не совпадает со связью категория-ресурс
+            (unless (equal save-group-id group_id)
+              (format t "~&warn: not equal link to category (~A | ~A) and resource (~A | ~A)"
+                      save-group-id
+                      save-group-name
+                      id
+                      name))
+
+            ;; Добавляем этот ресурс в категорию, т.е. связываем категорию с ресурсом
+            (setf (a-resources this-category)
+                  (append (a-resources this-category)
+                          (list this-resource)))
+            t)t)t)t)t)
+
+  ;; Связываем категории в дерево - здесь parent становится категорией, и слот child-categoryes становится валидным
+  (maphash #'(lambda (key category)
+               (let ((parent-category (gethash (a-parent category) *CATEGORY*)))
+                 (setf (a-parent category) parent-category)
+                 (when parent-category
+                   (setf (a-child-categoryes parent-category)
+                         (append (a-child-categoryes parent-category)
+                                 (list category))))))
+           *CATEGORY*)
+  t)
+
+
+(categoryes-and-resources)
+
+
+(defun resource-price ()
+  (defparameter *PRICE-REFERENCE* (make-hash-table :test #'equal))
+  ;; Забираем все справочники
+  (with-query-select ("SELECT |:::| FROM `jos_gt_resource_price_level`"
+                      ("id" "level" "title"))
+    ;; Создаем справочник
+    (let ((reference-id id)
+          (this-price-reference (setf (gethash id *PRICE-REFERENCE*)
+                                      (make-instance 'PRICE-REFERENCE
+                                                     :date level
+                                                     :name title
+                                                     :resource-prices nil))))
+      ;; (format t "~& ~A | ~A"  (a-date this-price-reference) (a-name this-price-reference)) ;;
+      ;; Забираем все цены для этого справочника
+      (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_resource_price` WHERE `level_id` = ~A" reference-id)
+                          ("id" "code_id" "estimate" "wholesale" "level_id"))
+        ;; Создаем цену, связывая ее со справочником
+        (let ((this-resource-price (setf (gethash id *RESOURCE-PRICE*)
+                                         (make-instance 'RESOURCE-PRICE
+                                                        :estimate estimate
+                                                        :wholesale wholesale
+                                                        :price-level this-price-reference
+                                                        :resource nil))))
+          ;; Связываем справочник с созданной ценой
+          (setf (a-resource-prices this-price-reference)
+                (append (a-resource-prices this-price-reference)
+                        (list this-resource-price)))
+          ;; По code_id получаем код ресурса
+          (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_resource_code` WHERE `code`=~A" code_id)
+                              ("resource_id"))
+            ;; По коду ресурса получаем ресурс, с которым связываем цену
+            (let ((this-resource (gethash resource_id *RESOURCE*)))
+              (when this-resource ;; иногда бывает nil, что вероятно связано с неполным дампом
+                (setf (a-resource this-resource-price) this-resource)
+                ;; Добавляем цену к ресурсу
+                (setf (a-resource-prices this-resource)
+                      (append (a-resource-prices this-resource)
+                              (list this-resource-price))))
+              t)t)t)t)t)t)t)
+
+
+;; tests
+;; (hash-table-count *PRICE-REFERENCE*)
+
+;; tests
+;; (maphash #'(lambda (k v)
+;;              (print (list k (a-name v)))
+;;              (print (length (a-resource-prices v)))
+;;              (loop :for a :in (a-resource-prices v) :do
+;;                 (when (a-resource a)
+;;                   (print (list (a-estimate a)
+;;                                (a-wholesale a)
+;;                                (a-price-level a)
+;;                                (a-name (a-resource a))
+;;                                (a-name (a-category (a-resource a)))))
+;;                   (return))))
+;;          *PRICE-REFERENCE*)
+
+(resource-price)
+
+
+(defun tenders ()
+  "Тендеры"
+  (defparameter *TENDER*                      (make-hash-table :test #'equal))
+  (defparameter *OFFER*                       (make-hash-table :test #'equal))
+  ;; Забираем все тендеры
+  (with-query-select ("SELECT |:::| FROM `jos_gt_tender`"
+                      ("id" "company_id" "name" "tender_begin" "tender_end" "order_begin" "order_end" "process_begin" "process_end"
+                            "talking_begin" "talking_end" "resulting_begin" "resulting_end" "total" "pricetype" "pricesource"
+                            "coverage" "status_id"))
+    (let* ((save-tender-id id)
+           (builder (gethash company_id *USER*))           ;; Отыскиваем компанию, которой принадлежит тендер, по company_id
+           (this-tender (setf (gethash id *TENDER*)        ;; Создаем тендер, связывая его с владельцем
+                               (make-instance 'TENDER
+                                              :name name
+                                              :owner builder
+                                              :all        (make-interval :begin tender_begin :end tender_end)
+                                              :claim      (make-interval :begin order_begin :end order_end)
+                                              :analize    (make-interval :begin process_begin :end process_end)
+                                              :interview  (make-interval :begin talking_begin :end talking_end)
+                                              :result     (make-interval :begin resulting_begin :end resulting_end)
+                                              :status (ecase status_id
+                                                        (1 :unactive)
+                                                        (2 :active)
+                                                        (3 :cancelled)
+                                                        (4 :finished))))))
+      ;; Связываем владельца с созданным тендером
+      (setf (a-tenders builder)
+            (append (a-tenders builder)
+                    (list this-tender)))
+      ;; Забираем ресурсы тендера
+      (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_tender_resource` WHERE `tender-id` = ~A" save-tender-id)
+                          ("id" "tender_id" "resource_id" "quantity" "price" "pricedate" "comments" "deliver" "is_basis"))
+        ;; * TODO По видимому тендер не просто содержит ресурсы, а вместо этого содержит объект, содержащий ссылку на ресурс и цену?
+
+        ;; * TODO Как таблицы tender_order и tender_offer превращаются в OFFER?
+      ;; ;; Забираем все завки на этот тендер
+      ;; (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_tender_order` WHERE `tender-id` = ~A" save-tender-id)
+      ;;                     ("id" "offer_id" "has_been_read"))
+      ;;   (let ((supplier   (gethash company_id *USER*))      ;; Отыскиваем компанию, откликнувшуюся на тендер, по company_id
+      ;;         (this-offer (setf (gethash id *OFFER*)        ;; Создаем заявку
+      ;;                           (make-instance 'OFFER
+      ;;                                          :owner supplier
+      ;;                                          :tender this-tender
+      ;;                                          :resources nil))))
+
+
+      ;; t)))
 
 
 ;; Пользователи
@@ -27,12 +247,9 @@
   (with-query-select ("SELECT |:::| FROM `jos_gt_company_group_bind`"
                       ("company_id" "group_id"))
     (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company` WHERE `id`='~A'" company_id)
-                        ("juridical_address_id" "actual_address_id" "head_id" "name" "email" "site" "is_diligent"))
-      (let ((juridical-address)
-            (actual-address)
-            (contacts)
-            (heads)
-            (divisions))
+                        ("juridical_address_id" "actual_address_id" "head_id" "details_id" "name" "email" "site" "is_diligent"))
+      (let ((juridical-address) (actual-address) (contacts) (heads) (divisions)
+            (inn*) (ogrn*) (bank-name*) (bik*) (correspondent_account*) (sattlement_account*))
         (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_address` WHERE `id`='~A'" juridical_address_id)
                             ("street" "house"))
           (setf juridical-address (format nil "~A ~A" street house)))
@@ -43,6 +260,14 @@
                             ("second_name" "name" "patronymic" "post" "phone" "email" "user_id"))
           (setf heads (format nil "~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] "
                               post second_name name patronymic phone email)))
+        (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_details` WHERE `id`='~A'" details_id)
+                            ("inn" "ogrn" "bank" "bik" "correspondent_account" "sattlement_account"))
+          (setf inn* inn)
+          (setf ogrn* ogrn)
+          (setf bank* bank)
+          (setf bik* bik)
+          (setf correspondent_account* correspondent_account)
+          (setf sattlement_account* sattlement_account))
         (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_division` WHERE `company_id`='~A'" company_id)
                             ("city_id" "name" "post_index" "street" "house" "office" "phone"))
           (let ((save-name name))
@@ -58,90 +283,58 @@
             ;; Поставщики - это первые четыре группы
             (progn
               (format t "~%[SUPPLIER]: ~A | ~A" name company_id)
-              (setf (gethash company_id *USER*)
-                    (make-instance 'SUPPLIER
-                                   :login (symbol-name (gensym "LOGIN"))
-                                   :password (symbol-name (gensym "PASSWORD"))
-                                   :name name
-                                   :email email
-                                   :site site
-                                   :heads heads
-                                   :addresses (format nil "~{~A ~}" #|"~{~@[~A~%~]~}"~|# divisions)
-                                   :status (if (equal 1 is_diligent)  :fair  :unfair)
-                                   :juridical-address juridical-address
-                                   :actual-address actual-address
-                                   :contacts contacts)))
-            ;; Застройщики - это все остальные
-            (progn
-              ;; (format t "~%[BUILDER]: ~A" name )
-              (setf (gethash company_id *USER*)
-                    (make-instance 'BUILDER
-                                   :login (symbol-name (gensym "LOGIN"))
-                                   :password (symbol-name (gensym "PASSWORD"))
-                                   :name name
-                                   :email email
-                                   :site site
-                                   :juridical-address juridical-address
-                                   :actual-address actual-address
-                                   :contacts contacts)))))))
-  ;; Эксперты
-  (loop :for i :from 1 :to 9 :do
-     (push-hash *USER* 'EXPERT
-       :name (format nil "Эксперт-~A" i)
-       :login (format nil "exp~A" i)
-       :password (format nil "exp~A" i))))
+              (let ((supplier (setf (gethash company_id *USER*)
+                                    (make-instance 'SUPPLIER
+                                                   :login (symbol-name (gensym "LOGIN"))
+                                                   :password (symbol-name (gensym "PASSWORD"))
+                                                   :name name
+                                                   :email email
+                                                   :site site
+                                                   :heads heads
+                                                   :inn inn*
+                                                   :ogrn ogrn*
+                                                   :bank-name bank-name*
+                                                   :bik bik*
+                                                   :corresp-account correspondent_account*
+                                                   :client-account sattlement_account*
+                                                   :addresses (format nil "~{~A ~}" divisions)
+                                                   :status (if (equal 1 is_diligent)  :fair  :unfair)
+                                                   :juridical-address juridical-address
+                                                   :actual-address actual-address
+                                                   :contacts contacts))))
+                ;; Поставщик может предоставлять скидки на свою продукцию
+                (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_discount` WHERE `company_id`='~A'" company_id)
+                                    ("resource_id conditions actually_to"))
+                  ;; И вот тут у нас начинается жопа, так как нам нужны ресурсы )
+
+                  )
+                ;; Застройщики - это все остальные
+                (progn
+                  ;; (format t "~%[BUILDER]: ~A" name )
+                  (setf (gethash company_id *USER*)
+                        (make-instance 'BUILDER
+                                       :login (symbol-name (gensym "LOGIN"))
+                                       :password (symbol-name (gensym "PASSWORD"))
+                                       :name name
+                                       :email email
+                                       :site site
+                                       :juridical-address juridical-address
+                                       :actual-address actual-address
+                                       :contacts contacts)))))))
+      ;; Эксперты
+      (loop :for i :from 1 :to 9 :do
+         (push-hash *USER* 'EXPERT
+           :name (format nil "Эксперт-~A" i)
+           :login (format nil "exp~A" i)
+           :password (format nil "exp~A" i))))
+
+    (gethash 21 *USER*)
 
 
-;; test
-;; (loop :for (id . obj) :in (remove-if-not #'(lambda (x)
-;;                                     (equal 'supplier (type-of (cdr x))))
-;;                                 (cons-hash-list *USER*)) :do
-;;    (format t "~%~A | ~A" id (a-addresses obj)))
+    ;; test
+    ;; (loop :for (id . obj) :in (remove-if-not #'(lambda (x)
+    ;;                                     (equal 'supplier (type-of (cdr x))))
+    ;;                                 (cons-hash-list *USER*)) :do
+    ;;    (format t "~%~A | ~A" id (a-addresses obj)))
 
 
-;; Извлекаем группы ресурсов, которые у нас называются категориями
-(progn
-  ;; Очищаем категории ресурсы и тендеры
-  (defparameter *CATEGORY* (make-hash-table :test #'equal))
-  (defparameter *RESOURCE* (make-hash-table :test #'equal))
-  (defparameter *TENDER*   (make-hash-table :test #'equal))
-  ;; Забираем сырые данные по категориям из базы
-  (with-query-select ("SELECT |:::| FROM `jos_gt_resource_group`"
-                    ("id" "name" "type" "parent_id"))
-    (let ((this-category (setf (gethash id *CATEGORY*)
-                               (make-instance 'CATEGORY
-                                              :name name
-                                              :parent parent_id))))
-      ;; Забираем ресурсы, принадлежащие этой категории
-      (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_resource` WHERE `group_id` = '~A'" id)
-                          ("id" "name" "type" "unit_id"))
-        (let ((this-resource (setf (gethash id *RESOURCE*)
-                                   (make-instance 'RESOURCE
-                                                  :name name
-                                                  :category this-category
-                                                  :resource-type (if (equal 1 type) :machine :material)
-                                                  :unit  (if (equal 1 unit_id) "шт." "ед.изм")))))
-          (setf (a-resources this-category)
-                (append (a-resources this-category)
-                        (list this-resource)))))))
-  ;; Связываем категории в дерево
-  (maphash #'(lambda (key category)
-               (let ((parent-category (gethash (a-parent category) *CATEGORY*)))
-                 (setf (a-parent category) parent-category)
-                 (when parent-category
-                   (setf (a-child-categoryes parent-category)
-                         (append (a-child-categoryes parent-category)
-                                 (list category))))))
-           *CATEGORY*)
-  ;; Тендеры
-  (with-query-select ("SELECT |:::| FROM `jos_gt_tender`"
-                      ("id" "company_id" "name" "pricetype"))
-    ;; Отыскиваем компанию, которой принадлежит тендер, по company_id
-    (let ((builder (gethash company_id *USER*)))
-      (let ((this-tender (setf (gethash id *TENDER*)
-                               (make-instance 'TENDER
-                                              :name name
-                                              :owner builder))))
-        (setf (a-tenders builder)
-              (append (a-tenders builder)
-                      (list this-tender)))))))

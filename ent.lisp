@@ -7,6 +7,11 @@
 
 (defclass entity () ())
 
+;; Тип данных для хранения интервалов времени
+(defstruct interval
+  (begin 0 :type integer)
+  (end 0 :type integer))
+
 ;; Возможные типы ресурсов: машины, материалы etc
 (defparameter *resource-types*
   '(:machine "машина" :material "материал"))
@@ -280,9 +285,41 @@
      :fields
      ((name                "Наименование"               (:str))
       (category            "Категория"                  (:link category))
-      (resource-type       "Тип"                        (:list-of-keys resource-types))
+      (resource-type       "Тип ресурса"                (:list-of-keys resource-types))
       (unit                "Единица измерения"          (:str))
-      (suppliers           "Поставляющие организации"   (:list-box supplier)))
+      (suppliers           "Поставляющие организации"   (:list-box supplier))
+      (resource-prices     "Цены ресурса"               (:list-of-links resource-price)))
+     :perm
+     (:create :system
+      :delete :system
+      :view   :all
+      :show   :all
+      :update :system))
+
+
+    ;; Цены на ресурс
+    (:entity               resource-price
+     :container            resource-price
+     :fields
+     ((estimate            "Сметная цена"               (:num))
+      (wholesale           "Оптовая цена"               (:num))
+      (price-level         "Справочник цен"             (:link price-level))
+      (resource            "Ресурс"                     (:link resource)))
+     :perm
+     (:create :system
+      :delete :system
+      :view   :all
+      :show   :all
+      :update :system))
+
+
+    ;; Справочники цен
+    (:entity               price-reference
+     :container            price-reference
+     :fields
+     ((name                "Наименование"               (:str))
+      (date                "Дата"                       (:str))
+      (resource-prices     "Цены"                       (:list-of-links resource-price)))
      :perm
      (:create :system
       :delete :system
