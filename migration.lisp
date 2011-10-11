@@ -185,7 +185,7 @@
 ;;                   (return))))
 ;;          *PRICE-REFERENCE*)
 
-(resource-price)
+;; (resource-price)
 
 
 (defun users ()
@@ -300,8 +300,6 @@
 
 
 
-
-
 (defun tenders ()
   "Тендеры"
   (defparameter *TENDER*                      (make-hash-table :test #'equal))
@@ -323,69 +321,60 @@
                                               :interview  (make-interval :begin talking_begin :end talking_end)
                                               :result     (make-interval :begin resulting_begin :end resulting_end)
                                               :status (ecase status_id (1 :unactive) (2 :active) (3 :cancelled) (4 :finished))))))
+
       ;; Связываем владельца с созданным тендером
       (setf (a-tenders builder)
             (append (a-tenders builder)
                     (list this-tender)))
       ;; Забираем ресурсы тендера
-      (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_tender_resource` WHERE `tender-id` = ~A" save-tender-id)
+      (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_tender_resource` WHERE `tender_id` = ~A" save-tender-id)
                           ("id" "tender_id" "resource_id" "quantity" "price" "pricedate" "comments" "deliver" "is_basis"))
-        ;; Создаем объекты tender-resource
+        ;; Создаем объекты tender-resource, связанные с тендером
         (let ((this-tender-resource (setf (gethash id *TENDER-RESOURCE*)
                                           (make-instance 'TENDER-RESOURCE
                                                          :tender this-tender
-                                                         :resource (gethash resource-id *TENDER-RESOURCE)
+                                                         :resource (gethash resource_id *TENDER-RESOURCE*)
                                                          :quantity quantity
                                                          :price price
-                                                         :price-date price-date
+                                                         :price-date pricedate
                                                          :comment comments
-                                                         :deliver (if (equal deliver 1) T NIL)
-                                                         :basic   (if (equal is_basis 1) T NIL)))))
-          t)t)t)t)t)
+                                                         :delivery (if (equal deliver 1) T NIL)
+                                                         :basic   (if (equal is_basis 1) T NIL)
+                                                         ))))
+          ;; Связываем тендер с созданным tender-resource
+          (setf (a-resources this-tender)
+                (append (a-resources this-tender)
+                        (list this-tender-resource)))
+          t))
+      ;; Забираем поставщиков тендера
+      (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_tender_supplier` WHERE `tender_id` = ~A" save-tender-id)
+                          ("id" "company_id" "is_invited"))  ;;  в этой таблице is_invited - мемоизация, не переносить
+        ;; Связываем их с тендером
+        (setf (a-suppliers this-tender)
+              (append (a-suppliers this-tender)
+                      (list (gethash company_id *USER*))))
+        t)
+
+      )))
 
 (tenders)
 
 
-        #|
+#|
 
-        Когда забили ресурсы в тендер система находит всех поставщиков этих ресурсов
-        и заносит их в tender_supplier, где создатель тендера может некоторых их них удалить или добавить своего
-        в этой таблице is_invited - мемоизация, не переносить
+Когда забили ресурсы в тендер система находит всех поставщиков этих ресурсов
+и заносит их в tender_supplier, где создатель тендера может некоторых их них удалить или добавить своего
+в этой таблице is_invited - мемоизация, не переносить
 
-        tender_offer - это приглашение на тендер поставщику
+tender_offer - это приглашение на тендер поставщику
 
-        Поставщик в ответ на приглашение может создать заявку (tender_order), которая через offer_id привязана к пришлашению
-        status - это для того чтобы можно было заявку отменить
+Поставщик в ответ на приглашение может создать заявку (tender_order), которая через offer_id привязана к пришлашению
+status - это для того чтобы можно было заявку отменить
 
-        При создании заявки, создаются записи в tender_order_resource, где
-        order_id - заявка
-        tender_resource_id - запись в таблице tender_resource, чтобы увидеть рекомендуемую цену, обьем итд
+При создании заявки, создаются записи в tender_order_resource, где
+order_id - заявка
+tender_resource_id - запись в таблице tender_resource, чтобы увидеть рекомендуемую цену, обьем итд
 
-        ФИНАЛЬНЫЕ ТАбЛИЦА
+ФИНАЛЬНЫЕ ТАбЛИЦЫ - перечень ресурсов : поставщики
 
-        перечень ресурсов : поставщики
-
-
-
-
-        На завершающем этапе создания тендера поставщикам
-
-        |#
-
-        ;; * TODO По видимому тендер не просто содержит ресурсы, а вместо этого содержит объект, содержащий ссылку на ресурс и цену?
-
-        ;; * TODO Как таблицы tender_order и tender_offer превращаются в OFFER?
-      ;; ;; Забираем все завки на этот тендер
-      ;; (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_tender_order` WHERE `tender-id` = ~A" save-tender-id)
-      ;;                     ("id" "offer_id" "has_been_read"))
-      ;;   (let ((supplier   (gethash company_id *USER*))      ;; Отыскиваем компанию, откликнувшуюся на тендер, по company_id
-      ;;         (this-offer (setf (gethash id *OFFER*)        ;; Создаем заявку
-      ;;                           (make-instance 'OFFER
-      ;;                                          :owner supplier
-      ;;                                          :tender this-tender
-      ;;                                          :resources nil))))
-
-
-      ;; t)))
-
-
+#|

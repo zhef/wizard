@@ -320,12 +320,12 @@
                            '(:view   :finished))
       (price               "Рекомендуемая стоимость"    (:num) ;; вычисляется автоматически на основании заявленных ресурсов
                            '(:update :system))
-      (resources           "Ресурсы"                    (:list-of-links resource)
+      (resources           "Ресурсы"                    (:list-of-links tender-resource)
                            '(:update (and :owner :unactive)))
       (documents           "Документы"                  (:list-of-links document) ;; закачка и удаление файлов
                            '(:update (and :owner :unactive)))
-      (suppliers           "Поставщики"                 (:list-of-links supplier) ;; строится по ресурсам автоматически
-                           '(:update :system))
+      (suppliers           "Поставщики"                 (:list-of-links supplier) ;; строится по ресурсам автоматически при создании тендера
+                           '(:update :system))                                    ;; по ресурсам тендера
       (offers              "Заявки"                     (:list-of-links offer)
                            '(:update :system)))
      :perm
@@ -336,10 +336,9 @@
       :update (or :admin :owner)))
 
 
-    ;; Связующий объект - ресурс тендера (создается, когда к тендеру добавляется ресурс)
-    (:entity              tender-resource
-     :container           tender-resource
-     :field
+    (:entity               tender-resource
+     :container            tender-resource
+     :fields
      ((tender             "Тендер"                      (:link tender))
       (resource           "Ресурс"                      (:link resource))
       (quantity           "Количество"                  (:num))
@@ -354,6 +353,7 @@
       :view   (and :logged (or :stale (and :fresh :fair)))
       :show   :all
       :update (or :admin :owner)))
+
 
 
     ;; Связующий объект: Заявка на участие в тендере. Связывает поставщика, тендер и ресурсы заявки
