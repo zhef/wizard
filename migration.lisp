@@ -188,6 +188,120 @@
 (resource-price)
 
 
+(defun users ()
+  ;; Очистка
+  (defparameter *USER* (make-hash-table :test #'equal))
+  ;; Нулевой - админ
+  (push-hash *USER* 'ADMIN :login "admin" :password "admin")
+  ;; Идентификаторы всех поставщиков предзаносим в company_type
+  (let ((company_type (make-hash-table :test #'equal)))
+    (with-query-select ("SELECT |:::| FROM `jos_gt_company_group_bind`"
+                        ("company_id" "group_id"))
+      (when (< group_id 5)
+        (setf (gethash company_id company_type) 1)))
+    ;; Забираем все компании
+    (with-query-select ("SELECT |:::| FROM `jos_gt_company`"
+                        ("id" "juridical_address_id" "actual_address_id" "head_id" "details_id" "name" "email" "site" "is_diligent"))
+      (let ((company_id id))
+        ;; Для каждой собираем все адреса, телефоны и прочее
+        (let ((juridical-address) (actual-address) (contacts) (heads) (divisions)
+              (inn*) (ogrn*) (bank-name*) (bik*) (correspondent_account*) (sattlement_account*))
+          (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_address` WHERE `id`='~A'" juridical_address_id)
+                              ("street" "house"))
+            (setf juridical-address (format nil "~A ~A" street house)))
+          (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_address` WHERE `id`='~A'" actual_address_id)
+                              ("street" "house"))
+            (setf actual-address (format nil "~A ~A" street house)))
+          (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_employee` WHERE `id`='~A'" head_id)
+                              ("second_name" "name" "patronymic" "post" "phone" "email" "user_id"))
+            (setf heads (format nil "~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] "
+                                post second_name name patronymic phone email)))
+          (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_details` WHERE `id`='~A'" details_id)
+                              ("inn" "ogrn" "bank" "bik" "correspondent_account" "sattlement_account"))
+            (setf inn* inn)
+            (setf ogrn* ogrn)
+            (setf bank* bank)
+            (setf bik* bik)
+            (setf correspondent_account* correspondent_account)
+            (setf sattlement_account* sattlement_account))
+          (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_division` WHERE `company_id`='~A'" company_id)
+                              ("city_id" "name" "post_index" "street" "house" "office" "phone"))
+            (let ((save-name name))
+              (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_city` WHERE `id`='~A'" city_id)
+                                  ("name"))
+                (push (format nil "~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~]"
+                              name save-name post_index street house office phone)
+                      divisions)
+                t))t)
+          (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_phone` WHERE `company_id`='~A'" company_id)
+                              ("number"))
+            (setf contacts (append contacts (list number)))
+            t)
+
+          ;; Сохраняем в *USER*
+          (if (not (null (gethash company_id company_type)))
+              ;; Поставщик
+              (progn
+                (format t "~%[SUPPLIER]: ~A | ~A" name company_id)
+                (let ((supplier (setf (gethash company_id *USER*)
+                                      (make-instance 'SUPPLIER
+                                                     :login (symbol-name (gensym "LOGIN"))
+                                                     :password (symbol-name (gensym "PASSWORD"))
+                                                     :name (format nil ":::~A" name)
+                                                     :email email
+                                                     :site site
+                                                     :heads heads
+                                                     :inn inn*
+                                                     :ogrn ogrn*
+                                                     :bank-name bank-name*
+                                                     :bik bik*
+                                                     :corresp-account correspondent_account*
+                                                     :client-account sattlement_account*
+                                                     :addresses (format nil "~{~A ~}" divisions)
+                                                     :status (if (equal 1 is_diligent)  :fair  :unfair)
+                                                     :juridical-address juridical-address
+                                                     :actual-address actual-address
+                                                     :contacts contacts))))))
+              ;; Застройщик
+              (progn
+                (format t "~%[BUILDER]: ~A" name )
+                (setf (gethash company_id *USER*)
+                      (make-instance 'BUILDER
+                                     :login (symbol-name (gensym "LOGIN"))
+                                     :password (symbol-name (gensym "PASSWORD"))
+                                     :name (format nil ":::~A" name)
+                                     :email email
+                                     :site site
+                                     :juridical-address juridical-address
+                                     :actual-address actual-address
+                                     :contacts contacts))
+                t))t))t)
+    ;; Эксперты
+    (loop :for i :from 1 :to 9 :do
+       (push-hash *USER* 'EXPERT
+         :name (format nil "Эксперт-~A" i)
+         :login (format nil "exp~A" i)
+         :password (format nil "exp~A" i)))))
+
+(users)
+
+;; tests
+;; (maphash #'(lambda (k v)
+;;              (if (and (not (equal 'ADMIN  (type-of v)))
+;;                       (not (equal 'EXPERT (type-of v))))
+;;                  (print (list k v (a-name v)))))
+;;          *USER*)
+
+;; test
+;; (loop :for (id . obj) :in (remove-if-not #'(lambda (x)
+;;                                              (equal 'supplier (type-of (cdr x))))
+;;                                          (cons-hash-list *USER*)) :do
+;;    (format t "~%~A | ~A" id (a-addresses obj)))
+
+
+
+
+
 (defun tenders ()
   "Тендеры"
   (defparameter *TENDER*                      (make-hash-table :test #'equal))
@@ -208,11 +322,7 @@
                                               :analize    (make-interval :begin process_begin :end process_end)
                                               :interview  (make-interval :begin talking_begin :end talking_end)
                                               :result     (make-interval :begin resulting_begin :end resulting_end)
-                                              :status (ecase status_id
-                                                        (1 :unactive)
-                                                        (2 :active)
-                                                        (3 :cancelled)
-                                                        (4 :finished))))))
+                                              :status (ecase status_id (1 :unactive) (2 :active) (3 :cancelled) (4 :finished))))))
       ;; Связываем владельца с созданным тендером
       (setf (a-tenders builder)
             (append (a-tenders builder)
@@ -220,6 +330,48 @@
       ;; Забираем ресурсы тендера
       (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_tender_resource` WHERE `tender-id` = ~A" save-tender-id)
                           ("id" "tender_id" "resource_id" "quantity" "price" "pricedate" "comments" "deliver" "is_basis"))
+        ;; Создаем объекты tender-resource
+        (let ((this-tender-resource (setf (gethash id *TENDER-RESOURCE*)
+                                          (make-instance 'TENDER-RESOURCE
+                                                         :tender this-tender
+                                                         :resource (gethash resource-id *TENDER-RESOURCE)
+                                                         :quantity quantity
+                                                         :price price
+                                                         :price-date price-date
+                                                         :comment comments
+                                                         :deliver (if (equal deliver 1) T NIL)
+                                                         :basic   (if (equal is_basis 1) T NIL)))))
+          t)t)t)t)t)
+
+(tenders)
+
+
+        #|
+
+        Когда забили ресурсы в тендер система находит всех поставщиков этих ресурсов
+        и заносит их в tender_supplier, где создатель тендера может некоторых их них удалить или добавить своего
+        в этой таблице is_invited - мемоизация, не переносить
+
+        tender_offer - это приглашение на тендер поставщику
+
+        Поставщик в ответ на приглашение может создать заявку (tender_order), которая через offer_id привязана к пришлашению
+        status - это для того чтобы можно было заявку отменить
+
+        При создании заявки, создаются записи в tender_order_resource, где
+        order_id - заявка
+        tender_resource_id - запись в таблице tender_resource, чтобы увидеть рекомендуемую цену, обьем итд
+
+        ФИНАЛЬНЫЕ ТАбЛИЦА
+
+        перечень ресурсов : поставщики
+
+
+
+
+        На завершающем этапе создания тендера поставщикам
+
+        |#
+
         ;; * TODO По видимому тендер не просто содержит ресурсы, а вместо этого содержит объект, содержащий ссылку на ресурс и цену?
 
         ;; * TODO Как таблицы tender_order и tender_offer превращаются в OFFER?
@@ -235,106 +387,5 @@
 
 
       ;; t)))
-
-
-;; Пользователи
-(progn
-  ;; Очистка
-  (defparameter *USER* (make-hash-table :test #'equal))
-  ;; Нулевой - админ
-  (push-hash *USER* 'ADMIN :login "admin" :password "admin")
-  ;; Застройшики и поставщики
-  (with-query-select ("SELECT |:::| FROM `jos_gt_company_group_bind`"
-                      ("company_id" "group_id"))
-    (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company` WHERE `id`='~A'" company_id)
-                        ("juridical_address_id" "actual_address_id" "head_id" "details_id" "name" "email" "site" "is_diligent"))
-      (let ((juridical-address) (actual-address) (contacts) (heads) (divisions)
-            (inn*) (ogrn*) (bank-name*) (bik*) (correspondent_account*) (sattlement_account*))
-        (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_address` WHERE `id`='~A'" juridical_address_id)
-                            ("street" "house"))
-          (setf juridical-address (format nil "~A ~A" street house)))
-        (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_address` WHERE `id`='~A'" actual_address_id)
-                            ("street" "house"))
-          (setf actual-address (format nil "~A ~A" street house)))
-        (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_employee` WHERE `id`='~A'" head_id)
-                            ("second_name" "name" "patronymic" "post" "phone" "email" "user_id"))
-          (setf heads (format nil "~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] "
-                              post second_name name patronymic phone email)))
-        (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_details` WHERE `id`='~A'" details_id)
-                            ("inn" "ogrn" "bank" "bik" "correspondent_account" "sattlement_account"))
-          (setf inn* inn)
-          (setf ogrn* ogrn)
-          (setf bank* bank)
-          (setf bik* bik)
-          (setf correspondent_account* correspondent_account)
-          (setf sattlement_account* sattlement_account))
-        (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_division` WHERE `company_id`='~A'" company_id)
-                            ("city_id" "name" "post_index" "street" "house" "office" "phone"))
-          (let ((save-name name))
-            (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_city` WHERE `id`='~A'" city_id)
-                                ("name"))
-              (push (format nil "~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~]"
-                            name save-name post_index street house office phone)
-                    divisions))))
-        (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_phone` WHERE `company_id`='~A'" company_id)
-                            ("number"))
-          (setf contacts (append contacts (list number))))
-        (if (< group_id 5)
-            ;; Поставщики - это первые четыре группы
-            (progn
-              (format t "~%[SUPPLIER]: ~A | ~A" name company_id)
-              (let ((supplier (setf (gethash company_id *USER*)
-                                    (make-instance 'SUPPLIER
-                                                   :login (symbol-name (gensym "LOGIN"))
-                                                   :password (symbol-name (gensym "PASSWORD"))
-                                                   :name name
-                                                   :email email
-                                                   :site site
-                                                   :heads heads
-                                                   :inn inn*
-                                                   :ogrn ogrn*
-                                                   :bank-name bank-name*
-                                                   :bik bik*
-                                                   :corresp-account correspondent_account*
-                                                   :client-account sattlement_account*
-                                                   :addresses (format nil "~{~A ~}" divisions)
-                                                   :status (if (equal 1 is_diligent)  :fair  :unfair)
-                                                   :juridical-address juridical-address
-                                                   :actual-address actual-address
-                                                   :contacts contacts))))
-                ;; Поставщик может предоставлять скидки на свою продукцию
-                (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_discount` WHERE `company_id`='~A'" company_id)
-                                    ("resource_id conditions actually_to"))
-                  ;; И вот тут у нас начинается жопа, так как нам нужны ресурсы )
-
-                  )
-                ;; Застройщики - это все остальные
-                (progn
-                  ;; (format t "~%[BUILDER]: ~A" name )
-                  (setf (gethash company_id *USER*)
-                        (make-instance 'BUILDER
-                                       :login (symbol-name (gensym "LOGIN"))
-                                       :password (symbol-name (gensym "PASSWORD"))
-                                       :name name
-                                       :email email
-                                       :site site
-                                       :juridical-address juridical-address
-                                       :actual-address actual-address
-                                       :contacts contacts)))))))
-      ;; Эксперты
-      (loop :for i :from 1 :to 9 :do
-         (push-hash *USER* 'EXPERT
-           :name (format nil "Эксперт-~A" i)
-           :login (format nil "exp~A" i)
-           :password (format nil "exp~A" i))))
-
-    (gethash 21 *USER*)
-
-
-    ;; test
-    ;; (loop :for (id . obj) :in (remove-if-not #'(lambda (x)
-    ;;                                     (equal 'supplier (type-of (cdr x))))
-    ;;                                 (cons-hash-list *USER*)) :do
-    ;;    (format t "~%~A | ~A" id (a-addresses obj)))
 
 

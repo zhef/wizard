@@ -148,44 +148,6 @@
       :update             (or :admin :self)))
 
 
-    ;; Связующий объект: Заявка на участие в тендере. Связывает поставщика, тендер и ресурсы заявки
-    ;; Создается поставщиком, когда он отвечает своим предложением на тендер застройщика
-    (:entity               offer
-     :container            offer
-     :fields
-     ((owner               "Поставщик ресурсов"         (:link supplier)
-                           '(:update :nobody))
-      (tender              "Тендер"                     (:link tender)
-                           '(:update :nobody))
-      (resources           "Ресурсы заявки"             (:list-of-links offer-resource)))
-     :perm
-     (:create (and :active :supplier) ;; создается связанный объект offer-resource, содержащие ресурсы заявки
-      :delete (and :owner  :active)   ;; удаляются связанный объект offer-resource
-      :view   :all
-      :show   :all
-      :update (and :active :owner)    ;; Заявка модет быть отредактирвана пока срок приема заявок не истек.
-      ))
-
-
-    ;; Связующий объект: Ресурсы и цены для заявки на участие в тендере
-    (:entity               offer-resource
-     :container            offer-resource
-     :fields
-     ((owner               "Поставщик"                  (:link supplier)
-                           '(:update :nobody))
-      (offer               "Заявка"                     (:link offer)
-                           '(:update :nobody))
-      (resource            "Ресурс"                     (:link resource)
-                           '(:update :nobody))
-      (price               "Цена поставщика"            (:num)))
-     :perm
-     (:create :owner
-      :delete :owner
-      :view   :all
-      :show   :all
-      :update (and :active :owner)))
-
-
     ;; Связующий объект: Распродажи - связывает поставщика, объявленный им ресурс и хранит условия скидки
     (:entity               sale
      :container            sale
@@ -372,6 +334,64 @@
       :view   (and :logged (or :stale (and :fresh :fair)))
       :show   :all
       :update (or :admin :owner)))
+
+
+    ;; Связующий объект - ресурс тендера (создается, когда к тендеру добавляется ресурс)
+    (:entity              tender-resource
+     :container           tender-resource
+     :field
+     ((tender             "Тендер"                      (:link tender))
+      (resource           "Ресурс"                      (:link resource))
+      (quantity           "Количество"                  (:num))
+      (price              "Цена"                        (:num)) ;; Первоначально цена заполняется из справочника
+      (price-date         "Дата справочника цен"        (:str))
+      (comment            "Комментарий"                 (:str))
+      (delivery           "Доставка"                    (:bool))
+      (basic              "Базовый ресурс"              (:bool)))
+     :perm
+     (:create :builder
+      :delete :admin
+      :view   (and :logged (or :stale (and :fresh :fair)))
+      :show   :all
+      :update (or :admin :owner)))
+
+
+    ;; Связующий объект: Заявка на участие в тендере. Связывает поставщика, тендер и ресурсы заявки
+    ;; Создается поставщиком, когда он отвечает своим предложением на тендер застройщика
+    (:entity               offer
+     :container            offer
+     :fields
+     ((owner               "Поставщик ресурсов"         (:link supplier)
+                           '(:update :nobody))
+      (tender              "Тендер"                     (:link tender)
+                           '(:update :nobody))
+      (resources           "Ресурсы заявки"             (:list-of-links offer-resource)))
+     :perm
+     (:create (and :active :supplier) ;; создается связанный объект offer-resource, содержащие ресурсы заявки
+      :delete (and :owner  :active)   ;; удаляются связанный объект offer-resource
+      :view   :all
+      :show   :all
+      :update (and :active :owner)    ;; Заявка модет быть отредактирвана пока срок приема заявок не истек.
+      ))
+
+
+    ;; Связующий объект: Ресурсы и цены для заявки на участие в тендере
+    (:entity               offer-resource
+     :container            offer-resource
+     :fields
+     ((owner               "Поставщик"                  (:link supplier)
+                           '(:update :nobody))
+      (offer               "Заявка"                     (:link offer)
+                           '(:update :nobody))
+      (resource            "Ресурс"                     (:link resource)
+                           '(:update :nobody))
+      (price               "Цена поставщика"            (:num)))
+     :perm
+     (:create :owner
+      :delete :owner
+      :view   :all
+      :show   :all
+      :update (and :active :owner)))
 
 
     ;; Связанные с тендерами документы
