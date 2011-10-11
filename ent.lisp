@@ -932,7 +932,17 @@
                               :fields '(name
                                         (:btn   "Удалить из тендера"
                                          :perm  :all
-                                         :act   (delete-doc-from-tender))
+                                         :act   (let* ((key       (get-btn-key (caar (last (form-data)))))
+                                                       (document  (gethash key *DOCUMENT*))
+                                                       (tender    (a-tender document)))
+                                                  ;; Удаляем этот документ из тендера
+                                                  (setf (a-documents tender)
+                                                        (remove-if #'(lambda (x)
+                                                                       (equal x document))
+                                                                   (a-documents tender)))
+                                                  ;; Удаляем документ из документов
+                                                  (remhash key *DOCUMENT*)
+                                                  (hunchentoot:redirect (hunchentoot:request-uri*))))
                                         (:btn   "Страница документа"
                                          :perm  :all
                                          :act   (to "/document/~A" (caar (last (form-data)))))))
@@ -1016,8 +1026,8 @@
                                        :fields             '((:btn "Подтверждаю отмену"
                                                               :perm :all
                                                               :act  (progn
-                                                                      (cancel-this-tender)
-                                                                      (hunchentoot:redirect (format nil "/tender")))))))))))
+                                                                      (setf (a-status (gethash (cur-id) *TENDER*)) :cancelled)
+                                                                      (hunchentoot:redirect (hunchentoot:request-uri*)))))))))))
 
     ;; Заявки на тендер
     (:place                offers
