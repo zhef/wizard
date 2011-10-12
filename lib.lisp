@@ -48,6 +48,9 @@
                  (cdr (assoc ,(symbol-name fld) (form-data) :test #'equal))))
      (hunchentoot:redirect (hunchentoot:request-uri*))))
 
+(defmacro append-link (lst elt)
+  `(setf ,lst (append ,lst (list ,elt))))
+
 (defmacro to (format-str form-elt)
   `(hunchentoot:redirect
     (format nil ,format-str (get-btn-key ,form-elt))))
