@@ -185,7 +185,7 @@
 ;;                   (return))))
 ;;          *PRICE-REFERENCE*)
 
-;; (resource-price)
+(resource-price)
 
 
 (defun users ()
@@ -352,8 +352,26 @@
         ;; Связываем их с тендером
         (setf (a-suppliers this-tender)
               (append (a-suppliers this-tender)
-                      (list (gethash company_id *USER*))))
-        t)
+                      (list (gethash company_id *USER*)))))
+      ;; Забираем приглашения поставщикам на этот тендер
+      (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_tender_offer` WHERE `tender_id` = ~A" save-tender-id)
+                          ("id" "tender_id" "company_id" "has_been_read "))  ;;  в этой таблице is_invited - мемоизация, не переносить
+        (let* ((owner (gethash company_id *USER*))
+               (this-offer (setf (getf id *OFFER*)
+                                (make-instance 'OFFER
+                                               :owner owner
+                                               :tender this-tender
+                                               :has-been-read (if (equal 1 has_been_read) T NIL)))))
+          ;; Связываем тендер c приглашением
+          (setf (a-offers this-tender)
+                (append (a-offers this-tender)
+                        (list this-offer)))
+          ;; Связываем поставщика с приглашением
+          (setf (a-offers owner)
+                (append (a-offers owner)
+                        (list this-offer)))))
+      ;; Забираем заявки поставщиков, которые поставщики отправили в ответ на каждое приглашение
+      ()
 
       )))
 

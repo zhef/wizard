@@ -136,7 +136,7 @@
                            '(:add-resource :self   ;; создается связующий объект supplier-resource-price содержащий установленную поставщиком цену
                              :del-resource :self   ;; удаляется связующий объект
                              :change-price :self))
-      (offers              "Посланные заявки на тендеры"  (:list-of-links offer)
+      (offers              "Посланные приглашения на тендеры"  (:list-of-links offer)
                            '(:view :self
                              :update :self))  ;; offer - связующий объект
       (sales               "Распродажи"                (:list-of-links sale)))    ;; sale - связующий объект
@@ -365,7 +365,7 @@
                            '(:update :nobody))
       (tender              "Тендер"                     (:link tender)
                            '(:update :nobody))
-      (resources           "Ресурсы заявки"             (:list-of-links offer-resource)))
+      (has-been-read       "Флаг прочтения"             (:bool)))
      :perm
      (:create (and :active :supplier) ;; создается связанный объект offer-resource, содержащие ресурсы заявки
       :delete (and :owner  :active)   ;; удаляются связанный объект offer-resource
