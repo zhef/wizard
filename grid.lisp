@@ -34,15 +34,20 @@
         (permfld   (getf infld :perm))
         (typedata  (getf infld :typedata)))
     (declare (ignore permfld))
-    (cond ((equal typedata '(:str))      (show-fld-helper captfld #'tpl:strupd  namefld (a-fld namefld val)))
-          ((equal typedata '(:pswd))     (show-fld-helper captfld #'tpl:pswdupd namefld (a-fld namefld val)))
+    (cond ((equal typedata '(:bool))     (show-fld-helper captfld #'tpl:flagupd namefld (a-fld namefld val)))
           ((equal typedata '(:num))      (show-fld-helper captfld #'tpl:strupd  namefld (a-fld namefld val)))
+          ((equal typedata '(:str))      (show-fld-helper captfld #'tpl:strupd  namefld (a-fld namefld val)))
+          ((equal typedata '(:pswd))     (show-fld-helper captfld #'tpl:pswdupd namefld (a-fld namefld val)))
           ((equal typedata '(:interval)) (show-fld-helper captfld #'tpl:strupd  namefld (a-fld namefld val)))
           ((equal typedata '(:date))     (show-fld-helper captfld #'tpl:strupd  namefld (a-fld namefld val)))
           ((equal typedata '(:list-of-keys supplier-status))
            (tpl:fld
             (list :fldname captfld
                   :fldcontent (tpl:strview (list :value (getf *supplier-status* (a-fld namefld val)))))))
+          ((equal typedata '(:list-of-keys offer-status))
+           (tpl:fld
+            (list :fldname captfld
+                  :fldcontent (tpl:strview (list :value (getf *offer-status* (a-fld namefld val)))))))
           ((equal typedata '(:list-of-keys resource-types))
            (tpl:fld
             (list :fldname captfld
@@ -76,6 +81,11 @@
                   :fldcontent (tpl:textupd (list :name namefld
                                                  :value (a-fld namefld val))))))
           ((equal typedata '(:link supplier-resource-price))
+           (tpl:fld
+            (list :fldname captfld
+                  :fldcontent (tpl:strview (list :name namefld
+                                                 :value (a-name (a-fld namefld val)))))))
+          ((equal typedata '(:link resource))
            (tpl:fld
             (list :fldname captfld
                   :fldcontent (tpl:strview (list :name namefld
@@ -193,7 +203,7 @@ function(){
 (defun show-act (act)
   (if (not (check-perm (getf act :perm) (cur-user) (getf act :val)))
       (format nil "permission denied in defun show-act: ~A"
-              (bprint #| (getf act :perm) |# act))
+              (bprint (getf act :perm) #| act |#))
       ;; else
       (let ((val (funcall (getf act :val))))
         (case (getf act :showtype)
@@ -280,10 +290,15 @@ function(){
                           (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
                          ((equal '(:link supplier)                    (getf infld :typedata))
                           (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
+                         ((equal '(:link tender-resource)             (getf infld :typedata))
+                          (setf accessor (lambda (x) (format nil "~A" (a-name (a-resource (funcall symb x)))))))
+                         ((equal '(:list-of-keys resource-types)      (getf infld :typedata))
+                          (setf accessor (lambda (x) (format nil "~A" (getf *resource-types* (funcall symb x))))))
                          (t ;; default - print unknown type message in grid field
-                          (setf accessor (lambda (x)
-                                           (declare (ignore x))
-                                           "unknown typedata in grid pager"))))
+                          (let ((err-str (format nil "unk typedata: ~A" (getf infld :typedata))))
+                            (setf accessor (lambda (x)
+                                             (declare (ignore x))
+                                             err-str)))))
                    (push (cons accessor perm) field-cons))
       :btn       (let* ((perm      (getf infld :perm))
                         (btn       (getf infld :btn))                    ;; тут важно чтобы вычисление происходило вне лямбды

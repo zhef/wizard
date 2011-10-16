@@ -11,5 +11,6 @@
 (require 'CL-JSON)
 (load "lib.lisp")
 (reload)
+(load "init.lisp")
 (restas:start '#:wizard :port 8081)
 (restas:debug-mode-on)

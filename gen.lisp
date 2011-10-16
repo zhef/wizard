@@ -104,7 +104,7 @@
     (setf containers (reverse (remove-duplicates containers)))
     (format out "~%~%;; Containers~%")
     (loop :for container :in containers :do
-       (format out "~%~<(defparameter *~A* ~43:T (make-hash-table :test #'equal))~:>"
+       (format out "~%~<(defvar *~A* ~43:T (make-hash-table :test #'equal))~:>"
                `(,container)))
     ;; Classes
     (format out "~%~%;; Classes")

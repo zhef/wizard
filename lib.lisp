@@ -6,8 +6,7 @@
   (load "grid.lisp")
   (load "fld.lisp")
   (load "perm.lisp")
-  (load "defmodule.lisp")
-  (load "init.lisp"))
+  (load "defmodule.lisp"))
 
 (restas:define-module #:WIZARD
     (:use #:CL #:ITER #:cl-mysql #:alexandria #:anaphora))
@@ -15,13 +14,34 @@
 (in-package #:WIZARD)
 
 
+(defmacro with-query-select ((query-str fields) &body body)
+  (let* ((fld-str (format nil "~{`~A`~^, ~}" fields))
+         (fld-sym (loop :for fld :in fields :collect (intern (string-upcase fld) (find-package "WIZARD")))))
+    (with-gensyms (res row)
+      `(let ((,res (caar (query (replace-all ,query-str "|:::|" ,fld-str)))))
+         (aif ,res
+              (loop :for ,row :in ,res :collect
+                 (destructuring-bind ,fld-sym
+                     ,row
+                   ,@body))
+              nil)))))
+
 (defmacro cons-hash-list (hash)
   `(loop :for obj :being the :hash-values :in ,hash :using (hash-key key) :collect
       (cons key obj)))
 
 (defmacro push-hash (hash class &body init)
-  `(setf (gethash (hash-table-count ,hash) ,hash)
-         (make-instance ,class ,@init)))
+  (with-gensyms (name-block result present id)
+    `(block ,name-block
+       (loop :for ,id :from 0 :do
+          (multiple-value-bind (,result ,present)
+              (gethash ,id ,hash)
+            (unless ,present
+              (return-from ,name-block
+                (values
+                 (setf (gethash ,id ,hash)
+                       (make-instance ,class ,@init))
+                 ,id))))))))
 
 (defmacro cons-inner-objs (hash inner-lst)
   `(let ((inner-lst ,inner-lst)

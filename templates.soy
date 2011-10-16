@@ -504,6 +504,11 @@
   <input type="text" name="{$name}" value="{$value}" /> <br />{\n}
 {/template}
 
+{template flagupd}
+  <input type="checkbox" name="{$name}" value="T" {if $value} checked {/if} /> <br />{\n}
+{/template}
+
+
 {template selopt}
   <OPTION value="{$id}">{$name}</OPTION>{\n}
 {/template}
