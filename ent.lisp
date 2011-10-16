@@ -312,8 +312,6 @@
       (owner               "Заказчик"                   (:link builder)
                            '(:update :admin))
       ;; Дата, когда тендер стал активным (первые сутки новые тендеры видят только добростовестные поставщики)
-      (active-date         "Дата активации"             (:date)
-                           '(:update :system))
       (all                 "Срок проведения"            (:interval)
                            '(:view   :all
                              :update (or :admin  (and :owner :unactive))))
@@ -336,7 +334,8 @@
       (suppliers           "Поставщики"                 (:list-of-links supplier) ;; строится по ресурсам автоматически при создании тендера
                            '(:update :system))                                    ;; по ресурсам тендера
       (offers              "Заявки"                     (:list-of-links offer)
-                           '(:update :system)))
+                           '(:update :system)
+                           ))
      :perm
      (:create :builder
       :delete :admin
@@ -351,7 +350,7 @@
      :fields
      ((tender             "Тендер"                      (:link tender))
       (resource           "Ресурс"                      (:link resource))
-      (quantity           "Количество"                  (:num))
+      (quantity           "Кол-во"                      (:num) 55)
       (price              "Цена"                        (:num)) ;; Первоначально цена заполняется из справочника
       (price-date         "Дата справочника цен"        (:str))
       (comment            "Комментарий"                 (:text))
@@ -393,9 +392,9 @@
      :container            offer-resource
      :fields
      ((offer              "Заявка"                      (:link offer))
-      (tender-resource    "Ресурс тендера"              (:link tender-resource))
-      (quantity           "Количество"                  (:num))
-      (price              "Цена до собеседования"       (:num)) ;; Первоначально цена заполняется из справочника
+      (tender-resource    "Ресурс тендера"              (:link tender-resource) 380)
+      (quantity           "Кол-во"                      (:num) 55)
+      (price              "Цена до собеседования"       (:num) 150) ;; Первоначально цена заполняется из справочника
       (price-result       "Цена после собеседования"    (:num))
       (comment            "Комментарий"                 (:str))
       (delivery           "Доставка"                    (:bool))
@@ -902,7 +901,7 @@
         :perm              :all
         :entity            tender
         :val               (gethash (cur-id) *TENDER*)
-        :fields            '(name status owner active-date all claim analize interview result ;; winner price
+        :fields            '(name status owner all claim analize interview result ;; winner price
                              (:btn "Сохранить"
                               :perm :all
                               :act (let ((obj (gethash (cur-id) *TENDER*)))
@@ -1123,15 +1122,20 @@
                               :showtype         :grid
                               :perm             :all
                               :entity           offer-resource
+                              ;; (mapcar #'(lambda (x)
+                              ;;             (cons (car x) (a-resources (cdr x))))
+                              ;;  (cons-hash-list *OFFER*))
                               :val              (cons-inner-objs *OFFER-RESOURCE* (a-resources (gethash (cur-id) *OFFER*)))
                               :fields '(tender-resource quantity price #|price-result comment delivery delivery-price market rank |#
                                         (:btn "Удалить из заявки"
                                          :perm :all
+                                         :width 110
                                          :act (del-inner-obj
                                                  (caar (last (form-data)))
                                                  *OFFER-RESOURCE*
                                                  (a-resources (gethash (cur-id) *OFFER*))))
                                         (:btn   "Страница ресурса заявки"
+                                         :width 150
                                          :perm  :all
                                          :act   (to "/offer-resource/~A" (caar (last (form-data)))))))
                              (:btn "Добавить ресурс к заявке"
@@ -1140,7 +1144,7 @@
                                        :showtype          :grid
                                        :perm              :all ;; (and :active :fair)
                                        :entity            tender-resource
-                                       :val               (cons-inner-objs *TENDER-RESOURCE* (a-resources (a-tender (gethash 0 *OFFER*))))
+                                       :val               (cons-inner-objs *TENDER-RESOURCE* (a-resources (a-tender (gethash (cur-id) *OFFER*))))
                                        :fields            '(resource
                                                             (:btn  "Добавить к заявке"
                                                              :perm :all

@@ -38,8 +38,31 @@
           ((equal typedata '(:num))      (show-fld-helper captfld #'tpl:strupd  namefld (a-fld namefld val)))
           ((equal typedata '(:str))      (show-fld-helper captfld #'tpl:strupd  namefld (a-fld namefld val)))
           ((equal typedata '(:pswd))     (show-fld-helper captfld #'tpl:pswdupd namefld (a-fld namefld val)))
-          ((equal typedata '(:interval)) (show-fld-helper captfld #'tpl:strupd  namefld (a-fld namefld val)))
-          ((equal typedata '(:date))     (show-fld-helper captfld #'tpl:strupd  namefld (a-fld namefld val)))
+          ((equal typedata '(:interval))
+           (let ((val (a-fld namefld val)))
+             (if (equal 'INTERVAL (type-of val))
+                 (tpl:fld
+                  (list :fldname captfld
+                        :fldcontent (tpl:intervalupd (list :name namefld
+                                                           :valuebegin (decode-date (interval-begin val))
+                                                           :valueend   (decode-date (interval-end val))))))
+                 (tpl:fld
+                  (list :fldname captfld
+                        :fldcontent (tpl:intervalupd (list :name namefld
+                                                           :valuebegin ""
+                                                           :valueend   "")))))))
+          ((equal typedata '(:date))
+           (let ((val (a-fld namefld val)))
+             (if (or (null val)
+                     (equal "" val))
+                 (tpl:fld
+                  (list :fldname captfld
+                        :fldcontent (tpl:dateupd (list :name namefld
+                                                       :value ""))))
+                 (tpl:fld
+                  (list :fldname captfld
+                        :fldcontent (tpl:dateupd (list :name namefld
+                                                       :value (decode-date val))))))))
           ((equal typedata '(:list-of-keys supplier-status))
            (tpl:fld
             (list :fldname captfld
@@ -142,22 +165,28 @@ function(){
       :fld (when (check-perm (getf (getf infld :permlist) :show) (cur-user))
              (push (getf infld :name) col-names)
              (let* ((in-name (getf infld :fld))
+                    (width   (getf infld :width))
                     (model `(("name" . ,in-name)
                              ("index" . ,in-name)
-                             ("width" . "200")
+                             ("width" . ,width)
+                             ("align" . ,(if (equal '(:num) (getf infld :typedata))
+                                             "center"
+                                             "left"))
                              ("sortable" . t)
                              ("editable" . nil #|(if (check-perm (getf (getf infdls :permlist) :update)
                                                            t
                                                            nil)) |# )))) ;; rulez
                (push model col-model)))
       :btn (when (check-perm (getf infld :perm) (cur-user))
-             (let* ((in-name (getf infld :btn))
+             (let* ((in-name "" #|(getf infld :btn)|#)
+                    (width   (getf infld :width))
                     ;; commented for change algorithm
                     ;; (in-capt (getf infld :value))
                     ;; (btn-str (format nil "\"<form method='post'><input type='submit' name='~A~~\"+cl+\"' value='~A' /></form>\"" in-name in-capt))
                     (model `(("name" . ,in-name)
                              ("index" . ,in-name)
-                             ("width" . "200")
+                             ("width" . ,width)
+                             ("align" . "center")
                              ("sortable" . nil)
                              ("editable" . nil))))
                (push in-name col-names)
@@ -165,10 +194,12 @@ function(){
                ;; (push `(,in-name . ,btn-str) col-replace) ;; commented for change algorithm
                ))
       :popbtn (when (check-perm (getf infld :perm) (cur-user))
-                (let* ((in-name (getf infld :popbtn))
+                (let* ((in-name "" #|(getf infld :popbtn)|#)
+                       (width   (getf infld :width))
                        (model `(("name" . ,in-name)
                                 ("index" . ,in-name)
-                                ("width" . "200")
+                                ("width" . ,width)
+                                ("align" . "center")
                                 ("sortable" . nil)
                                 ("editable" . nil))))
                   (push in-name col-names)
@@ -261,7 +292,6 @@ function(){
                                 ))))))) ;; <------ here inserted
 
 (defun pager (val fields page rows-per-page)
-  "[debugged 29.08.2011]"
   (let* ((rows             (funcall val))
          (cnt-rows         (length rows))
          (slice-cons)      ;; many of (id . #<object>)
@@ -305,7 +335,7 @@ function(){
                         (value     (getf infld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
                         (accessor  (lambda (x)
                                      (declare (ignore x))
-                                     (format nil "<form method='post'><input type='submit' name='~A~~%|id|%' value='~A~~%|id|%' /></form>"
+                                     (format nil "<form method='post'><input type='submit' name='~A~~%|id|%' value='~A' /></form>"
                                              btn
                                              value))))
                    (push (cons accessor perm) field-cons))
@@ -314,7 +344,7 @@ function(){
                         (value     (getf infld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
                         (accessor  (lambda (x)
                                      (declare (ignore x))
-                                     (format nil "<input type='button' name='~A~~%|id|%' value='~A~~%|id|%' onclick='ShowHide(\"~A\")' />"
+                                     (format nil "<input type='button' name='~A~~%|id|%' value='~A' onclick='ShowHide(\"~A\")' />"
                                              btn
                                              value
                                              btn))))

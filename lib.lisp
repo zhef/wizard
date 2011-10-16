@@ -14,6 +14,17 @@
 (in-package #:WIZARD)
 
 
+(defun decode-date (timestamp)
+  (multiple-value-bind (second minute hour date month year)
+      (decode-universal-time timestamp)
+    (declare (ignore second minute hour))
+    (format nil
+            "~2,'0d.~2,'0d.~d"
+            date
+            month
+            year)))
+
+
 (defmacro with-query-select ((query-str fields) &body body)
   (let* ((fld-str (format nil "~{`~A`~^, ~}" fields))
          (fld-sym (loop :for fld :in fields :collect (intern (string-upcase fld) (find-package "WIZARD")))))

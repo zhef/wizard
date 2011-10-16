@@ -6,42 +6,100 @@
 (defparameter *param-id-flag*      nil)
 
 
+(defparameter *test*
+  '(:entity               tender
+    :container            tender
+    :fields
+    ((name                "Название"                   (:str)
+      '(:view   :all))
+     (status              "Статус"                     (:list-of-keys tender-status)
+      '(:view   :all))
+     (owner               "Заказчик"                   (:link builder)
+      '(:update :admin))
+     ;; Дата, когда тендер стал активным (первые сутки новые тендеры видят только добростовестные поставщики)
+     (all                 "Срок проведения"            (:interval)
+      '(:view   :all
+        :update (or :admin  (and :owner :unactive))))
+     (claim               "Срок подачи заявок"         (:interval)
+      '(:update (or :admin  (and :owner :unactive))))
+     (analize             "Срок рассмотрения заявок"   (:interval)
+      '(:update (or :admin  (and :owner :unactive))))
+     (interview           "Срок проведения интервью"   (:interval)
+      '(:update (or :admin  (and :owner :unactive))))
+     (result              "Срок подведения итогов"     (:interval)
+      '(:update (or :admin (and :owner :unactive))))
+     (winner              "Победитель тендера"         (:link supplier)
+      '(:view   :finished))
+     (price               "Рекомендуемая стоимость"    (:num) ;; вычисляется автоматически на основании заявленных ресурсов
+      '(:update :system))
+     (resources           "Ресурсы"                    (:list-of-links tender-resource)
+      '(:update (and :owner :unactive)))
+     (documents           "Документы"                  (:list-of-links document) ;; закачка и удаление файлов
+      '(:update (and :owner :unactive)))
+     (suppliers           "Поставщики"                 (:list-of-links supplier) ;; строится по ресурсам автоматически при создании тендера
+      '(:update :system))                                    ;; по ресурсам тендера
+     (offers              "Заявки"                     (:list-of-links offer)))
+    :perm
+    (:create :builder
+     :delete :admin
+     :view   (and :logged (or :stale (and :fresh :fair)))
+     :show   :all
+     :update (or :admin :owner))))
+
+
 (defun gen-fld-symb (fld entity-param)
-  (let* ((entity    (find-if #'(lambda (entity)      (equal (getf entity :entity) entity-param))    *entityes*))
-         (name      (cadr   (find-if #'(lambda (x)   (equal (car x) fld))                           (getf entity :fields))))
-         (typedata  (caddr  (find-if #'(lambda (x)   (equal (car x) fld))                           (getf entity :fields))))
-         (fld-perm  (cadddr (find-if #'(lambda (x)   (equal (car x) fld))                           (getf entity :fields))))
-         (obj-perm  (getf entity :perm)))
-    (format nil "~%~25T (list :fld \"~A\" :typedata '~A :name \"~A\" ~%~31T :permlist '~A)"
-            fld
-            (bprint typedata)
-            name
-            (let ((res-perm))
-              (loop :for perm :in obj-perm :by #'cddr :do
-                 (if (null (getf fld-perm perm))
-                     (setf (getf res-perm perm) (getf obj-perm perm))
-                     (setf (getf res-perm perm) (getf fld-perm perm))))
-              (bprint res-perm)))))
+  (let* ((entity    (find-if #'(lambda (entity)  (equal (getf entity :entity) entity-param))  *entityes*))
+         (record    (find-if #'(lambda (x)       (equal (car x) fld))                         (getf entity :fields)))
+         (obj-perm  (getf entity :perm))
+         (fld-perm  obj-perm)
+         (width     200))
+    (destructuring-bind (fld name typedata &rest rest)
+        record
+      (ecase (length rest)
+        (0 nil)
+        (1 (etypecase (car rest)
+             (cons    (setf fld-perm (car rest)))
+             (integer (setf width (car rest)))))
+        (2 (progn
+             (etypecase (car rest)
+               (cons    (setf fld-perm (car rest)))
+               (integer (setf width (car rest))))
+             (etypecase (cadr rest)
+               (cons    (setf fld-perm (cadr rest)))
+               (integer (setf width (cadr rest)))))))
+      (format nil "~%~25T (list :fld \"~A\" :typedata '~A :name \"~A\" :width ~A ~%~31T :permlist '~A)"
+              fld
+              (bprint typedata)
+              name
+              width
+              (let ((res-perm))
+                (loop :for perm :in obj-perm :by #'cddr :do
+                   (if (null (getf fld-perm perm))
+                       (setf (getf res-perm perm) (getf obj-perm perm))
+                       (setf (getf res-perm perm) (getf fld-perm perm))))
+                (bprint res-perm))))))
 
 
 (defun gen-fld-cons (fld)
   (let ((instr (car fld)))
     (ecase instr
-      (:btn         (cond ((not (null (getf fld :act)))         (let ((gen (string-downcase (symbol-name (gensym "B")))))
-                                                                  (setf *controllers*
-                                                                        (append *controllers*
-                                                                                (list (list gen (getf fld :act)))))
-                                                                  (format nil "~%~25T (list :btn \"~A\" :perm ~A :value \"~A\")"
-                                                                          gen
-                                                                          (bprint (getf fld :perm))
-                                                                          (getf fld instr))))
-                          ((not (null (getf fld :popup)))       (let* ((gen    (string-downcase (symbol-name (gensym "P")))))
-                                                                  (format nil "~%~25T (list :popbtn \"~A\" :perm ~A :value \"~A\" ~%~31T :action ~A)"
-                                                                          gen
-                                                                          (bprint (getf fld :perm))
-                                                                          (getf fld instr)
-                                                                          (gen-action (eval (getf fld :popup)))
-                                                                          )))))
+      (:btn         (cond ((not (null (getf fld :act)))    (let ((gen (string-downcase (symbol-name (gensym "B")))))
+                                                             (setf *controllers*
+                                                                   (append *controllers*
+                                                                           (list (list gen (getf fld :act)))))
+                                                             (format nil "~%~25T (list :btn \"~A\" :width ~A :perm ~A :value \"~A\")"
+                                                                     gen
+                                                                     (aif (getf fld :width) it "200")
+                                                                     (bprint (getf fld :perm))
+                                                                     (getf fld instr))))
+                          ((not (null (getf fld :popup)))  (let* ((gen    (string-downcase (symbol-name (gensym "P")))))
+                                                             (format nil "~%~25T (list :popbtn \"~A\" :width ~A :perm ~A :value \"~A\" ~%~31T :action ~A)"
+                                                                     gen
+                                                                     (aif (getf fld :width) it "200")
+                                                                     (bprint (getf fld :perm))
+                                                                     (getf fld instr)
+                                                                     (gen-action (eval (getf fld :popup)))
+                                                                     )))))
 
       (:action      (gen-action fld))
       ;; not debugged (!)

@@ -133,7 +133,7 @@
                                       (make-instance 'SUPPLIER
                                                      :login (symbol-name (gensym "LOGIN"))
                                                      :password (symbol-name (gensym "PASSWORD"))
-                                                     :name (format nil ":::~A" name)
+                                                     :name (format nil "~A" name)
                                                      :email email
                                                      :site site
                                                      :heads heads
@@ -282,5 +282,7 @@
 (categoryes-and-resources)
 (users)
 (tenders)
+
+;; (a-all (gethash 1 *TENDER*))
 
 (print "RELOAD FINISHED")

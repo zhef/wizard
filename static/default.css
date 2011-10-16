@@ -39,6 +39,10 @@ input[type="checkbox"] {
 	height:15px;
 	padding:0 !important;
 }
+input[type="submit"] {
+	padding:0 3px 0 3px !important;
+    background-color: #FFFFFF;
+}
 label {
 	cursor:pointer;
 }
