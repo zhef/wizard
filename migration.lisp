@@ -1,8 +1,27 @@
 (in-package #:wizard)
 
+(defparameter *list-of-hashes* '(
+                                 ;; user post
+                                 ;; sale supplier-resource category resource resource-price price-reference
+                                 ;; tender tender-resource offer offer-resource document
+                                 ))
+
+(defun store ()
+  (loop :for hash :in *list-of-hashes* :collect
+     (cl-store:store
+      (symbol-value (intern (format nil "*~A*"(symbol-name hash))))
+      (format nil "z_~A.bin" hash))))
+
+(defun restore ()
+  (loop :for hash :in *list-of-hashes* :collect
+     (setf
+      (symbol-value (intern (format nil "*~A*_"(symbol-name hash))))
+      (cl-store:restore (format nil "z_~A.bin" hash)))))
+
 
 (defun resource-price ()
-  (defparameter *PRICE-REFERENCE* (make-hash-table :test #'equal))
+  (clrhash *PRICE-REFERENCE*)
+  (clrhash *RESOURCE-PRICE*)
   ;; Забираем все справочники
   (with-query-select ("SELECT |:::| FROM `jos_gt_resource_price_level`"
                       ("id" "level" "title"))
