@@ -6,47 +6,6 @@
 (defparameter *param-id-flag*      nil)
 
 
-(defparameter *test*
-  '(:entity               tender
-    :container            tender
-    :fields
-    ((name                "Название"                   (:str)
-      '(:view   :all))
-     (status              "Статус"                     (:list-of-keys tender-status)
-      '(:view   :all))
-     (owner               "Заказчик"                   (:link builder)
-      '(:update :admin))
-     ;; Дата, когда тендер стал активным (первые сутки новые тендеры видят только добростовестные поставщики)
-     (all                 "Срок проведения"            (:interval)
-      '(:view   :all
-        :update (or :admin  (and :owner :unactive))))
-     (claim               "Срок подачи заявок"         (:interval)
-      '(:update (or :admin  (and :owner :unactive))))
-     (analize             "Срок рассмотрения заявок"   (:interval)
-      '(:update (or :admin  (and :owner :unactive))))
-     (interview           "Срок проведения интервью"   (:interval)
-      '(:update (or :admin  (and :owner :unactive))))
-     (result              "Срок подведения итогов"     (:interval)
-      '(:update (or :admin (and :owner :unactive))))
-     (winner              "Победитель тендера"         (:link supplier)
-      '(:view   :finished))
-     (price               "Рекомендуемая стоимость"    (:num) ;; вычисляется автоматически на основании заявленных ресурсов
-      '(:update :system))
-     (resources           "Ресурсы"                    (:list-of-links tender-resource)
-      '(:update (and :owner :unactive)))
-     (documents           "Документы"                  (:list-of-links document) ;; закачка и удаление файлов
-      '(:update (and :owner :unactive)))
-     (suppliers           "Поставщики"                 (:list-of-links supplier) ;; строится по ресурсам автоматически при создании тендера
-      '(:update :system))                                    ;; по ресурсам тендера
-     (offers              "Заявки"                     (:list-of-links offer)))
-    :perm
-    (:create :builder
-     :delete :admin
-     :view   (and :logged (or :stale (and :fresh :fair)))
-     :show   :all
-     :update (or :admin :owner))))
-
-
 (defun gen-fld-symb (fld entity-param)
   (let* ((entity    (find-if #'(lambda (entity)  (equal (getf entity :entity) entity-param))  *entityes*))
          (record    (find-if #'(lambda (x)       (equal (car x) fld))                         (getf entity :fields)))

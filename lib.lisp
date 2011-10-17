@@ -207,3 +207,83 @@
                                 (funcall #'equal (tld a) (tld b)))))
          (return-from activate (funcall (cdr key)))))
     "err: unk:post:controller"))
+
+
+(defun decoder-3-csv  (in-string)
+  "Второе возвращаемое значение показывает, была ли закрыта кавычка, или строка
+   закончилась посередине обрабатываемой ячейки, что указывает на разрыв строки"
+  (let ((err))
+    (values
+     (mapcar #'(lambda (y) (string-trim '(#\Space #\Tab) y))
+             (mapcar #'(lambda (y) (ppcre:regex-replace-all "\\s+" y " "))
+                     (mapcar #'(lambda (y) (string-trim '(#\Space #\Tab #\") y))
+                             (let ((inp) (sav) (acc) (res))
+                               (loop :for cur :across in-string do
+                                  ;; (print cur)
+                                  (if (null inp)
+                                      (cond ((equal #\" cur) (progn (setf inp t)
+                                                                    ;; (print "open quote : inp t")
+                                                                    ))
+                                            ((equal #\, cur)  (progn (push "" res)
+                                                                     ;; (print "next")
+                                                                     ))
+                                            ;; (t (print "unknown sign out of quite"))
+                                            )
+                                      ;; else
+                                      (cond ((and (null sav) (equal #\" cur)) (progn (setf sav t)
+                                                                                     ;; (print "close quote : sav t")
+                                                                                     ))
+                                            ((and sav (equal #\" cur)) (progn (setf sav nil)
+                                                                              ;; (print (list ".." #\"))
+                                                                              (push #\" acc)))
+                                            ((and sav (equal #\, cur)) (progn (setf sav nil)
+                                                                              (setf inp nil)
+                                                                              (push (coerce (reverse acc) 'string) res)
+                                                                              ;; (print "inp f")
+                                                                              (setf acc nil)))
+                                            ((equal #\Return cur)      nil)
+                                            (t (progn (push cur acc)
+                                                      ;; (print (list "." cur))
+                                                      )))))
+                               (when acc
+                                 ;; незакрытая кавычка
+                                 (if (and inp (null sav))
+                                     (setf err t))
+                                 ;; (print (list ":" inp sav acc res))
+                                 (push (coerce (reverse acc) 'string) res))
+                               (reverse res)))))
+     err)))
+
+
+(defun xls-processor (infile)
+  (let* ((result)
+         (output (with-output-to-string (*standard-output*)
+                   (let* ((proc (sb-ext:run-program "/usr/bin/xls2csv"
+                                                    (list "-q3" (format nil "~a" infile)) :wait nil :output :stream)))
+                     (with-open-stream (in (sb-ext:process-output proc))
+                       (loop :for i from 1 do
+                          (tagbody loop-body
+                             (handler-case
+                                 (let ((in-string (read-line in)))
+                                   (format nil "~A" in-string)
+                                   ;; начинаем декодировать
+                                   (tagbody start-decoding
+                                      (multiple-value-bind (line err-string-flag)
+                                          (decoder-3-csv in-string)
+                                        (when err-string-flag
+                                          (setf in-string (concatenate 'string in-string (read-line in)))
+                                          ;; (format t "~%warn-broken-string [~a] ~a~%" i in-string)
+                                          (incf i)
+                                          (go start-decoding))
+                                        (format t "~%~%str: ~a~%lin: ~a" in-string (bprint line))
+                                        (unless (null line)
+                                          (handler-case
+                                              (push line result)
+                                            (SB-INT:SIMPLE-PARSE-ERROR () nil))
+                                          )))
+                                   )
+                               (END-OF-FILE () (return i)))))))
+                   )))
+    ;; output
+    (reverse result)))
+;; (xls-processor "/home/rigidus/xls.xls")

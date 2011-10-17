@@ -1275,3 +1275,15 @@
         :perm              :all)))
 
    ))
+
+
+
+(restas:define-route test ("/test")
+  (tpl:test))
+
+(restas:define-route test/post ("/test" :method :post)
+  (if (null (car (hunchentoot:post-parameter "file")))
+      (tpl:test)
+      ;; else
+      (format nil "<pre>~A</pre>" (processor (car (hunchentoot:post-parameter "file"))))))
+

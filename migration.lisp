@@ -28,47 +28,6 @@
       (symbol-value (intern (format nil "*~A*_"(symbol-name hash))))
       (cl-store:restore (format nil "z_~A.bin" hash)))))
 
-
-
-(defclass TEST-1 (entity)
-  ((NAME             :initarg :NAME                :initform nil :accessor A-NAME)
-   (IN               :initarg :IN                  :initform nil :accessor A-IN)))
-
-(defclass TEST-2 (entity)
-  ((NAME             :initarg :NAME                :initform nil :accessor A-NAME)))
-
-
-
-
-(defparameter *test-1* (make-hash-table :test #'equal))
-(defparameter *test-2* (make-hash-table :test #'equal))
-
-(setf (gethash 1 *test-2*) (make-instance 'TEST-2 :name "this is inner"))
-(setf (gethash 1 *test-1*) (make-instance 'TEST-1
-                                          :name "this is outer"
-                                          :in (gethash 1 *test-2*)
-                                          ))
-
-(a-name (a-in (gethash 1 *test-1*)))
-
-(cl-store:store *test-1* "z_test-1.bin")
-(cl-store:store *test-2* "z_test-2.bin")
-
-(clrhash *test-1*)
-(clrhash *test-2*)
-
-(a-name (a-in (gethash 1 *test-1*)))
-
-(setf *test-1* (cl-store:restore  "z_test-1.bin"))
-(setf *test-2* (cl-store:restore  "z_test-2.bin"))
-
-(setf (a-name (a-in (gethash 1 *test-1*))) "this")
-
-(a-name (gethash 1 *test-2*))
-
-
-
-
 ;; (store)
 
 (hash-table-count *resource-price*)

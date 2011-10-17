@@ -10,6 +10,7 @@
 (require 'CLOSURE-TEMPLATE)
 (require 'RESTAS-DIRECTORY-PUBLISHER)
 (require 'CL-JSON)
+(require 'CL-PPCRE)
 (load "lib.lisp")
 (reload)
 (load "init.lisp")
