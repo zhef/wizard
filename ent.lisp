@@ -274,7 +274,7 @@
      :fields
      ((estimate            "Сметная цена"               (:num))
       (wholesale           "Оптовая цена"               (:num))
-      (price-level         "Справочник цен"             (:link price-level))
+      (price-reference     "Справочник цен"             (:link price-reference))
       (resource            "Ресурс"                     (:link resource)))
      :perm
      (:create :system
@@ -350,7 +350,7 @@
      :fields
      ((tender             "Тендер"                      (:link tender))
       (resource           "Ресурс"                      (:link resource))
-      (quantity           "Кол-во"                      (:num) 55)
+      (quantity           "Кол-во"                      (:num))
       (price              "Цена"                        (:num)) ;; Первоначально цена заполняется из справочника
       (price-date         "Дата справочника цен"        (:str))
       (comment            "Комментарий"                 (:text))
@@ -1157,7 +1157,7 @@
                                                                            :tender-resource tender-resource
                                                                            :quantity 0
                                                                            :price 0
-                                                                           :price-resilt 0
+                                                                           :price-result 0
                                                                            :comment ""
                                                                            :delivery nil
                                                                            :delivery-price 0
@@ -1285,5 +1285,5 @@
   (if (null (car (hunchentoot:post-parameter "file")))
       (tpl:test)
       ;; else
-      (format nil "<pre>~A</pre>" (processor (car (hunchentoot:post-parameter "file"))))))
+      (format nil "<pre>~A</pre>" (xls-processor (car (hunchentoot:post-parameter "file"))))))
 
