@@ -509,14 +509,17 @@
   <input type="text" name="{$name}" value="{$value}" style="width: 350px;" /> <br />{\n}
 {/template}
 
+
 {template strupd}
   <input type="text" name="{$name}" value="{$value}" style="width: 350px;" /> <br />{\n}
 {/template}
+
 
 {template dateupd}
   <input type="text" name="{$name}" value="{$value}" style="width: 65px;" />{\n}
   <br />
 {/template}
+
 
 {template intervalupd}
   <input type="text" name="{$name}:begin" value="{$valuebegin}" style="width: 65px;" />{\n}
@@ -524,6 +527,7 @@
   <input type="text" id="id-{$name}" name="{$name}:end" value="{$valueend}" style="width: 65px;" />{\n}
   <br />
 {/template}
+
 
 {template flagupd}
   <input type="checkbox" name="{$name}" value="T" {if $value} checked {/if} /> <br />{\n}
@@ -534,6 +538,7 @@
   <OPTION value="{$id}">{$name}</OPTION>{\n}
 {/template}
 
+
 {template selres}
   <SELECT name="{$name}" size="10">
     {foreach $option in $options}
@@ -542,15 +547,14 @@
   </SELECT>
 {/template}
 
+
 {template textupd}
-  <textarea name="{$name}" rows="5" col="120" />{$value}</textarea> <br />{\n}
+  <textarea name="{$name}" rows="6" col="120" style="width: 350px;" />{$value}</textarea> <br />{\n}
 {/template}
 
 
-
-
 {template pswdupd}
-  <input type="password" name="{$name}" value="{$value}" /> <br />{\n}
+  <input type="password" name="{$name}" value="{$value}" style="width: 350px;" /> <br />{\n}
 {/template}
 
 

@@ -268,11 +268,13 @@ function(){
 
 
 (defun grid-helper (grid-id pager-id json-code)
-  (format nil "<table id=\"~A\"></table><div id=\"~A\"></div>
+  (format nil "<div style=\"margin: 10px 0 10px 0\">
+               <table id=\"~A\"></table><div id=\"~A\"></div>
                <script type=\"text/javascript\">
                jQuery('#~A').jqGrid(~A);
                jQuery('#~A').jqGrid('navGrid','#~A',{edit:false,add:false,del:false});
-               </script>"
+               </script>
+               </div>"
           grid-id pager-id grid-id json-code grid-id pager-id))
 
 

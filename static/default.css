@@ -8,7 +8,7 @@ html {background:#006bbe; height:100%;z-index:10;}
 
 body {
 	font-family: arial, helvetica, sans-serif;
-        background:#006bbe;
+    background:#006bbe;
 /*	background:transparent;*/
 	color:#010101;
 	font-size:12px;
@@ -23,9 +23,10 @@ select, input, textarea {
 	font-family: arial;
 	font-size:11px;
 	padding:2px 6px;
-	border:1px solid #FF6600;
-}
-select {
+    border-top: 1px solid #909090;
+    border-left: 1px solid #909090;
+    border-right: 1px solid #D0D0D0;
+    border-bottom: 1px solid #D0D0D0;
 	padding:1px 1px 1px 4px;
 }
 
@@ -42,6 +43,7 @@ input[type="checkbox"] {
 input[type="submit"] {
 	padding:0 3px 0 3px !important;
     background-color: #FFFFFF;
+    border:1px solid #FF6600;
 }
 label {
 	cursor:pointer;

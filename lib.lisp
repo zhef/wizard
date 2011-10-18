@@ -284,6 +284,7 @@
                                    )
                                (END-OF-FILE () (return i)))))))
                    )))
+    (declare (ignore output))
     ;; output
     (reverse result)))
 ;; (xls-processor "/home/rigidus/xls.xls")
