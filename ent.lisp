@@ -141,10 +141,8 @@
                            '(:view   (or :logged :fair)))                   ;; Гость не видит у недобросовестных
       (contact-person      "Контактное лицо"           (:str)
                            '(:view   (or :logged :fair)))                   ;; Гость не видит у недобросовестных
-      (resources           "Поставляемые ресурсы"      (:list-of-links supplier-resource)
-                           '(:add-resource :self   ;; создается связующий объект supplier-resource содержащий установленную поставщиком цену
-                             :del-resource :self   ;; удаляется связующий объект
-                             :change-price :self))
+      (resources           "Поставляемые ресурсы"      (:list-of-links supplier-resource))
+      (price-elts          "Ресурсы из прайся"         (:list-of-links supplier-resource-price-elt))
       (offers              "Посланные приглашения на тендеры"  (:list-of-links offer)
                            '(:view :self
                              :update :self))  ;; offer - связующий объект
@@ -200,7 +198,7 @@
      ((owner               "Поставщик"                  (:link supplier))
       (name                "Наименование"               (:str))
       (unit                "Единица измерения"          (:str))
-      (price               "Цена"                       (:num)))
+      (price               "Цена"                       (:str)))
      :perm
      (:create :supplier
       :delete :owner
@@ -673,6 +671,7 @@
         :fields            '(name login
                              (:btn "Страница поставщика"
                               :perm :all
+                              :width 120
                               :act (to "/supplier/~A" (caar (form-data))))))))
     ;; Страница поставщика
     (:place                supplier
@@ -761,7 +760,9 @@
                               :showtype          :grid
                               :perm              :all
                               :entity            supplier-resource-price-elt
-                              :val               (cons-inner-objs *SALE* (a-sales (gethash (cur-id) *USER*)))
+                              :val               (remove-if-not #'(lambda (x)
+                                                                    (equal (a-owner (cdr x)) (gethash (cur-id) *user*)))
+                                                  (cons-hash-list *supplier-resource-price-elt*))
                               :fields            '(name unit price
                                                    (:btn "Удалить"
                                                     :perm (or :admin :owner)
@@ -782,9 +783,17 @@
                                                               :perm :all
                                                               :act
                                                               (progn
-                                                                (error (form-data))
+                                                                (awhen (car (hunchentoot:post-parameter "FILE"))
+                                                                  (loop :for src :in (xls-processor it) :do
+                                                                     (let ((obj (push-hash *supplier-resource-price-elt* 'supplier-resource-price-elt
+                                                                                  :owner (cur-user)
+                                                                                  :name (nth 1 src)
+                                                                                  :unit (nth 2 src)
+                                                                                  :price (nth 3 src))))
+                                                                       (append-link (a-price-elts (cur-user)) obj))
+                                                                     )
+                                                                  )
                                                                 (hunchentoot:redirect (hunchentoot:request-uri*)))))))
-
                              (:action            "Список распродаж"
                               :showtype          :grid
                               :perm              :all
