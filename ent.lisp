@@ -184,7 +184,7 @@
      ((owner               "Поставщик"                  (:link supplier)
                            '(:update :nobody))
       (resource            "Ресурс"                     (:link resource) 485)
-      (price               "Цена поставщика"            (:num)))
+      (price               "Цена поставщика"            (:num) 55))
      :perm
      (:create :owner
       :delete :owner
@@ -713,6 +713,7 @@
                               :fields            '(resource price
                                                    (:btn   "Удалить"
                                                     :perm  :all
+                                                    :width 60
                                                     :act (del-inner-obj
                                                           (caar (form-data))
                                                           *SUPPLIER-RESOURCE*
@@ -745,7 +746,7 @@
                               :fields            '(tender
                                                    (:btn "Страница заявки"
                                                     :perm :all
-                                                    :width 100
+                                                    :width 105
                                                     :act (to "/offer/~A" (caar (form-data))))
                                                    (:btn "Удалить заявку"
                                                     :perm :all
@@ -770,21 +771,18 @@
                              (:btn               "Загрузить прайс-лист"
                               :perm              (or :admin :self)
                               :popup '(:action             "Добавление ресурса"
-                                       :showtype           :grid
+                                       :showtype           :linear
                                        :perm               (or :admin :self)
-                                       :entity             resource
-                                       :val                (cons-hash-list *RESOURCE*)
-                                       :fields             '(name
-                                                             (:btn "Добавить ресурс"
+                                       :entity             supplier-resource-price-elt
+                                       :val                :clear
+                                       :fields             '((:file file
+                                                              :perm :all
+                                                              :name "Прайс")
+                                                             (:btn "Загрузить"
                                                               :perm :all
                                                               :act
                                                               (progn
-                                                                (push-hash *SUPPLIER-RESOURCE* 'SUPPLIER-RESOURCE
-                                                                  :owner (gethash (cur-user) *USER*)
-                                                                  :resource (gethash
-                                                                             (cdr (assoc "res" (form-data) :test #'equal))
-                                                                             *RESOURCE*)
-                                                                  :price (cdr (assoc "PRICE" (form-data) :test #'equal)))
+                                                                (error (form-data))
                                                                 (hunchentoot:redirect (hunchentoot:request-uri*)))))))
 
                              (:action            "Список распродаж"

@@ -534,6 +534,11 @@
 {/template}
 
 
+{template fileupd}
+  <input type="file" name="{$name}" />{\n}
+{/template}
+
+
 {template selopt}
   <OPTION value="{$id}">{$name}</OPTION>{\n}
 {/template}
@@ -567,6 +572,7 @@
   </div>
 {/template}
 
+
 {template btnlin}
   <input type="hidden" name="{$name}" value="{$value}" />
   <div class="button" onclick="jQuery(this).parent('form').submit()" style="margin: 10px 0 10px 0;">
@@ -589,7 +595,6 @@
 {/template}
 
 
-
 {template popbtnlin}
   <div class="button" onclick="ShowHide('{$popid}');" style="margin: 10px 0 10px 0;">
     <div class="left"></div>
@@ -598,11 +603,13 @@
   </div>
 {/template}
 
+
 {template frmobj}
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     {$content |noAutoescape}
   </form>
 {/template}
+
 
 {template frmtbl}
   <table border="0" bgcolor="#DCDCDC" width="100%">
@@ -619,7 +626,6 @@
     {/foreach}
   </table>
 {/template}
-
 
 
 {template popup}
