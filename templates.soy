@@ -509,14 +509,17 @@
   <input type="text" name="{$name}" value="{$value}" style="width: 350px;" /> <br />{\n}
 {/template}
 
+
 {template strupd}
   <input type="text" name="{$name}" value="{$value}" style="width: 350px;" /> <br />{\n}
 {/template}
+
 
 {template dateupd}
   <input type="text" name="{$name}" value="{$value}" style="width: 65px;" />{\n}
   <br />
 {/template}
+
 
 {template intervalupd}
   <input type="text" name="{$name}:begin" value="{$valuebegin}" style="width: 65px;" />{\n}
@@ -525,14 +528,21 @@
   <br />
 {/template}
 
+
 {template flagupd}
   <input type="checkbox" name="{$name}" value="T" {if $value} checked {/if} /> <br />{\n}
+{/template}
+
+
+{template fileupd}
+  <input type="file" name="{$name}" />{\n}
 {/template}
 
 
 {template selopt}
   <OPTION value="{$id}">{$name}</OPTION>{\n}
 {/template}
+
 
 {template selres}
   <SELECT name="{$name}" size="10">
@@ -542,15 +552,14 @@
   </SELECT>
 {/template}
 
+
 {template textupd}
-  <textarea name="{$name}" rows="5" col="120" />{$value}</textarea> <br />{\n}
+  <textarea name="{$name}" rows="6" col="120" style="width: 350px;" />{$value}</textarea> <br />{\n}
 {/template}
 
 
-
-
 {template pswdupd}
-  <input type="password" name="{$name}" value="{$value}" /> <br />{\n}
+  <input type="password" name="{$name}" value="{$value}" style="width: 350px;" /> <br />{\n}
 {/template}
 
 
@@ -562,6 +571,7 @@
     <div class="right"></div>
   </div>
 {/template}
+
 
 {template btnlin}
   <input type="hidden" name="{$name}" value="{$value}" />
@@ -585,7 +595,6 @@
 {/template}
 
 
-
 {template popbtnlin}
   <div class="button" onclick="ShowHide('{$popid}');" style="margin: 10px 0 10px 0;">
     <div class="left"></div>
@@ -594,11 +603,13 @@
   </div>
 {/template}
 
+
 {template frmobj}
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     {$content |noAutoescape}
   </form>
 {/template}
+
 
 {template frmtbl}
   <table border="0" bgcolor="#DCDCDC" width="100%">
@@ -615,7 +626,6 @@
     {/foreach}
   </table>
 {/template}
-
 
 
 {template popup}

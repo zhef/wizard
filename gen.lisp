@@ -61,16 +61,10 @@
                                                                      )))))
 
       (:action      (gen-action fld))
-      ;; not debugged (!)
-      (:calc        (format nil "~%~25T (list :calc (lambda (obj) ~A) :perm 111)"
-                            (bprint (getf fld instr))))
-      (:col         (let ((str (gen-fields (eval (getf fld :fields))
-                                           (getf fld :entity))))
-                      (format nil "~%~25T (list :col \"~A\" :perm 111 ~%~32T:val (lambda () ~A)~%~32T:fields ~A)"
-                              (getf fld instr)
-                              (getf fld :val)
-                              str)))
-      )))
+      (:file        (format nil "~%~25T (list :file \"~A\" :perm ~A :value \"~A\")"
+                            (getf fld instr)
+                            (bprint (getf fld :perm))
+                            (getf fld :name))))))
 
 
 (defun gen-fields (fields entity)

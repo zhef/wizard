@@ -125,15 +125,23 @@
   (declare (ignore act))
   (let ((in-action (getf infld :action)))
     (push
-     (list :id (getf infld :popbtn) :title (getf in-action :action) :content (show-act in-action) :left 200 :width 500)
+     (list :id (getf infld :popbtn) :title (getf in-action :action) :content (show-act in-action) :left 200 :width 800)
      *popups*))
   (tpl:popbtnlin (list :popid (getf infld :popbtn) :value (getf infld :value))))
+
+
+(defun show-file (infld act)
+  (declare (ignore act))
+  (tpl:fld
+   (list :fldname (getf infld :value)
+         :fldcontent (tpl:fileupd (list :name (getf infld :file))))))
 
 
 (defun show-linear (act val)
   (let ((flds (with-in-fld-case (getf act :fields) ;; infld variable
                 :fld     (show-fld infld act val)
                 :btn     (show-btn infld act)
+                :file    (show-file infld act)
                 :action  (format nil "<div style=\"border: 1px solid red:\"> ~A</div>" (show-act infld))
                 :popbtn  (show-popbtn infld act))))
     (tpl:frmobj (list :content (format nil "~{~A~}" flds)))))
@@ -241,7 +249,9 @@ function(){
           (:none     "showtype is null in defun show-act")
           (:linear   (show-linear act val))
           (:grid     (show-grid   act val))
-          (otherwise (format nil "unknown showtype in defun show-act: ~A" (bprint act)))))))
+          (otherwise (format nil "unknown showtype [~A] in defun show-act [~A]"
+                             (bprint (getf act :showtype))
+                             (bprint (getf act :action))))))))
 
 
 (defun show-acts (acts)
@@ -268,11 +278,13 @@ function(){
 
 
 (defun grid-helper (grid-id pager-id json-code)
-  (format nil "<table id=\"~A\"></table><div id=\"~A\"></div>
+  (format nil "<div style=\"margin: 10px 0 10px 0\">
+               <table id=\"~A\"></table><div id=\"~A\"></div>
                <script type=\"text/javascript\">
                jQuery('#~A').jqGrid(~A);
                jQuery('#~A').jqGrid('navGrid','#~A',{edit:false,add:false,del:false});
-               </script>"
+               </script>
+               </div>"
           grid-id pager-id grid-id json-code grid-id pager-id))
 
 
