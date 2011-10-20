@@ -1,19 +1,5 @@
 (in-package #:wizard)
 
-;; (clrhash *USER*)
-;; (clrhash *POST*)
-;; (clrhash *SALE*)
-;; (clrhash *SUPPLIER-RESOURCE*)
-;; (clrhash *CATEGORY*)
-;; (clrhash *RESOURCE*)
-;; (clrhash *RESOURCE-PRICE*)
-;; (clrhash *PRICE-REFERENCE*)
-;; (clrhash *TENDER*)
-;; (clrhash *TENDER-RESOURCE*)
-;; (clrhash *OFFER*)
-;; (clrhash *OFFER-RESOURCE*)
-;; (clrhash *DOCUMENT*)
-
 (connect :user "root" :password "root" :database "ktopostavljaet")
 (query "SET NAMES utf8")
 
@@ -283,6 +269,7 @@
 (users)
 (tenders)
 
-;; (a-all (gethash 1 *TENDER*))
-
 (print "RELOAD FINISHED")
+
+(restas:start '#:wizard :port 8081)
+(restas:debug-mode-on)
