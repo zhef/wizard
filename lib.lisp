@@ -288,3 +288,18 @@
     ;; output
     (reverse result)))
 ;; (xls-processor "/home/rigidus/xls.xls")
+
+
+(defmacro and-it (&rest args)
+  (cond ((null args) t)
+        ((null (cdr args)) (car args))
+        (t `(let ((it ,(car args)))
+              (when it
+                (and-it ,@(cdr args)))))))
+
+
+(defmacro maybecall (val &rest funs)
+  `(and-it ,val
+           ,@(mapcar (lambda (fun)
+                       `(funcall ,fun it))
+                     funs)))
