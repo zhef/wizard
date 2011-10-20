@@ -35,7 +35,7 @@
            (:all         t)                                          ;; "Все пользователи"
            (:nobody      nil)                                        ;; "Никто"
            (:system      nil) ;; "Система (загрузка данных на старте и изменение статуса поставщиков, когда время добросовестности истеклл)"
-           (:notlogged   (when   (cur-user) t))                      ;; "Незалогиненный пользователь (может зарегистрироваться как поставщик)"
+           (:notlogged   (not (cur-user)))                           ;; "Незалогиненный пользователь (может зарегистрироваться как поставщик)"
            (:logged      (unless (cur-user) t))                      ;; "Залогиненный пользователь"
            (:admin       (if (equal (type-of subj) 'ADMIN) t nil))   ;; "Администратор"
            (:expert      nil) ;; "Пользователь-Эксперт"
@@ -57,23 +57,6 @@
            (:owner       nil) ;; "Объект, над которым совершается действие имеет поле owner содержащее ссылку на объект текущего пользователя"
            ))
         (t perm)))
-
-(defparameter *safe-write-sleep* 0.01)
-(defun safe-write (pathname string &aux stream)
-  (setf stream (open pathname :direction :output :if-does-not-exist :create :if-exists :append))
-  (unwind-protect
-       (loop
-          until (block try-lock
-                  (handler-bind ((error (lambda (condition)
-                                          (if (= sb-posix:eagain
-                                                 (sb-posix:syscall-errno condition))
-                                              (return-from try-lock)
-                                              (error condition)))))
-                    (sb-posix:lockf stream sb-posix:f-tlock 0)
-                    (princ string stream)
-                    (close stream)))
-          do (sleep *safe-write-sleep*))
-    (close stream)))
 
 
 (defclass DYMMY (entity)

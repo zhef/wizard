@@ -4,7 +4,6 @@
   (load "ent.lisp")
   (load "gen.lisp")
   (load "grid.lisp")
-  (load "fld.lisp")
   (load "perm.lisp")
   (load "defmodule.lisp"))
 
@@ -290,12 +289,115 @@
 ;; (xls-processor "/home/rigidus/xls.xls")
 
 
-(defmacro and-it (&rest args)
-  (cond ((null args) t)
-        ((null (cdr args)) (car args))
-        (t `(let ((it ,(car args)))
-              (when it
-                (and-it ,@(cdr args)))))))
+;; eval-always
+
+
+(defmacro eval-always (&body body)
+  "Wrap <_:arg body /> in <_:fun eval-when /> with all keys \(compile, load and execute) mentioned"
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     ,@body))
+
+
+;; abbrev
+
+
+(defmacro abbrev (short long)
+  "Abbreviate a <_:arg long /> MACRO or FUNCTION name as <_:arg short />"
+  `(eval-always
+     (cond
+       ((macro-function ',long)       (setf (macro-function ',short) (macro-function ',long)))
+       ((special-operator-p ',long)   (error "Can't ABBREViate a special-operator ~a" ',long))
+       ((fboundp ',long)              (setf (fdefinition ',short) (fdefinition ',long)))
+       (t                             (error "Can't ABBREViate ~a" ',long)))
+     (setf (documentation ',short 'function) (documentation ',long 'function))
+     ',short))
+
+
+;; literal syntax
+
+
+(defgeneric enable-literal-syntax (which)
+  (:documentation "Dynamically modify read-table to enable some reader-macros"))
+
+(defgeneric disable-literal-syntax (which)
+  (:documentation "Dynamically modify read-table to disable some reader-macros"))
+
+(defmacro locally-enable-literal-syntax (which)
+  "Modify read-table to enable some reader-macros at compile/load time"
+  `(eval-always
+     (enable-literal-syntax ,which)))
+
+(defmacro locally-disable-literal-syntax (which)
+  "Modify read-table to disable some reader-macros at compile/load time"
+  `(eval-always
+     (disable-literal-syntax ,which)))
+
+
+;; #` syntax
+
+
+(eval-always
+  (defun |#`-reader| (stream char arg)
+    "Reader syntax for one argument lambdas. Examples:
+- #`(+ 2 _) => (lambda (x) (+ 2 x))
+- #`((1+ _) (print _)) => (lambda (x) (1+ x) (print x))"
+    (declare (ignore char arg))
+    (let ((sexp (read stream t nil t))
+          (x (gensym "X")))
+      `(lambda (&optional ,x)
+         (declare (ignorable ,x))
+         ,@(subst x '_ (if (listp (car sexp)) sexp (list sexp))))))
+
+  (defmethod enable-literal-syntax ((which (eql :sharp-backq)))
+    (set-dispatch-macro-character #\# #\` #'|#`-reader|))
+
+  (defmethod disable-literal-syntax ((which (eql :sharp-backq)))
+    (set-dispatch-macro-character #\# #\` (make-reader-error-fun #\`))))
+
+;; activate #` syntax
+(locally-enable-literal-syntax :sharp-backq)
+
+
+;; anaphoric
+
+
+(eval-always
+  (defmacro if-it (test then &optional else)
+    "Like <_:fun if />. IT is bound to <_:arg test />"
+    `(let ((it ,test))
+       (if it ,then ,else))))
+
+(eval-always
+  (defmacro when-it (test &body body)
+    "Like <_:fun when />. IT is bound to <_:arg test />"
+    `(let ((it ,test))
+       (when it
+         ,@body))))
+
+(eval-always
+  (defmacro and-it (&rest args)
+    "Like <_:fun and />. IT is bound to the value of the previous <_:fun and /> form"
+    (cond ((null args) t)
+          ((null (cdr args)) (car args))
+          (t `(when-it ,(car args) (and-it ,@(cdr args)))))))
+
+(eval-always
+  (defmacro dowhile-it (test &body body)
+    "Like <_:fun dowhile />. IT is bound to <_:arg test />"
+    `(do ((it ,test ,test))
+         ((not it))
+       ,@body)))
+
+(eval-always
+  (defmacro cond-it (&body body)
+    "Like <_:fun cond />. IT is bound to the passed <_:fun cond /> test"
+    `(let (it)
+       (cond
+         ,@(mapcar #``((setf it ,(car _)) ,(cadr _))
+                   ;; uses the fact, that SETF returns the value set
+                   body)))))
+
+;; maybe
 
 
 (defmacro maybecall (val &rest funs)
@@ -303,6 +405,77 @@
            ,@(mapcar (lambda (fun)
                        `(funcall ,fun it))
                      funs)))
+
+
+(defmacro maybe (form)
+  "Return a value, returned by a <_:arg form /> or nil, if <_:class error /> is signalled"
+  `(restart-case
+       (handler-bind ((error #'(lambda (c)
+                                 (declare (ignore condition))
+                                 (invoke-restart 'skip))))
+         ,form)
+     (skip () nil)))
+
+
+;; dotree
+
+
+(defmacro dotree ((var tree-form &optional result-form) &body body)
+  "The analog of <_:fun dolist />, operating on trees"
+  (with-unique-names (traverser list list-element)
+    `(progn
+       (labels ((,traverser (,list)
+                  (dolist (,list-element ,list)
+                    (if (consp ,list-element)
+                        (,traverser ,list-element)
+                        (let ((,var ,list-element))
+                          ,@body)))))
+         (,traverser ,tree-form)
+         ,result-form))))
+
+
+;; obj-equal
+
+
+(defgeneric obj-equal-by-slots (obj1 obj2 &optional test)
+  (:documentation "Slot-by-slot comparison of objects of one class.
+If objs are of different classes the result is NIL.
+Obviously, can be specialized on classes, and even for two objects of
+diffenet classes, why not...")
+  (:method (obj1 obj2 &optional (test 'equal))
+    (let ((cls (class-of obj1)))
+      (when (eq cls (class-of obj2))
+        (handler-case
+            (apply #'every test
+                   (mapcar (lambda (obj)
+                             (mapcar (lambda (slot)
+                                       (slot-value
+                                        obj
+                                        (closer-mop:slot-definition-name slot)))
+                                     (closer-mop:class-slots (class-of obj))))
+                           (list obj1 obj2)))
+          (unbound-slot () nil))))))
+
+
+(defgeneric obj-equal (obj1 obj2 &optional test)
+  (:documentation
+   "Class-aware polymorphic equality with an optional <_:arg test />")
+  (:method (obj1 obj2 &optional (test 'equal))
+    "For non CLOS primitive types"
+    (funcall test obj1 obj2))
+  (:method ((obj1 sequence) (obj2 sequence) &optional (test 'equal))
+    "For sequences -- recursively look inside the ordered variants"
+    (when (= (length obj1) (length obj2))
+      (every (lambda (obj1 obj2)
+               (obj-equal obj1 obj2 test))
+             obj1 obj2))) ; add lexicographical ordering
+  (:method ((obj1 standard-class) (obj2 standard-class) &optional (test 'equal))
+    "Slot-by-slot comparison for STANDARD-CLASSES.
+If objs are of different classes the result is NIL."
+    (obj-equal-by-slots obj1 obj2 test)))
+
+
+;; send-email
 
 
 (defun send-email (text &rest reciepients)
@@ -313,6 +486,9 @@
                                        :encoding :base64 :charset "UTF-8"
                                        :content (arnesi:string-to-octets text :utf-8))
                         t t)))
+
+
+;; gcase
 
 
 (defmacro gcase ((keyform &key (test #'eql)) &body clauses)
@@ -333,3 +509,24 @@
                                                                (type-error-expected-type ,c))))
                                       ,@(cdr clause)))))
                    clauses)))))
+
+
+;; safe-write
+
+
+(defparameter *safe-write-sleep* 0.01)
+(defun safe-write (pathname string &aux stream)
+  (setf stream (open pathname :direction :output :if-does-not-exist :create :if-exists :append))
+  (unwind-protect
+       (loop
+          until (block try-lock
+                  (handler-bind ((error (lambda (condition)
+                                          (if (= sb-posix:eagain
+                                                 (sb-posix:syscall-errno condition))
+                                              (return-from try-lock)
+                                              (error condition)))))
+                    (sb-posix:lockf stream sb-posix:f-tlock 0)
+                    (princ string stream)
+                    (close stream)))
+          do (sleep *safe-write-sleep*))
+    (close stream)))

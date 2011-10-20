@@ -692,7 +692,7 @@
                                        PASSWORD)))))
        (:action            "Поставщик"
         :showtype          :linear
-        :perm              (or :admin :self)
+        :perm              (or :admin :self :notlogged)
         :entity            supplier
         :val               (gethash (cur-id) *USER*)
         :fields            '(name status juridical-address actual-address contacts email site heads inn kpp ogrn

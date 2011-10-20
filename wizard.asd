@@ -10,7 +10,9 @@
                #:cl-ppcre
                #:cl-smtp
                #:cl-mime
-               #:arnesi)
+               #:arnesi
+               #:closer-mop
+               )
   :serial      t
   :components ((:file "lib")
                (:file "ent")
