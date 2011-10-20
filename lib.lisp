@@ -305,7 +305,6 @@
                      funs)))
 
 
-
 (defun send-email (text &rest reciepients)
   "Generic send SMTP mail with some TEXT to RECIEPIENTS"
   (cl-smtp:with-smtp-mail (out "localhost" "noreply@fin-ack.com" reciepients)
@@ -315,3 +314,22 @@
                                        :content (arnesi:string-to-octets text :utf-8))
                         t t)))
 
+
+(defmacro gcase ((keyform &key (test #'eql)) &body clauses)
+  "GENERALIZED-CASE -- the difference from simple CASE is that it can use any given TEST-function. TYPE-ERRORs signaled by TEST-functions are ignored"
+  (unless (listp clauses) (error "~a -- bad clause in CASE" clauses))
+  (let ((t-clause? nil))
+    (when (eql (caar (last clauses)) 'otherwise)
+      (setf t-clause? t))
+    `(let ((it ,keyform))
+       (cond
+         ,@(mapcar #'(lambda (clause)
+                       (if (and t-clause? (eql (car clause) 'otherwise))
+                           `(t ,@(cdr clause))
+                           (w/uniqs (c)
+                                    `((handler-case (funcall ,test it ,(car clause))
+                                        (type-error (,c) (warn "The value ~a is not of type ~a"
+                                                               (type-error-datum ,c)
+                                                               (type-error-expected-type ,c))))
+                                      ,@(cdr clause)))))
+                   clauses)))))
