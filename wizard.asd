@@ -7,7 +7,10 @@
                #:restas
                #:restas-directory-publisher
                #:cl-json
-               #:cl-ppcre)
+               #:cl-ppcre
+               #:cl-smtp
+               #:cl-mime
+               #:arnesi)
   :serial      t
   :components ((:file "lib")
                (:file "ent")
@@ -22,5 +25,7 @@
                (:static-file "wizard.asd")
                (:static-file "templates.soy")
                ))
+
+
 
 

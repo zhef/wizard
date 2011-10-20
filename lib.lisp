@@ -303,3 +303,15 @@
            ,@(mapcar (lambda (fun)
                        `(funcall ,fun it))
                      funs)))
+
+
+
+(defun send-email (text &rest reciepients)
+  "Generic send SMTP mail with some TEXT to RECIEPIENTS"
+  (cl-smtp:with-smtp-mail (out "localhost" "noreply@fin-ack.com" reciepients)
+    (cl-mime:print-mime out
+                        (make-instance 'cl-mime:text-mime
+                                       :encoding :base64 :charset "UTF-8"
+                                       :content (arnesi:string-to-octets text :utf-8))
+                        t t)))
+

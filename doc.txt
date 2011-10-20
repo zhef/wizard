@@ -125,3 +125,23 @@ http://www.emacswiki.org/emacs/ExecuteExternalCommand
 при вызове save-lisp-and-die. Ф-ию с кодом, восстанавливающим
 состояние, можно поместить в значение ключа :top-level ф-ии
 save-lisp-and-die.
+
+
+
+;; Поиск и выполнение произвольных методов объекта
+
+(defclass test-obj ()
+  ((test-method :initarg :test-method :initform nil :accessor a-test-method)))
+
+(defparameter *test-example*
+  (make-instance 'test-obj :test-method 'a))
+
+(funcall (closer-mop:method-function
+          (find-method #'a-test-method '() (mapcar #'find-class '(test-obj))))
+         (list *test-example*) '())
+
+
+
+[17:02] dmitry_vk> "Open Implementations and Metaobject Protocols", by
+Gregor Kiczales and Andreas Paepcke - ИМХО, более хорошее введение в
+суть MOP'а, чем AMOP
