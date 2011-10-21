@@ -679,3 +679,40 @@
     <input type="submit" />{\n}
   </form>
 {/template}
+
+
+{template testmap}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" {$iehack |noAutoescape}>
+<head>
+    <title>Примеры. Знакомство с JavaScript API. Простой вызов карты.</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    {$viewporthack |noAutoescape}
+    <script src="http://api-maps.yandex.ru/1.1/index.xml?key={$mapkey}"
+            type="text/javascript"></script>
+    <script type="text/javascript">
+        YMaps.jQuery(function () {lb}
+            // Создает экземпляр карты и привязывает его к созданному контейнеру
+            var map = new YMaps.Map(YMaps.jQuery("#YMapsID")[0]);
+            // Устанавливает начальные параметры отображения карты: центр карты и коэффициент масштабирования
+            map.setCenter(new YMaps.GeoPoint({$center}), 10);
+            map.addControl(new YMaps.TypeControl());
+            map.addControl(new YMaps.ToolBar());
+            map.addControl(new YMaps.Zoom());
+            map.addControl(new YMaps.MiniMap());
+            map.addControl(new YMaps.ScaleLine());
+            // Создает метку и добавляет ее на карту
+            var placemark = new YMaps.Placemark(new YMaps.GeoPoint({$center}));
+            placemark.name = "Имя метки";
+            placemark.description = "{$addr}";
+            map.addOverlay(placemark);
+            // Открывает балун
+            placemark.openBalloon();
+        {rb})
+    </script>
+</head>
+<body>
+    <div id="YMapsID" style="width:600px;height:400px"></div>
+</body>
+</html>
+{/template}

@@ -12,7 +12,7 @@
                #:cl-mime
                #:arnesi
                #:closer-mop
-               )
+               #:drakma)
   :serial      t
   :components ((:file "lib")
                (:file "ent")
