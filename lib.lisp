@@ -577,13 +577,13 @@ If objs are of different classes the result is NIL."
                           :initform ,initform
                           :accessor ,(intern (format nil "A-~A" (symbol-name slot-name))))))
      (defmethod print-object ((obj ,class-name) stream)
-       (format stream ,(format nil "#[MYCLASS:~A | ~{~A~^, ~}]"
+       (format stream ,(format nil "#[MYCLASS:~A | ~A]"
                                (symbol-name class-name)
                                (loop :for (slot-name initform) :in slots :collect
-                                  (format nil "~A:~~A"
+                                  (format nil ":~A ~~A"
                                           slot-name)))
                 ,@(loop :for (slot-name initform) :in slots :collect
-                    `(,(intern (format nil "A-~A" (symbol-name slot-name))) obj))))))
+                     `(bprint (,(intern (format nil "A-~A" (symbol-name slot-name))) obj)))))))
 
 
 ;; CLASS ACTION
@@ -600,6 +600,8 @@ If objs are of different classes the result is NIL."
   (title "")
   (descr "")
   (coord ""))
+
+(mi 'yapoint)
 
 ;; CLASS YAMAP
 (with-defclass (yamap ())

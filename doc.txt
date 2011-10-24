@@ -145,3 +145,10 @@ save-lisp-and-die.
 [17:02] dmitry_vk> "Open Implementations and Metaobject Protocols", by
 Gregor Kiczales and Andreas Paepcke - ИМХО, более хорошее введение в
 суть MOP'а, чем AMOP
+
+
+[01:02] LinkFly> ещё есть slime-list-threads, hot key - C-c C-x t -
+там можно манипулировать потоками
+[01:15] LinkFly> rigidus: разобрался с буфером? Тм очень просто: ? -
+описание команд. Можно выделить несколько потоков, как обычно
+выделяешь текст, нажать k - и они убьются, достаточно удобно.
