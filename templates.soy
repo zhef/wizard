@@ -685,7 +685,7 @@
 
 {template placemark}
   // Создает метку и добавляет ее на карту{\n}
-  var placemark = new YMaps.Placemark(new YMaps.GeoPoint({$coords}));{\n}
+  var placemark = new YMaps.Placemark(new YMaps.GeoPoint({$coord}));{\n}
   placemark.name = "{$title}";{\n}
   placemark.description = "{$descr}";{\n}
   map.addOverlay(placemark);{\n}
@@ -696,7 +696,7 @@
 
 
 {template map}
-<script type="text/javascript">
+<script type="text/javascript">{\n}
     YMaps.jQuery(function () {lb}{\n}
         // Создает экземпляр карты и привязывает его к созданному контейнеру{\n}
         var map = new YMaps.Map(YMaps.jQuery("#YMapsID")[0]);{\n}
@@ -709,7 +709,7 @@
         map.addControl(new YMaps.ScaleLine());{\n}
         // Устанавливаем метки{\n}
         {$placemarks |noAutoescape}{\n}
-    {rb})
-</script>
-<div id="YMapsID" style="width:600px;height:400px"></div>
+    {rb}){\n}
+</script>{\n}
+<div id="YMapsID" style="width:600px;height:400px"></div>{\n}
 {/template}

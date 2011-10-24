@@ -2,6 +2,10 @@
 
 (defparameter *popups* nil)
 
+;; (actions (showtype (none)
+;;                    (linear fld btn file action popbtn)
+;;                    (grid fld btn popbtn calc)
+;;                    (map)))
 
 (defmacro a-fld (name obj)
   `(if (equal val :clear)
@@ -243,17 +247,44 @@ function(){
                                    "\"-=|=-\"" ;; замена после кодирования в json - иначе никак не вставить js :)
                                    (grid-replace-helper grid-id col-replace)))))
 
-(defparameter *addr* "Рашетова 22")
+
+(defmethod show ((obj yamap) &optional (center-descr "") (center-title ""))
+  (tpl:map (list :center (a-center-coord obj)
+                 :placemarks (format nil "~{~A~}"
+                                     (mapcar #'(lambda (point)
+                                                 (tpl:placemark
+                                                  (list :title (a-title point)
+                                                        :coord (a-coord point)
+                                                        :descr (a-descr point))))
+                                             (append
+                                              (a-mark-points obj)
+                                              (list (make-instance 'yapoint
+                                                                   :title center-title
+                                                                   :descr center-descr
+                                                                   :coord (a-center-coord obj)))))))))
+
+;; (print
+;;  (show
+;;   (make-instance 'yamap
+;;                  :center-coord (geo-coder "Проспект Просвещения 1")
+;;                  :mark-points  (list
+;;                                 (make-instance 'yapoint
+;;                                                :title "aaaa"
+;;                                                :descr "bbb"
+;;                                                :coord "Проспект Просвещения 2")))))
+
 
 
 (defun show-map (act val)
-  (tpl:map (list :center (cdr (car val))
-                 :placemarks (format nil "~{~A~}"
-                                     (mapcar #'(lambda (x)
-                                                 (tpl:placemark (list :title ""
-                                                                      :coords (cdr x)
-                                                                      :descr (car x))))
-                                                 (reverse val))))))
+  (let ((yamap (make-instance 'YAMAP
+                              :center-coord (cdr (car val))
+                              :mark-points  (mapcar #'(lambda (point)
+                                                        (make-instance 'YAPOINT
+                                                                       :title ""
+                                                                       :descr (car point)
+                                                                       :coord (cdr point)))
+                                                  (cdr val)))))
+    (show yamap "Центр карты" "Это центр карты")))
 
 
 (defun show-act (act)

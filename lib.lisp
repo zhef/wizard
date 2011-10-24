@@ -549,3 +549,29 @@ If objs are of different classes the result is NIL."
       (if-it (maybecall tree #'car #'cdr #'car #'cdr #'cdr #'car #'cdr #'caar #'cdr #'fourth #'cdr #'car #'cdr)
              (format nil "~{~A~^, ~}" (split-sequence:split-sequence #\Space it))
              nil))))
+
+
+;; MYDEFCLASS
+(defmacro mydefclass (class-name super-class-names slots)
+  `(defclass ,class-name ,super-class-names
+     ,(loop :for (slot-name initform) :in slots :collect
+         `(,slot-name :initarg  ,(intern (symbol-name slot-name) :keyword)
+                      :initform ,initform
+                      :accessor ,(intern (format nil "A-~A" (symbol-name slot-name)))))))
+
+
+;; CLASS ACTION
+(mydefclass action ()
+            ((title "") (showtype :none) (perm :all) (val nil) (entity nil) (fields nil)))
+
+
+;; CLASS YAPOINT
+(mydefclass yapoint ()
+            ((title "") (descr "") (coord "")))
+
+
+;; CLASS YAMAP
+(mydefclass yamap ()
+            ((center-coord "")  (mark-points nil)))
+
+

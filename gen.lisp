@@ -57,10 +57,24 @@
                                                                      (aif (getf fld :width) it "200")
                                                                      (bprint (getf fld :perm))
                                                                      (getf fld instr)
-                                                                     (gen-action (eval (getf fld :popup)))
+                                                                     (let ((action (eval (getf fld :popup))))
+                                                                       (gen (make-instance 'ACTION
+                                                                                           :title    (getf action :action)
+                                                                                           :showtype (getf action :showtype)
+                                                                                           :perm     (getf action :perm)
+                                                                                           :val      (getf action :val)
+                                                                                           :entity   (getf action :entity)
+                                                                                           :fields   (getf action :fields))))
                                                                      )))))
 
-      (:action      (gen-action fld))
+      (:action      (let ((action fld))
+                      (gen (make-instance 'ACTION
+                                          :title    (getf action :action)
+                                          :showtype (getf action :showtype)
+                                          :perm     (getf action :perm)
+                                          :val      (getf action :val)
+                                          :entity   (getf action :entity)
+                                          :fields   (getf action :fields)))))
       (:file        (format nil "~%~25T (list :file \"~A\" :perm ~A :value \"~A\")"
                             (getf fld instr)
                             (bprint (getf fld :perm))
@@ -76,14 +90,14 @@
                (cons    (gen-fld-cons fld))))))
 
 
-(defun gen-action (action)
+(defmethod gen ((action action))
   ;; (format t "~%--------------------action: ~A" (getf action :action)) ;;
-  (let ((pre-generated-fields (gen-fields (eval (getf action :fields)) (getf action :entity))))
+  (let ((pre-generated-fields (gen-fields (eval (a-fields action)) (a-entity action))))
     (format nil "~%~14T (list :action \"~A\" ~%~20T :showtype ~A ~%~20T :perm '~A ~A ~%~20T :val (named-lambda ~A () ~A)~% ~20T :fields ~A)"
-            (getf action :action)
-            (bprint (getf action :showtype))
-            (bprint (getf action :perm))
-            (if (not (equal :grid (getf action :showtype)))
+            (a-title action)
+            (bprint (a-showtype action))
+            (bprint (a-perm action))
+            (if (not (equal :grid (a-showtype action)))
                 ""
                 (let ((grid (string-downcase (symbol-name (gensym "JG")))))
                   (setf *ajaxdataset*
@@ -91,14 +105,14 @@
                                 (list (list grid
                                             (format nil "(named-lambda ~A () ~A)"
                                                     (symbol-name (gensym "GRDNL-"))
-                                                    (bprint (getf action :val)))
+                                                    (bprint (a-val action)))
                                             pre-generated-fields
                                             *param-id-flag*))))
                   (format nil "~%~20T :grid \"~A\" ~%~20T :param-id ~A"
                           grid
                           *param-id-flag*)))
             (symbol-name (gensym "ACTNL-"))
-            (bprint (getf action :val))
+            (bprint (a-val action))
             pre-generated-fields)))
 
 
@@ -145,8 +159,13 @@
      (format out "~A~%  (let ((session (hunchentoot:start-session))~%~7T (acts (list ~{~A~})))~%~5T(declare (ignore session))~%~5T(show-acts acts)))"
              (if *param-id-flag* (format nil "~%  (declare (ignore id))") "")
              (loop :for action :in (eval (getf place :actions)) :collect
-                (gen-action action) ;; append *controllers* and *ajaxdataset* (!)
-                ))
+                (gen (make-instance 'ACTION
+                                    :title    (getf action :action)
+                                    :showtype (getf action :showtype)
+                                    :perm     (getf action :perm)
+                                    :val      (getf action :val)
+                                    :entity   (getf action :entity)
+                                    :fields   (getf action :fields)))))
      ;; CONTROLLERS for this place
      ;; (unless (null *controllers*) ;; всегда нужно иметь контроллеры, т.к. есть логин на всех страницах
      (format out "~%~%(restas:define-route ~A/ctrs (\"~A\" :method :post)"
