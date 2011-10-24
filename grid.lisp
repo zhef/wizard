@@ -98,6 +98,11 @@
            (tpl:fld
             (list :fldname captfld
                   :fldcontent (tpl:strview (list :value (a-name (a-fld namefld val)))))))
+          ((equal typedata '(:text))
+           (tpl:fld
+            (list :fldname captfld
+                  :fldcontent (tpl:textupd (list :name namefld
+                                                 :value (a-fld namefld val))))))
           ((equal typedata '(:list-of-str))
            (tpl:fld
             (list :fldname captfld
@@ -238,6 +243,18 @@ function(){
                                    "\"-=|=-\"" ;; замена после кодирования в json - иначе никак не вставить js :)
                                    (grid-replace-helper grid-id col-replace)))))
 
+(defparameter *addr* "Рашетова 22")
+
+
+(defun show-map (act val)
+  (tpl:map (list :center (cdr (car val))
+                 :placemarks (format nil "~{~A~}"
+                                     (mapcar #'(lambda (x)
+                                                 (tpl:placemark (list :title ""
+                                                                      :coords (cdr x)
+                                                                      :descr (car x))))
+                                                 (reverse val))))))
+
 
 (defun show-act (act)
   (if (not (check-perm (getf act :perm) (cur-user) (getf act :val)))
@@ -249,6 +266,7 @@ function(){
           (:none     "showtype is null in defun show-act")
           (:linear   (show-linear act val))
           (:grid     (show-grid   act val))
+          (:map      (show-map    act val))
           (otherwise (format nil "unknown showtype [~A] in defun show-act [~A]"
                              (bprint (getf act :showtype))
                              (bprint (getf act :action))))))))
@@ -270,6 +288,7 @@ function(){
       (declare (special *popups*))
       (tpl:root
        (list
+        :mapkey    *mapkey*
         :personal  personal
         :popups    *popups*
         :navpoints (menu)

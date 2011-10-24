@@ -953,7 +953,14 @@
     (:place                tender
      :url                  "/tender/:id"
      :actions
-     '((:action            "Тендер"
+     '((:action            "Карта"
+        :showtype          :map
+        :perm              :all
+        :val               (list
+                            (cons "Проспект Просвещения д 1" (geo-coder "Проспект Просвещения д 1"))
+                            (cons "Проспект Просвещения д. 2" (geo-coder "Проспект Просвещения д. 2"))
+                            (cons "Проспект Просвещения д. 3" (geo-coder "Проспект Просвещения д. 3"))))
+       (:action            "Тендер"
         :showtype          :linear
         :perm              :all
         :entity            tender

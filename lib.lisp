@@ -530,3 +530,22 @@ If objs are of different classes the result is NIL."
                     (close stream)))
           do (sleep *safe-write-sleep*))
     (close stream)))
+
+
+
+(defparameter *mapkey*  "AKOwoE4BAAAAzn_UAAQAmXdybST_B2x-mnLcto5q_tTa2B4AAAAAAAAAAAAtC7dNu632YaEJuBnHz1d5g8a1IQ==")
+(setf drakma:*drakma-default-external-format* :utf-8)
+
+(defun geo-coder (addr)
+  (multiple-value-bind (body status headers ret-uri stream must-close reason)
+      (drakma:http-request "http://geocode-maps.yandex.ru/1.x/"
+                           :method :get
+                           :parameters `(("geocode" . ,addr)
+                                         ("key" . ,(format nil "~A" *mapkey*))
+                                         ("format" . "json")))
+    (let ((tree (json:decode-json-from-string
+                 (sb-ext:octets-to-string body))))
+      ;; (print tree)
+      (if-it (maybecall tree #'car #'cdr #'car #'cdr #'cdr #'car #'cdr #'caar #'cdr #'fourth #'cdr #'car #'cdr)
+             (format nil "~{~A~^, ~}" (split-sequence:split-sequence #\Space it))
+             nil))))
