@@ -606,9 +606,18 @@ If objs are of different classes the result is NIL."
   (center-coord "")
   (mark-points nil))
 
+;; CLASS PERM
+(with-defclass (perm ())
+  (update :all)
+  (show :all)
+  (view :all)
+  (delete :all)
+  (create :all))
 
-(mi 'yamap
-    :center-coord "1111")
-
-(defmethod print-object ((obj yamap) stream)
-  (format stream "~A" (a-center-coord obj)))
+;; CLASS FLD
+(with-defclass (fld ())
+  (title "")
+  (name "")
+  (typedata '(:str))
+  (width 200)
+  (perm (mi 'perm)))
