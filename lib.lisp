@@ -156,13 +156,9 @@
     (declare (ignore request-str request-get-plist))
     request-list))
 
-(defun get-btn-key (btn)
-  "separate for btn form data"
-  (let* ((tilde (position #\~ btn))
-         (id    (if tilde
-                    (subseq btn (+ 1 tilde))
-                    btn)))
-    (parse-integer id)))
+
+;; replace-all
+
 
 (defun replace-all (string part replacement &key (test #'char=))
   "Returns a new string in which all the occurences of the part is replaced with replacement."
@@ -177,6 +173,19 @@
                         :end (or pos (length string)))
        when pos do (write-string replacement out)
        while pos)))
+
+
+;; form processing
+
+
+(defun get-btn-key (btn)
+  "separate for btn form data"
+  (let* ((tilde (position #\~ btn))
+         (id    (if tilde
+                    (subseq btn (+ 1 tilde))
+                    btn)))
+    (parse-integer id)))
+
 
 (defun activate (acts)
   "activation form processing"
@@ -206,6 +215,9 @@
                                 (funcall #'equal (tld a) (tld b)))))
          (return-from activate (funcall (cdr key)))))
     "err: unk:post:controller"))
+
+
+;; xls-decoder
 
 
 (defun decoder-3-csv  (in-string)
@@ -311,6 +323,8 @@
        (t                             (error "Can't ABBREViate ~a" ',long)))
      (setf (documentation ',short 'function) (documentation ',long 'function))
      ',short))
+
+(abbrev mi make-instance)
 
 
 ;; literal syntax
@@ -532,6 +546,8 @@ If objs are of different classes the result is NIL."
     (close stream)))
 
 
+;; geo-coder
+
 
 (defparameter *mapkey*  "AKOwoE4BAAAAzn_UAAQAmXdybST_B2x-mnLcto5q_tTa2B4AAAAAAAAAAAAtC7dNu632YaEJuBnHz1d5g8a1IQ==")
 (setf drakma:*drakma-default-external-format* :utf-8)
@@ -551,27 +567,48 @@ If objs are of different classes the result is NIL."
              nil))))
 
 
-;; MYDEFCLASS
-(defmacro mydefclass (class-name super-class-names slots)
-  `(defclass ,class-name ,super-class-names
-     ,(loop :for (slot-name initform) :in slots :collect
-         `(,slot-name :initarg  ,(intern (symbol-name slot-name) :keyword)
-                      :initform ,initform
-                      :accessor ,(intern (format nil "A-~A" (symbol-name slot-name)))))))
+;; with-defclass
+
+(defmacro with-defclass ((class-name super-class-names) &body slots)
+  `(prog1
+       (defclass ,class-name ,super-class-names
+         ,(loop :for (slot-name initform) :in slots :collect
+             `(,slot-name :initarg  ,(intern (symbol-name slot-name) :keyword)
+                          :initform ,initform
+                          :accessor ,(intern (format nil "A-~A" (symbol-name slot-name))))))
+     (defmethod print-object ((obj ,class-name) stream)
+       (format stream ,(format nil "#[MYCLASS:~A | ~{~A~^, ~}]"
+                               (symbol-name class-name)
+                               (loop :for (slot-name initform) :in slots :collect
+                                  (format nil "~A:~~A"
+                                          slot-name)))
+                ,@(loop :for (slot-name initform) :in slots :collect
+                    `(,(intern (format nil "A-~A" (symbol-name slot-name))) obj))))))
 
 
 ;; CLASS ACTION
-(mydefclass action ()
-            ((title "") (showtype :none) (perm :all) (val nil) (entity nil) (fields nil)))
-
+(with-defclass (action ())
+  (title "")
+  (showtype :none)
+  (perm :all)
+  (val nil)
+  (entity nil)
+  (fields nil))
 
 ;; CLASS YAPOINT
-(mydefclass yapoint ()
-            ((title "") (descr "") (coord "")))
-
+(with-defclass (yapoint ())
+  (title "")
+  (descr "")
+  (coord ""))
 
 ;; CLASS YAMAP
-(mydefclass yamap ()
-            ((center-coord "")  (mark-points nil)))
+(with-defclass (yamap ())
+  (center-coord "")
+  (mark-points nil))
 
 
+(mi 'yamap
+    :center-coord "1111")
+
+(defmethod print-object ((obj yamap) stream)
+  (format stream "~A" (a-center-coord obj)))

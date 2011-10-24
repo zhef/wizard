@@ -58,23 +58,23 @@
                                                                      (bprint (getf fld :perm))
                                                                      (getf fld instr)
                                                                      (let ((action (eval (getf fld :popup))))
-                                                                       (gen (make-instance 'ACTION
-                                                                                           :title    (getf action :action)
-                                                                                           :showtype (getf action :showtype)
-                                                                                           :perm     (getf action :perm)
-                                                                                           :val      (getf action :val)
-                                                                                           :entity   (getf action :entity)
-                                                                                           :fields   (getf action :fields))))
+                                                                       (gen (mi 'ACTION
+                                                                                :title    (getf action :action)
+                                                                                :showtype (getf action :showtype)
+                                                                                :perm     (getf action :perm)
+                                                                                :val      (getf action :val)
+                                                                                :entity   (getf action :entity)
+                                                                                :fields   (getf action :fields))))
                                                                      )))))
 
       (:action      (let ((action fld))
-                      (gen (make-instance 'ACTION
-                                          :title    (getf action :action)
-                                          :showtype (getf action :showtype)
-                                          :perm     (getf action :perm)
-                                          :val      (getf action :val)
-                                          :entity   (getf action :entity)
-                                          :fields   (getf action :fields)))))
+                      (gen (mi 'ACTION
+                               :title    (getf action :action)
+                               :showtype (getf action :showtype)
+                               :perm     (getf action :perm)
+                               :val      (getf action :val)
+                               :entity   (getf action :entity)
+                               :fields   (getf action :fields)))))
       (:file        (format nil "~%~25T (list :file \"~A\" :perm ~A :value \"~A\")"
                             (getf fld instr)
                             (bprint (getf fld :perm))
@@ -159,13 +159,13 @@
      (format out "~A~%  (let ((session (hunchentoot:start-session))~%~7T (acts (list ~{~A~})))~%~5T(declare (ignore session))~%~5T(show-acts acts)))"
              (if *param-id-flag* (format nil "~%  (declare (ignore id))") "")
              (loop :for action :in (eval (getf place :actions)) :collect
-                (gen (make-instance 'ACTION
-                                    :title    (getf action :action)
-                                    :showtype (getf action :showtype)
-                                    :perm     (getf action :perm)
-                                    :val      (getf action :val)
-                                    :entity   (getf action :entity)
-                                    :fields   (getf action :fields)))))
+                (gen (mi 'ACTION
+                         :title    (getf action :action)
+                         :showtype (getf action :showtype)
+                         :perm     (getf action :perm)
+                         :val      (getf action :val)
+                         :entity   (getf action :entity)
+                         :fields   (getf action :fields)))))
      ;; CONTROLLERS for this place
      ;; (unless (null *controllers*) ;; всегда нужно иметь контроллеры, т.к. есть логин на всех страницах
      (format out "~%~%(restas:define-route ~A/ctrs (\"~A\" :method :post)"

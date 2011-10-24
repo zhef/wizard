@@ -276,14 +276,14 @@ function(){
 
 
 (defun show-map (act val)
-  (let ((yamap (make-instance 'YAMAP
-                              :center-coord (cdr (car val))
-                              :mark-points  (mapcar #'(lambda (point)
-                                                        (make-instance 'YAPOINT
-                                                                       :title ""
-                                                                       :descr (car point)
-                                                                       :coord (cdr point)))
-                                                  (cdr val)))))
+  (let ((yamap (mi 'YAMAP
+                   :center-coord (cdr (car val))
+                   :mark-points  (mapcar #'(lambda (point)
+                                             (mi 'YAPOINT
+                                                 :title ""
+                                                 :descr (car point)
+                                                 :coord (cdr point)))
+                                         (cdr val)))))
     (show yamap "Центр карты" "Это центр карты")))
 
 

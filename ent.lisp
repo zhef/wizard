@@ -915,16 +915,16 @@
                               (let* ((id     (hash-table-count *TENDER*))
                                      (owner  (gethash (cur-id) *USER*))
                                      (tender (setf (gethash id *TENDER*)
-                                                   (make-instance 'TENDER
-                                                                  :name      (cdr (ASSOC "NAME" (FORM-DATA) :test #'equal))
-                                                                  :status    :unactive
-                                                                  :owner     owner
-                                                                  :all       (cdr (ASSOC "ALL" (FORM-DATA) :test #'equal))
-                                                                  :claim     (cdr (ASSOC "CLAIM" (FORM-DATA) :test #'equal))
-                                                                  :analize   (cdr (ASSOC "ANALIZE" (FORM-DATA) :test #'equal))
-                                                                  :interview (cdr (ASSOC "INTERVIEW" (FORM-DATA) :test #'equal))
-                                                                  :result    (cdr (ASSOC "RESULT" (FORM-DATA) :test #'equal))
-                                                                  ))))
+                                                   (mi 'TENDER
+                                                       :name      (cdr (ASSOC "NAME" (FORM-DATA) :test #'equal))
+                                                       :status    :unactive
+                                                       :owner     owner
+                                                       :all       (cdr (ASSOC "ALL" (FORM-DATA) :test #'equal))
+                                                       :claim     (cdr (ASSOC "CLAIM" (FORM-DATA) :test #'equal))
+                                                       :analize   (cdr (ASSOC "ANALIZE" (FORM-DATA) :test #'equal))
+                                                       :interview (cdr (ASSOC "INTERVIEW" (FORM-DATA) :test #'equal))
+                                                       :result    (cdr (ASSOC "RESULT" (FORM-DATA) :test #'equal))
+                                                       ))))
                                 ;; Связываем с владельцем
                                 (setf (a-tenders owner)
                                       (append (a-tenders owner)
@@ -1232,37 +1232,6 @@
                                                                        (hunchentoot:redirect (format nil "/offer-resource/~A" id))))
                                                              )
                                                             )))))))
-                             ;;                                ;; (:col "Выберите ресурс"
-                             ;;                                ;;  :perm 222
-                             ;;                                ;;  :entity resource
-                             ;;                                ;;  :val (cons-hash-list *RESOURCE*)
-                             ;;                                ;;  :fields '(name
-                             ;;                                ;;            (:btn "Добавить ресурс"
-                             ;;                                ;;             :perm :all
-                             ;;                                ;;             :popup '(:action  "Укажите цену"
-                             ;;                                ;;                      :perm    1111
-                             ;;                                ;;                      :entity  resource
-                             ;;                                ;;                      :val     :clear
-                             ;;                                ;;                      :fields  '((:calc "<input type=\"text\" name=\"INPRICE\" />")
-                             ;;                                ;;                                 (:btn "Задать цену"
-                             ;;                                ;;                                  :perm :all
-                             ;;                                ;;                                  :act
-                             ;;                                ;;                                  (let ((res-id (get-btn-key(caar (last (form-data)))))
-                             ;;                                ;;                                        (in (cdr (assoc "INPRICE" (form-data) :test #'equal)))
-                             ;;                                ;;                                        (id (hash-table-count *OFFER-RESOURCE*)))
-                             ;;                                ;;                                    (push
-                             ;;                                ;;                                     (setf (gethash id *OFFER-RESOURCE*)
-                             ;;                                ;;                                           (make-instance 'OFFER-RESOURCE
-                             ;;                                ;;                                                          :owner (cur-user)
-                             ;;                                ;;                                                          :offer (gethash (cur-id) *OFFER*)
-                             ;;                                ;;                                                          :resource (gethash res-id *RESOURCE*)
-                             ;;                                ;;                                                          :price in))
-                             ;;                                ;;                                     (a-resources (gethash (cur-id) *OFFER*)))
-                             ;;                                ;;                                    (hunchentoot:redirect (hunchentoot:request-uri*)))
-                             ;;                                ;;                                  ))))))
-                             ;;                                )))
-                             ;; ))))
-
 
     ;; Страница заявки на тендер
     (:place                offer-resource
