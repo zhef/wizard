@@ -33,10 +33,10 @@
 
 (defun show-fld (infld act val)
   (declare (ignore act))
-  (let ((namefld   (getf infld :fld))
-        (captfld   (getf infld :name))
-        (permfld   (getf infld :perm))
-        (typedata  (getf infld :typedata)))
+  (let ((namefld   (a-title infld))
+        (captfld   (a-name  infld))
+        (permfld   (a-perm  infld))
+        (typedata  (a-typedata infld)))
     (declare (ignore permfld))
     (cond ((equal typedata '(:bool))     (show-fld-helper captfld #'tpl:flagupd namefld (a-fld namefld val)))
           ((equal typedata '(:num))      (show-fld-helper captfld #'tpl:strupd  namefld (a-fld namefld val)))
@@ -147,12 +147,18 @@
 
 
 (defun show-linear (act val)
-  (let ((flds (with-in-fld-case (getf act :fields) ;; infld variable
-                :fld     (show-fld infld act val)
-                :btn     (show-btn infld act)
-                :file    (show-file infld act)
-                :action  (format nil "<div style=\"border: 1px solid red:\"> ~A</div>" (show-act infld))
-                :popbtn  (show-popbtn infld act))))
+  (let ((flds (loop :for infld :in (getf act :fields) :collect
+                 (cond ((equal 'fld (type-of infld))
+                        (show-fld infld act val))
+                       ((equal :btn (car infld))
+                        (show-btn infld act))
+                       ((equal :file (car infld))
+                        (show-file infld act))
+                       ((equal :action (car infld))
+                        (format nil "<div style=\"border: 1px solid red:\"> ~A</div>" (show-act infld)))
+                       ((equal :popbtn (car infld))
+                        (show-popbtn infld act))
+                       (t (error "show-linear bad infld"))))))
     (tpl:frmobj (list :content (format nil "~{~A~}" flds)))))
 
 
