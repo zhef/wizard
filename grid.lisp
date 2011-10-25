@@ -178,39 +178,40 @@ function(){
         (col-model)
         (col-replace))
     (declare (special *popups*))
-    (with-in-fld-case (getf act :fields) ;; infld variable
-      :fld (when (check-perm (getf (getf infld :permlist) :show) (cur-user))
-             (push (getf infld :name) col-names)
-             (let* ((in-name (getf infld :fld))
-                    (width   (getf infld :width))
-                    (model `(("name" . ,in-name)
-                             ("index" . ,in-name)
-                             ("width" . ,width)
-                             ("align" . ,(if (equal '(:num) (getf infld :typedata))
-                                             "center"
-                                             "left"))
-                             ("sortable" . t)
-                             ("editable" . nil #|(if (check-perm (getf (getf infdls :permlist) :update)
-                                                           t
-                                                           nil)) |# )))) ;; rulez
-               (push model col-model)))
-      :btn (when (check-perm (getf infld :perm) (cur-user))
-             (let* ((in-name "" #|(getf infld :btn)|#)
-                    (width   (getf infld :width))
-                    ;; commented for change algorithm
-                    ;; (in-capt (getf infld :value))
-                    ;; (btn-str (format nil "\"<form method='post'><input type='submit' name='~A~~\"+cl+\"' value='~A' /></form>\"" in-name in-capt))
-                    (model `(("name" . ,in-name)
-                             ("index" . ,in-name)
-                             ("width" . ,width)
-                             ("align" . "center")
-                             ("sortable" . nil)
-                             ("editable" . nil))))
-               (push in-name col-names)
-               (push model col-model)
-               ;; (push `(,in-name . ,btn-str) col-replace) ;; commented for change algorithm
-               ))
-      :popbtn (when (check-perm (getf infld :perm) (cur-user))
+    (loop :for infld :in (getf act :fields) :collect
+       (cond ((equal 'fld (type-of infld))
+              (when (check-perm (a-show (a-perm infld)) (cur-user))
+                (push (a-name infld) col-names)
+                (let* ((in-name (a-title infld))
+                       (width   (a-width infld))
+                       (model `(("name" . ,in-name)
+                                ("index" . ,in-name)
+                                ("width" . ,width)
+                                ("align" . ,(if (equal '(:num) (a-typedata infld))
+                                                "center"
+                                                "left"))
+                                ("sortable" . t)
+                                ("editable" . nil))))
+                  (push model col-model))))
+             ((equal :btn (car infld))
+              (when (check-perm (getf infld :perm) (cur-user))
+                (let* ((in-name "" #|(getf infld :btn)|#)
+                       (width   (getf infld :width))
+                       ;; commented for change algorithm
+                       ;; (in-capt (getf infld :value))
+                       ;; (btn-str (format nil "\"<form method='post'><input type='submit' name='~A~~\"+cl+\"' value='~A' /></form>\"" in-name in-capt))
+                       (model `(("name" . ,in-name)
+                                ("index" . ,in-name)
+                                ("width" . ,width)
+                                ("align" . "center")
+                                ("sortable" . nil)
+                                ("editable" . nil))))
+                  (push in-name col-names)
+                  (push model col-model)
+                  ;; (push `(,in-name . ,btn-str) col-replace) ;; commented for change algorithm
+                  )))
+             ((equal :popbtn (car infld))
+              (when (check-perm (getf infld :perm) (cur-user))
                 (let* ((in-name "" #|(getf infld :popbtn)|#)
                        (width   (getf infld :width))
                        (model `(("name" . ,in-name)
@@ -224,8 +225,7 @@ function(){
                   (let ((in-action (getf infld :action)))
                     (push
                      (list :id (getf infld :popbtn) :title (getf in-action :action) :content (show-act in-action) :left 200 :width 500)
-                     *popups*))))
-      :calc (error "dumb error calc"))
+                     *popups*)))))))
     (grid-helper grid-id pager-id (replace-all
                                    (json:encode-json-to-string
                                     `(("url" . ,(format nil "/~A~A"
@@ -364,54 +364,58 @@ function(){
          (unless (null row)
            (push (nth num rows) slice-cons))))
     ;; field-cons (innerloop)
-    (with-in-fld-case fields ;; infld variable
-      :fld       (let ((perm  (getf (getf infld :permlist) :show))
-                       (symb  (find-symbol (format nil "A-~A" (getf infld :fld)) (find-package "WIZARD")))
-                       (accessor))
-                   (cond ((equal '(:str)                              (getf infld :typedata))
-                          (setf accessor symb))
-                         ((equal '(:num)                              (getf infld :typedata))
-                          (setf accessor (lambda (x) (format nil "~A" (funcall symb x)))))
-                         ((equal '(:link resource)                    (getf infld :typedata))
-                          (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
-                         ((equal '(:link tender)                      (getf infld :typedata))
-                          (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
-                         ((equal '(:list-of-keys tender-status)       (getf infld :typedata))
-                          (setf accessor (lambda (x) (format nil "~A" (getf *tender-status* (funcall symb x))))))
-                         ((equal '(:link builder)                     (getf infld :typedata))
-                          (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
-                         ((equal '(:link supplier)                    (getf infld :typedata))
-                          (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
-                         ((equal '(:link tender-resource)             (getf infld :typedata))
-                          (setf accessor (lambda (x) (format nil "~A" (a-name (a-resource (funcall symb x)))))))
-                         ((equal '(:list-of-keys resource-types)      (getf infld :typedata))
-                          (setf accessor (lambda (x) (format nil "~A" (getf *resource-types* (funcall symb x))))))
-                         (t ;; default - print unknown type message in grid field
-                          (let ((err-str (format nil "unk typedata: ~A" (getf infld :typedata))))
-                            (setf accessor (lambda (x)
-                                             (declare (ignore x))
-                                             err-str)))))
-                   (push (cons accessor perm) field-cons))
-      :btn       (let* ((perm      (getf infld :perm))
-                        (btn       (getf infld :btn))                    ;; тут важно чтобы вычисление происходило вне лямбды
-                        (value     (getf infld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
-                        (accessor  (lambda (x)
-                                     (declare (ignore x))
-                                     (format nil "<form method='post'><input type='submit' name='~A~~%|id|%' value='~A' /></form>"
-                                             btn
-                                             value))))
-                   (push (cons accessor perm) field-cons))
-      :popbtn    (let* ((perm      (getf infld :perm))
-                        (btn       (getf infld :popbtn))                 ;; тут важно чтобы вычисление происходило вне лямбды
-                        (value     (getf infld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
-                        (accessor  (lambda (x)
-                                     (declare (ignore x))
-                                     (format nil "<input type='button' name='~A~~%|id|%' value='~A' onclick='ShowHide(\"~A\")' />"
-                                             btn
-                                             value
-                                             btn))))
-                   (push (cons accessor perm) field-cons))
-         ) ;; end loop field cons (innerloop)
+    (loop :for infld :in fields :collect
+       (cond ((equal 'fld (type-of infld))
+              (let ((perm  (a-show (a-perm infld)))
+                    (symb  (find-symbol (format nil "A-~A" (a-title infld)) (find-package "WIZARD")))
+                    (accessor))
+                (cond ((equal '(:str)                              (a-typedata infld))
+                       (setf accessor symb))
+                      ((equal '(:num)                              (a-typedata infld))
+                       (setf accessor (lambda (x) (format nil "~A" (funcall symb x)))))
+                      ((equal '(:link resource)                    (a-typedata infld))
+                       (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
+                      ((equal '(:link tender)                      (a-typedata infld))
+                       (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
+                      ((equal '(:list-of-keys tender-status)       (a-typedata infld))
+                       (setf accessor (lambda (x) (format nil "~A" (getf *tender-status* (funcall symb x))))))
+                      ((equal '(:link builder)                     (a-typedata infld))
+                       (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
+                      ((equal '(:link supplier)                    (a-typedata infld))
+                       (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
+                      ((equal '(:link tender-resource)             (a-typedata infld))
+                       (setf accessor (lambda (x) (format nil "~A" (a-name (a-resource (funcall symb x)))))))
+                      ((equal '(:list-of-keys resource-types)      (a-typedata infld))
+                       (setf accessor (lambda (x) (format nil "~A" (getf *resource-types* (funcall symb x))))))
+                      (t ;; default - print unknown type message in grid field
+                       (let ((err-str (format nil "unk typedata: ~A" (a-typedata infld))))
+                         (setf accessor (lambda (x)
+                                          (declare (ignore x))
+                                          err-str)))))
+                (push (cons accessor perm) field-cons)))
+             ((equal :btn (car infld))
+              (let* ((perm      (getf infld :perm))
+                     (btn       (getf infld :btn))                    ;; тут важно чтобы вычисление происходило вне лямбды
+                     (value     (getf infld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
+                     (accessor  (lambda (x)
+                                  (declare (ignore x))
+                                  (format nil "<form method='post'><input type='submit' name='~A~~%|id|%' value='~A' /></form>"
+                                          btn
+                                          value))))
+                (push (cons accessor perm) field-cons)))
+             ((equal :popbtn (car infld))
+              (let* ((perm      (getf infld :perm))
+                     (btn       (getf infld :popbtn))                 ;; тут важно чтобы вычисление происходило вне лямбды
+                     (value     (getf infld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
+                     (accessor  (lambda (x)
+                                  (declare (ignore x))
+                                  (format nil "<input type='button' name='~A~~%|id|%' value='~A' onclick='ShowHide(\"~A\")' />"
+                                          btn
+                                          value
+                                          btn))))
+                (push (cons accessor perm) field-cons)))
+             ) ;; end cond
+       ) ;; end loop field cons (innerloop)
     (values
      ;; result: get values from obj
      (loop :for (id . obj) :in (reverse slice-cons) :collect
