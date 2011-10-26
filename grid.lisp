@@ -300,7 +300,7 @@ function(){
       ;; else
       (let ((val (funcall (getf act :val))))
         (case (getf act :showtype)
-          (:none     "showtype is null in defun show-act")
+          (:none     "Раздел в разработке")
           (:linear   (show-linear act val))
           (:grid     (show-grid   act val))
           (:map      (show-map    act val))
@@ -393,6 +393,8 @@ function(){
                        (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
                       ((equal '(:list-of-keys tender-status)       (a-typedata infld))
                        (setf accessor (lambda (x) (format nil "~A" (getf *tender-status* (funcall symb x))))))
+                      ((equal '(:list-of-keys offer-status)        (a-typedata infld))
+                       (setf accessor (lambda (x) (format nil "~A" (getf *offer-status* (funcall symb x))))))
                       ((equal '(:link builder)                     (a-typedata infld))
                        (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
                       ((equal '(:link supplier)                    (a-typedata infld))

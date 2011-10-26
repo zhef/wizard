@@ -71,6 +71,8 @@
   ))
 
 
+;; (check-perm '(or :admin :self) (gethash 2 *USER*))
+
 ;; TEST
 ;; (check-perm '(or :ADMIN :SELF) (gethash 0 *USER*) (gethash 1 *USER*))
 ;; (perm-check '(or :admin (and :all :nobody)) 1 2)

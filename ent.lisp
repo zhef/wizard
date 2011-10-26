@@ -1,5 +1,7 @@
 (in-package #:WIZARD)
 
+(a-login (gethash 2 *USer*))
+
 (closure-template:compile-template :common-lisp-backend #P"templates.soy")
 
 (restas:mount-submodule -static- (#:restas.directory-publisher)
@@ -124,7 +126,7 @@
                            '(:view   (or :logged :fair)))
       (heads               "Руководство"                (:list-of-str)
                            '(:view   :logged))                              ;; Гости не видят руководство фирм-поставщиков
-      (inn                 "Инн"                        (:str)
+      (inn                 "ИНН"                        (:str)
                            '(:view   (or :logged :fair)))                   ;; Незалогиненные видят только добросовестных
       (kpp                 "КПП"                        (:str)
                            '(:view   (or :logged :fair)))                   ;; Незалогиненные видят только добросовестных
@@ -142,8 +144,12 @@
                            '(:view   (or :logged :fair)))                   ;; Гость не видит у недобросовестных
       (contact-person      "Контактное лицо"           (:str)
                            '(:view   (or :logged :fair)))                   ;; Гость не видит у недобросовестных
+      (contact-phone       "Контактный телефон"        (:str)
+                           '(:view   (or :logged :fair)))                   ;; Гость не видит у недобросовестных
+      (contact-email       "Контактный email"          (:str)
+                           '(:view   (or :logged :fair)))                   ;; Гость не видит у недобросовестных
       (resources           "Поставляемые ресурсы"      (:list-of-links supplier-resource))
-      (price-elts          "Ресурсы из прайся"         (:list-of-links supplier-resource-price-elt))
+      (price-elts          "Ресурсы из прайсa"         (:list-of-links supplier-resource-price-elt))
       (offers              "Посланные приглашения на тендеры"  (:list-of-links offer)
                            '(:view :self
                              :update :self))  ;; offer - связующий объект
@@ -164,7 +170,7 @@
                            '(:update :owner))
       (owner               "Поставщик"                  (:link supplier)
                            '(:update :admin))
-      (resource            "Ресурс"                     (:link supplier-resource))
+      (resource            "Ресурс"                     (:link supplier-resource) 600)
       (procent             "Процент скидки"             (:num))
       (price               "Цена со скидкой"            (:num))
       (notes               "Дополнительные условия"     (:list-of-str)))
@@ -268,7 +274,7 @@
     (:entity               resource
      :container            resource
      :fields
-     ((name                "Наименование"               (:str) 700)
+     ((name                "Наименование"               (:str) 650)
       (category            "Группы"                     (:link category))
       (resource-type       "Тип ресурса"                (:list-of-keys resource-types))
       (unit                "Единица измерения"          (:str))
@@ -387,9 +393,9 @@
     (:entity               offer
      :container            offer
      :fields
-     ((owner               "Поставщик ресурсов"         (:link supplier))
+     ((owner               "Название организации"       (:link supplier))
       (tender              "Тендер"                     (:link tender) 400)
-      (status              "Состояние"                  (:list-of-keys  offer-status))
+      (status              "Состояние"                  (:list-of-keys  offer-status) 300)
       (resources           "Ресурсы"                    (:list-of-links offer-resource))
       (allow-modify        "Разрешено изменять"         (:bool)))
       :perm
@@ -481,10 +487,20 @@
         :fields            '(title date photo-text text))))
 
 
+    ;; Аналитика
+    (:place                anal
+     :url                  "/anal"
+     :navpoint             "Аналитика"
+     :actions
+     '((:action            "Аналитика"
+        :showtype          :none
+        :perm              :all)))
+
+
     ;; Каталог материалов
     (:place                material
      :url                  "/material"
-     :navpoint             "Каталог материалов"
+     :navpoint             "Каталог ресурсов"
      :actions
      '((:action            "Группы"
         :showtype          :grid
@@ -505,7 +521,7 @@
     ;; Каталог материалов
     (:place                machine
      :url                  "/machine"
-     :navpoint             "Каталог строительной техники"
+     :navpoint             "Строительная техника"
      :actions
      '((:action            "Группы"
         :showtype          :grid
@@ -571,7 +587,7 @@
     ;; Личный кабинет Администратора
     (:place                admin
      :url                  "/admin"
-     :navpoint             "Администратор"
+     ;; :navpoint             "Администратор"
      :actions
      '((:action            "Изменить себе пароль"
         :showtype          :linear
@@ -648,7 +664,7 @@
     ;; Список экспертов
     (:place                experts
      :url                  "/expert"
-     :navpoint             "Эксперты"
+     ;; :navpoint             "Эксперты"
      :actions
      '((:action            "Эксперты"
         :showtype          :grid
@@ -691,17 +707,17 @@
      :actions
      '((:action            "Поставщик"
         :showtype          :linear
-        :perm              (or :admin :self :notlogged)
+        :perm              :all
         :entity            supplier
         :val               (gethash (cur-id) *USER*)
         :fields            '(name status juridical-address actual-address contacts email site heads inn kpp ogrn
-                             bank-name bik corresp-account client-account addresses contact-person
+                             bank-name bik corresp-account client-account addresses contact-person contact-phone contact-email
                              (:btn               "Сохранить"
-                              :perm              (or :admin :self)
+                              :perm              '(or :admin :self)
                               :act (let ((obj (gethash (cur-id) *USER*)))
                                      (with-obj-save obj
                                        NAME JURIDICAL-ADDRESS ACTUAL-ADDRESS CONTACTS EMAIL SITE HEADS INN KPP OGRN BANK-NAME
-                                       BIK CORRESP-ACCOUNT CLIENT-ACCOUNT ADDRESSES CONTACT-PERSON)
+                                       BIK CORRESP-ACCOUNT CLIENT-ACCOUNT ADDRESSES CONTACT-PERSON contact-phone contact-email)
                                      (hunchentoot:redirect (hunchentoot:request-uri*))))
                              ;; pricelist
                              (:action            "Прайс-лист"
@@ -712,16 +728,16 @@
                                                                     (equal (a-owner (cdr x)) (gethash (cur-id) *user*)))
                                                   (cons-hash-list *supplier-resource-price-elt*))
                               :fields            '(name unit price
-                                                   (:btn "Удалить"
-                                                    :perm (or :admin :owner)
-                                                    :width 100
-                                                    :act (delete-supplier-resource-price-elt))))
+                                                   (:btn    "Удалить"
+                                                    :perm   '(or :admin :owner)
+                                                    :width  100
+                                                    :act    (delete-supplier-resource-price-elt))))
 
                              (:btn               "Загрузить прайс-лист"
-                              :perm              (or :admin :self)
+                              :perm              '(or :admin :self)
                               :popup '(:action             "Добавление ресурса"
                                        :showtype           :linear
-                                       :perm               (or :admin :self)
+                                       :perm               '(or :admin :self)
                                        :entity             supplier-resource-price-elt
                                        :val                :clear
                                        :fields             '((:file file
@@ -757,7 +773,7 @@
                                                           *SUPPLIER-RESOURCE*
                                                           (a-resources (gethash (cur-id) *USER*))))))
                              (:btn               "Добавить ресурс"
-                              :perm              (or :admin :self)
+                              :perm              '(or :admin :self)
                               :popup '(:action             "Добавление ресурса"
                                        :showtype           :grid
                                        :perm               :all
@@ -776,7 +792,7 @@
                                                                   :price (cdr (assoc "PRICE" (form-data) :test #'equal)))
                                                                 (hunchentoot:redirect (hunchentoot:request-uri*)))))))
                              ;; sales
-                             (:action            "Список распродаж"
+                             (:action            "Акции"
                               :showtype          :grid
                               :perm              :all
                               :entity            sale
@@ -786,7 +802,7 @@
                                                     :perm :all
                                                     :act (to "/sale/~A"  (caar (form-data))))
                                                    (:btn "Удалить распродажу"
-                                                    :perm :all
+                                                    :perm :owner
                                                     :act (del-inner-obj
                                                           (caar (form-data))
                                                           *SALE*
@@ -795,7 +811,7 @@
                               :perm :all
                               :popup '(:action             "Добавление расподажи"
                                        :showtype           :linear
-                                       :perm               :all
+                                       :perm               :self
                                        :entity             sale
                                        :fields             '((:btn "Добавить распродажу"
                                                               :perm :all
@@ -827,7 +843,7 @@
 
        (:action            "Отправить заявку на добросовестность" ;; заявка на статус добросовестного поставщика (изменяет статус поставщика)
         :showtype          :linear
-        :perm              (and :self :unfair)
+        :perm              '(and :self :unfair)
         :entity            supplier
         :val               (gethash (cur-id) *USER*)
         :fields            '((:btn "Отправить заявку на добросовестность"
@@ -836,10 +852,20 @@
                                      (setf (a-status (gethash (cur-id) *USER*)) :request)
                                      (hunchentoot:redirect (hunchentoot:request-uri*))))))))
 
+    ;; Технологии
+    (:place                technologies
+     :url                  "/technologies"
+     :navpoint             "Технологии"
+     :actions
+     '((:action            "Технологии"
+        :showtype          :none
+        :perm              :all)))
+
+
     ;; Распродажи
     (:place                sales
      :url                  "/sale"
-     :navpoint             "Распродажи"
+     ;; :navpoint             "Распродажи"
      :actions
      '((:action            "Распродажи"
         :showtype          :grid
@@ -871,7 +897,7 @@
     ;; Список застройщиков
     (:place                builders
      :url                  "/builder"
-     :navpoint             "Застройщики"
+     ;; :navpoint             "Застройщики"
      :actions
      '((:action            "Организации-застройщики"
         :showtype          :grid
@@ -956,6 +982,7 @@
                               :perm :all
                               :act (to "/tender/~A" (caar (form-data))))
                              ))))
+
     ;; Страница тендера (поставщик может откликнуться)
     (:place                tender
      :url                  "/tender/:id"
@@ -1000,12 +1027,13 @@
                               :perm :all
                               :popup '(:action            "Выберите ресурсы"
                                        :showtype          :grid
-                                       :perm              :all ;;(and :active :fair)
+                                       :perm              :all ;;'(and :active :fair)
                                        :entity            resource
                                        :val               (cons-hash-list *RESOURCE*)
                                        :fields            '(name
                                                             (:btn      "Добавить к тендеру"
                                                              :perm     :all
+                                                             :width    140
                                                              :act      (let* ((key      (get-btn-key (caar (last (form-data)))))
                                                                               (resource (gethash key *RESOURCE*))
                                                                               (tender (gethash (cur-id) *TENDER*)))
@@ -1043,7 +1071,7 @@
                               :perm :all
                               :popup '(:action            "Загрузка документа"
                                        :showtype          :linear
-                                       :perm              :all ;; (and :active :fair)
+                                       :perm              :all ;; '(and :active :fair)
                                        :entity            document
                                        :val               :clear
                                        :fields            '((:btn   "Загрузит документ (пока не активно)"
@@ -1073,15 +1101,17 @@
                                                         (if (equal rd (cdr as))
                                                             (push as rs))))
                                                   rs)
-                              :fields           '(name
+                              :fields           '(name email inn
                                                   (:btn "Отправить приглашение"
                                                    :perm :all
+                                                   :width 140
                                                    :act (send-offer-to-supplier-from-tender))
                                                   (:btn "Страница поставщика"
                                                    :perm :all
+                                                   :width 140
                                                    :act (to "/supplier/~A"  (caar (last (form-data)))))))
                              (:btn "Добавить своего поставщика"
-                              :perm :all
+                              :perm :nobody
                               :act (add-supplier-to-tender))
                              ;; oferts
                              (:action           "Заявки на тендер"
@@ -1089,16 +1119,17 @@
                               :perm             :all
                               :entity           offer
                               :val              (cons-inner-objs *OFFER* (a-offers (gethash (cur-id) *TENDER*)))
-                              :fields '(owner
-                                        (:btn "Страница заявки"
+                              :fields '(owner status
+                                        (:btn "Просмотр заявки"
                                          :perm :all
+                                         :width 140
                                          :act (to "/offer/~A"  (caar (last (form-data)))))))
                              ;; create offer
                              (:btn "Ответить заявкой на тендер"
-                              :perm :all
+                              :perm :supplier
                               :popup '(:action            "Вы хотите участвовать в этом тендере?"
                                        :showtype          :linear
-                                       :perm              :all ;; (and :active :fair)
+                                       :perm              :all ;; '(and :active :fair)
                                        :entity            resource
                                        :val               (cons-hash-list *RESOURCE*)
                                        :fields            '((:btn  "Да, хочу!"
@@ -1112,7 +1143,7 @@
                                                                      (hunchentoot:redirect (format nil "/offer/~A" id)))))))
 
                              (:btn "Отменить тендер"
-                              :perm :all
+                              :perm :owner
                               :popup '(:action            "Действительно отменить?"
                                        :showtype           :linear
                                        :perm               :all ;;:owner
@@ -1156,7 +1187,7 @@
     ;; Заявки на тендер
     (:place                offers
      :url                  "/offers"
-     :navpoint             "Заявки на участие в тендере"
+     ;; :navpoint             "Заявки на участие в тендере"
      :actions
      '((:action            "Заявки на участие в тендере"
         :showtype          :grid
@@ -1216,7 +1247,7 @@
                               :perm :owner
                               :popup '(:action            "Выберите ресурсы"
                                        :showtype          :grid
-                                       :perm              :all ;; (and :active :fair)
+                                       :perm              :all ;; '(and :active :fair)
                                        :entity            tender-resource
                                        :val               (cons-inner-objs *TENDER-RESOURCE* (a-resources (a-tender (gethash (cur-id) *OFFER*))))
                                        :fields            '(resource
