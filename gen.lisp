@@ -69,7 +69,11 @@
                                                                                 :entity   (getf action :entity)
                                                                                 :fields   (getf action :fields))))
                                                                      )))))
-
+      (:calc        (format nil "~%~25T (list :calc \"~A\" :perm ~A :width ~A :func #'~A)"
+                            (getf fld :calc)
+                            (bprint (getf fld :perm))
+                            (bprint (getf fld :width))
+                            (bprint (getf fld :func))))
       (:action      (let ((action fld))
                       (gen (mi 'ACTION
                                :title    (getf action :action)

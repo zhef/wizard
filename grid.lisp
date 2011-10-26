@@ -17,13 +17,6 @@
         ,obj)))
 
 
-(defmacro with-in-fld-case (fields &rest cases)
-  `(loop :for infld :in ,fields :collect
-      (ecase (car infld)
-        ,@(loop :for case :in cases :by #'cddr :collect
-             (list case (getf cases case))))))
-
-
 (defun show-fld-helper (captfld tplfunc namefld valuefld)
   (tpl:fld
    (list :fldname captfld
@@ -102,6 +95,10 @@
            (tpl:fld
             (list :fldname captfld
                   :fldcontent (tpl:strview (list :value (a-name (a-fld namefld val)))))))
+          ((equal typedata '(:link tender-resource))
+           (tpl:fld
+            (list :fldname captfld
+                  :fldcontent (tpl:strview (list :value (a-name (a-resource (a-fld namefld val))))))))
           ((equal typedata '(:text))
            (tpl:fld
             (list :fldname captfld
@@ -127,16 +124,21 @@
 
 (defun show-btn (infld act)
   (declare (ignore act))
-  (tpl:btnlin (list :name (getf infld :btn) :value (getf infld :value))))
+  (if (check-perm (getf infld :perm) (cur-user))
+      (tpl:btnlin (list :name (getf infld :btn) :value (getf infld :value)))
+      ""))
 
 
 (defun show-popbtn (infld act)
   (declare (ignore act))
-  (let ((in-action (getf infld :action)))
-    (push
-     (list :id (getf infld :popbtn) :title (getf in-action :action) :content (show-act in-action) :left 200 :width 800)
-     *popups*))
-  (tpl:popbtnlin (list :popid (getf infld :popbtn) :value (getf infld :value))))
+  (if (check-perm (getf infld :perm) (cur-user))
+      (progn
+        (let ((in-action (getf infld :action)))
+          (push
+           (list :id (getf infld :popbtn) :title (getf in-action :action) :content (show-act in-action) :left 200 :width 800)
+           *popups*))
+        (tpl:popbtnlin (list :popid (getf infld :popbtn) :value (getf infld :value))))
+      ""))
 
 
 (defun show-file (infld act)
@@ -199,6 +201,18 @@ function(){
                                 ("sortable" . t)
                                 ("editable" . nil))))
                   (push model col-model))))
+             ((equal :calc (car infld))
+              (when (check-perm (getf infld :perm) (cur-user))
+                (let* ((in-name (getf infld :calc))
+                       (width   (getf infld :width))
+                       (model `(("name" . ,in-name)
+                                ("index" . ,in-name)
+                                ("width" . ,width)
+                                ("align" . "left")
+                                ("sortable" . t)
+                                ("editable" . nil))))
+                  (push in-name col-names)
+                  (push model col-model))))
              ((equal :btn (car infld))
               (when (check-perm (getf infld :perm) (cur-user))
                 (let* ((in-name "" #|(getf infld :btn)|#)
@@ -231,7 +245,8 @@ function(){
                   (let ((in-action (getf infld :action)))
                     (push
                      (list :id (getf infld :popbtn) :title (getf in-action :action) :content (show-act in-action) :left 200 :width 500)
-                     *popups*)))))))
+                     *popups*)))))
+             (t (error "show-grid unk fld" ))))
     (grid-helper grid-id pager-id (replace-all
                                    (json:encode-json-to-string
                                     `(("url" . ,(format nil "/~A~A"
@@ -254,7 +269,7 @@ function(){
                                    (grid-replace-helper grid-id col-replace)))))
 
 
-(defmethod show ((obj yamap) &optional (center-descr "") (center-title ""))
+(defmethod show ((obj yamap))
   (tpl:map (list :center (a-center-coord obj)
                  :placemarks (format nil "~{~A~}"
                                      (mapcar #'(lambda (point)
@@ -262,41 +277,26 @@ function(){
                                                   (list :title (a-title point)
                                                         :coord (a-coord point)
                                                         :descr (a-descr point))))
-                                             (append
-                                              (a-mark-points obj)
-                                              (list (make-instance 'yapoint
-                                                                   :title center-title
-                                                                   :descr center-descr
-                                                                   :coord (a-center-coord obj)))))))))
-
-;; (print
-;;  (show
-;;   (make-instance 'yamap
-;;                  :center-coord (geo-coder "Проспект Просвещения 1")
-;;                  :mark-points  (list
-;;                                 (make-instance 'yapoint
-;;                                                :title "aaaa"
-;;                                                :descr "bbb"
-;;                                                :coord "Проспект Просвещения 2")))))
-
+                                             (a-mark-points obj))))))
 
 
 (defun show-map (act val)
   (let ((yamap (mi 'YAMAP
-                   :center-coord (cdr (car val))
+                   :center-coord (nth 0 (car val))
                    :mark-points  (mapcar #'(lambda (point)
                                              (mi 'YAPOINT
-                                                 :title ""
-                                                 :descr (car point)
-                                                 :coord (cdr point)))
-                                         (cdr val)))))
-    (show yamap "Центр карты" "Это центр карты")))
+                                                 :title (aif (nth 2 point) it "")
+                                                 :descr (aif (nth 1 point) it "")
+                                                 :coord (aif (nth 0 point) it "")))
+                                         val))))
+    (show yamap)))
 
 
 (defun show-act (act)
   (if (not (check-perm (getf act :perm) (cur-user) (getf act :val)))
-      (format nil "permission denied in defun show-act: ~A"
-              (bprint (getf act :perm) #| act |#))
+      ""
+      ;; (format nil "permission denied in defun show-act: ~A"
+      ;;         (bprint (getf act :perm) #| act |#))
       ;; else
       (let ((val (funcall (getf act :val))))
         (case (getf act :showtype)
@@ -318,7 +318,7 @@ function(){
                        (list :id "trest"      :title "Регистрация" :content "TODO"           :left 200 :width 500)
                        (list :id "popupLogin" :title "Вход"        :content (tpl:popuplogin) :left 720 :width 196)))
            (content   (format nil "~{~A~}"
-                              (loop :for act :in acts #|:when (check-perm (getf act :perm) (cur-user) (getf act :val)) |# :collect
+                              (loop :for act :in acts :when (check-perm (getf act :perm) (cur-user) (getf act :val))  :collect
                                  (tpl:content-block
                                   (list :title (getf act :action)
                                         :content (show-act act)))))))
@@ -375,10 +375,18 @@ function(){
               (let ((perm  (a-show (a-perm infld)))
                     (symb  (find-symbol (format nil "A-~A" (a-title infld)) (find-package "WIZARD")))
                     (accessor))
-                (cond ((equal '(:str)                              (a-typedata infld))
+                (cond ((equal '(:bool)                             (a-typedata infld))
+                       (setf accessor (lambda (x) (format nil "~A" (aif (funcall symb x) "да" "нет")))))
+                      ((equal '(:str)                              (a-typedata infld))
                        (setf accessor symb))
+                      ((equal '(:text)                             (a-typedata infld))
+                       (setf accessor (lambda (x) (format nil "~A" (aif (funcall symb x) it "")))))
                       ((equal '(:num)                              (a-typedata infld))
-                       (setf accessor (lambda (x) (format nil "~A" (funcall symb x)))))
+                       (setf accessor (lambda (x)
+                                        (let ((val (funcall symb x)))
+                                          (if (realp val)
+                                              (format nil "~F" val)
+                                              (format nil "~A" val))))))
                       ((equal '(:link resource)                    (a-typedata infld))
                        (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
                       ((equal '(:link tender)                      (a-typedata infld))
@@ -393,11 +401,22 @@ function(){
                        (setf accessor (lambda (x) (format nil "~A" (a-name (a-resource (funcall symb x)))))))
                       ((equal '(:list-of-keys resource-types)      (a-typedata infld))
                        (setf accessor (lambda (x) (format nil "~A" (getf *resource-types* (funcall symb x))))))
+                      ((equal '(:interval)                         (a-typedata infld))
+                       (setf accessor (lambda (x)  (let ((val (funcall symb x)))
+                                                     (format nil "~A-~A"
+                                                             (decode-date (interval-begin val))
+                                                             (decode-date (interval-end val)))))))
                       (t ;; default - print unknown type message in grid field
                        (let ((err-str (format nil "unk typedata: ~A" (a-typedata infld))))
                          (setf accessor (lambda (x)
                                           (declare (ignore x))
                                           err-str)))))
+                (push (cons accessor perm) field-cons)))
+             ((equal :calc (car infld))
+              (let* ((perm      (getf infld :perm))
+                     (calc      (getf infld :cacl))                   ;; тут важно чтобы вычисление происходило вне лямбды
+                     (func      (getf infld :func))                  ;; тут важно чтобы вычисление происходило вне лямбды
+                     (accessor  (getf infld :func)))
                 (push (cons accessor perm) field-cons)))
              ((equal :btn (car infld))
               (let* ((perm      (getf infld :perm))
@@ -420,6 +439,7 @@ function(){
                                           value
                                           btn))))
                 (push (cons accessor perm) field-cons)))
+             (t (error "unk pager directive"))
              ) ;; end cond
        ) ;; end loop field cons (innerloop)
     (values
@@ -431,7 +451,7 @@ function(){
                       (replace-all (funcall accessor obj)
                                    "%|id|%"
                                    (format nil "~A" id))
-                      "permission denied in grid pager"))))
+                      (if (boundp '*dbg*) "permission denied in grid pager" "")))))
      ;; cnt-rows - two result
      cnt-rows)))
 

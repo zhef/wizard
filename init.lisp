@@ -1,6 +1,6 @@
 (in-package #:wizard)
 
-(connect :user "root" :password "root" :database "ktopostavljaet")
+(connect :user "root" :password "root" :database "ktopostavlyaet")
 (query "SET NAMES utf8")
 
 
@@ -253,7 +253,7 @@
                                                                     :tender-resource (gethash tender_resource_id *TENDER-RESOURCE*)
                                                                     :quantity quantity
                                                                     :price price
-                                                                    :price-result price2
+                                                                    :price-result (aif price2 price2 0)
                                                                     :comment comments
                                                                     :delivery (if (equal 1 deliver) T NIL)
                                                                     :delivery-price deliver_cost

@@ -548,8 +548,11 @@ If objs are of different classes the result is NIL."
 
 ;; geo-coder
 
-
+;; gdestroytorg.ru
+(defparameter *mapkey*  "AKd6p04BAAAAN6JBTQIAVVk3tt2BoBL03SxnV1Q883Tx2N8AAAAAAAAAAAAg4NNZvAEKtUxUl-gPDH65Ud3jMA==")
+;; myip
 (defparameter *mapkey*  "AKOwoE4BAAAAzn_UAAQAmXdybST_B2x-mnLcto5q_tTa2B4AAAAAAAAAAAAtC7dNu632YaEJuBnHz1d5g8a1IQ==")
+
 (setf drakma:*drakma-default-external-format* :utf-8)
 
 (defun geo-coder (addr)
