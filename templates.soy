@@ -80,6 +80,9 @@
               <a href="#">{\n}
                 <img src="/rss.png" />{\n}
               </a>{\n}
+              <div style="position: relative; top: 15px">
+                {$personal |noAutoescape}
+              </div>
             </span>{\n}
           </div><!-- syslinks -->{\n}
 
@@ -156,7 +159,7 @@
         </div><!-- header -->{\n}
 
         <div class="body">{\n}
-            {$personal |noAutoescape}
+
           {foreach $popup in $popups}
             {call popup data="$popup" /}
           {/foreach}

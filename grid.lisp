@@ -189,8 +189,8 @@ function(){
     (loop :for infld :in (getf act :fields) :collect
        (cond ((equal 'fld (type-of infld))
               (when (check-perm (a-show (a-perm infld)) (cur-user))
-                (push (a-name infld) col-names)
-                (let* ((in-name (a-title infld))
+                (push (a-title infld) col-names)
+                (let* ((in-name (a-name infld))
                        (width   (a-width infld))
                        (model `(("name" . ,in-name)
                                 ("index" . ,in-name)
@@ -269,7 +269,7 @@ function(){
                                    (grid-replace-helper grid-id col-replace)))))
 
 
-(defmethod show ((obj yamap))
+(defmethod show ((obj yamap) &key)
   (tpl:map (list :center (a-center-coord obj)
                  :placemarks (format nil "~{~A~}"
                                      (mapcar #'(lambda (point)
@@ -278,7 +278,6 @@ function(){
                                                         :coord (a-coord point)
                                                         :descr (a-descr point))))
                                              (a-mark-points obj))))))
-
 
 (defun show-map (act val)
   (let ((yamap (mi 'YAMAP
@@ -373,12 +372,14 @@ function(){
     (loop :for infld :in fields :collect
        (cond ((equal 'fld (type-of infld))
               (let ((perm  (a-show (a-perm infld)))
-                    (symb  (find-symbol (format nil "A-~A" (a-title infld)) (find-package "WIZARD")))
+                    (symb  (find-symbol (format nil "A-~A" (a-name infld)) (find-package "WIZARD")))
                     (accessor))
                 (cond ((equal '(:bool)                             (a-typedata infld))
                        (setf accessor (lambda (x) (format nil "~A" (aif (funcall symb x) "да" "нет")))))
                       ((equal '(:str)                              (a-typedata infld))
-                       (setf accessor symb))
+                       (if (equal 'a-name symb)
+                           (setf accessor (lambda (x) (format nil "<a href=\"/\">~A</a>" (funcall symb x))))
+                           (setf accessor (lambda (x) (format nil "~A" (funcall symb x))))))
                       ((equal '(:text)                             (a-typedata infld))
                        (setf accessor (lambda (x) (format nil "~A" (aif (funcall symb x) it "")))))
                       ((equal '(:num)                              (a-typedata infld))

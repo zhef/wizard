@@ -1,7 +1,5 @@
 (in-package #:WIZARD)
 
-(a-login (gethash 2 *USer*))
-
 (closure-template:compile-template :common-lisp-backend #P"templates.soy")
 
 (restas:mount-submodule -static- (#:restas.directory-publisher)

@@ -26,7 +26,7 @@
              (etypecase (cadr rest)
                (cons    (setf fld-perm (cadr rest)))
                (integer (setf width (cadr rest)))))))
-      (format nil "~%~25T (mi 'fld :title \"~A\" :typedata '~A :name \"~A\" :width ~A ~%~31T :perm ~A)"
+      (format nil "~%~25T (mi 'fld :name \"~A\" :typedata '~A :title \"~A\" :width ~A ~%~31T :perm ~A)"
               fld
               (bprint typedata)
               name

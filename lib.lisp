@@ -624,3 +624,15 @@ If objs are of different classes the result is NIL."
   (typedata '(:str))
   (width 200)
   (perm (mi 'perm)))
+
+;; (with-defclass (btn ())
+
+
+
+;; (maphash #'(lambda (k v)
+;;              (unless (equal 'admin(type-of v))
+;;                (format t "~%\"~A\" ~30t : ~A | ~A"
+;;                        (a-name v)
+;;                        (a-login v)
+;;                        (a-password v))))
+;;          *USER*)

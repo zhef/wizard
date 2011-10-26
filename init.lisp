@@ -153,7 +153,7 @@
                       (make-instance 'BUILDER
                                      :login (symbol-name (gensym "LOGIN"))
                                      :password (symbol-name (gensym "PASSWORD"))
-                                     :name (format nil ":::~A" name)
+                                     :name (format nil "~A" name)
                                      :email email
                                      :site site
                                      :juridical-address juridical-address
