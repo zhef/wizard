@@ -45,30 +45,35 @@
 (defun gen-fld-cons (fld)
   (let ((instr (car fld)))
     (ecase instr
-      (:btn         (cond ((not (null (getf fld :act)))    (let ((gen (string-downcase (symbol-name (gensym "B")))))
-                                                             (setf *controllers*
-                                                                   (append *controllers*
-                                                                           (list (list gen (getf fld :act)))))
-                                                             (format nil "~%~25T (list :btn \"~A\" :width ~A :perm ~A :value \"~A\")"
-                                                                     gen
-                                                                     (aif (getf fld :width) it "200")
-                                                                     (bprint (getf fld :perm))
-                                                                     (getf fld instr))))
-                          ((not (null (getf fld :popup)))  (let* ((gen    (string-downcase (symbol-name (gensym "P")))))
-                                                             (format nil "~%~25T (list :popbtn \"~A\" :width ~A :perm ~A :value \"~A\" ~%~31T :action ~A)"
-                                                                     gen
-                                                                     (aif (getf fld :width) it "200")
-                                                                     (bprint (getf fld :perm))
-                                                                     (getf fld instr)
-                                                                     (let ((action (eval (getf fld :popup))))
-                                                                       (gen (mi 'ACTION
-                                                                                :title    (getf action :action)
-                                                                                :showtype (getf action :showtype)
-                                                                                :perm     (getf action :perm)
-                                                                                :val      (getf action :val)
-                                                                                :entity   (getf action :entity)
-                                                                                :fields   (getf action :fields))))
-                                                                     )))))
+      (:btn         (cond ((not (null (getf fld :act)))
+                           (let ((genid (string-downcase (symbol-name (gensym "B")))))
+                             ;; add controller
+                             (setf *controllers*
+                                   (append *controllers*
+                                           (list (list genid (getf fld :act)))))
+                             ;; output
+                             (format nil "~%~25T (mi 'btn :name \"~A\" :width ~A :perm ~A :value \"~A\")"
+                                     genid
+                                     (aif (getf fld :width) it "200")
+                                     (bprint (getf fld :perm))
+                                     (getf fld instr))))
+                          ;; popbtn if :popup exists
+                          ((not (null (getf fld :popup)))
+                           (let* ((genid (string-downcase (symbol-name (gensym "P")))))
+                             ;; output
+                             (format nil "~%~25T (mi 'popbtn :name \"~A\" :width ~A :perm ~A :value \"~A\" ~%~31T :action ~A)"
+                                     genid
+                                     (aif (getf fld :width) it "200")
+                                     (bprint (getf fld :perm))
+                                     (getf fld instr)
+                                     (let ((action (eval (getf fld :popup))))
+                                       (gen (mi 'ACTION
+                                                :title    (getf action :action)
+                                                :showtype (getf action :showtype)
+                                                :perm     (getf action :perm)
+                                                :val      (getf action :val)
+                                                :entity   (getf action :entity)
+                                                :fields   (getf action :fields)))))))))
       (:calc        (format nil "~%~25T (list :calc \"~A\" :perm ~A :width ~A :func #'~A)"
                             (getf fld :calc)
                             (bprint (getf fld :perm))

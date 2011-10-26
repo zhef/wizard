@@ -2,10 +2,6 @@
 
 (defparameter *popups* nil)
 
-;; (actions (showtype (none)
-;;                    (linear fld btn file action popbtn)
-;;                    (grid fld btn popbtn calc)
-;;                    (map)))
 
 (defmacro a-fld (name obj)
   `(if (equal val :clear)
@@ -24,10 +20,9 @@
                                             :value valuefld)))))
 
 
-(defun show-fld (infld act val)
-  (declare (ignore act))
-  (let ((namefld   (a-title infld))
-        (captfld   (a-name  infld))
+(defmethod show ((infld fld) &key val) ;; keys: val
+  (let ((namefld   (a-name  infld))
+        (captfld   (a-title infld))
         (permfld   (a-perm  infld))
         (typedata  (a-typedata infld)))
     (declare (ignore permfld))
@@ -122,22 +117,25 @@
           (t (format nil "<br />err:unk2 typedata: ~A | ~A" namefld typedata)))))
 
 
-(defun show-btn (infld act)
-  (declare (ignore act))
-  (if (check-perm (getf infld :perm) (cur-user))
-      (tpl:btnlin (list :name (getf infld :btn) :value (getf infld :value)))
+(defmethod show ((infld btn) &key)
+  (if (check-perm (a-perm infld) (cur-user))
+      (tpl:btnlin (list :name (a-name infld) :value (a-value infld)))
       ""))
 
 
-(defun show-popbtn (infld act)
-  (declare (ignore act))
-  (if (check-perm (getf infld :perm) (cur-user))
+(defmethod show ((infld popbtn) &key)
+  (if (check-perm (a-perm infld) (cur-user))
       (progn
-        (let ((in-action (getf infld :action)))
+        (let ((in-action (a-action infld)))
           (push
-           (list :id (getf infld :popbtn) :title (getf in-action :action) :content (show-act in-action) :left 200 :width 800)
+           (list :id (a-name infld)
+                 :title (getf in-action :action)
+                 :content (show-act in-action)
+                 :left 200
+                 :width 800)
            *popups*))
-        (tpl:popbtnlin (list :popid (getf infld :popbtn) :value (getf infld :value))))
+        (tpl:popbtnlin (list :popid (a-name infld)
+                             :value (a-value infld))))
       ""))
 
 
@@ -151,15 +149,15 @@
 (defun show-linear (act val)
   (let ((flds (loop :for infld :in (getf act :fields) :collect
                  (cond ((equal 'fld (type-of infld))
-                        (show-fld infld act val))
-                       ((equal :btn (car infld))
-                        (show-btn infld act))
+                        (show infld :val val))
+                       ((equal 'btn (type-of infld))
+                        (show infld))
+                       ((equal 'popbtn (type-of infld))
+                        (show infld))
                        ((equal :file (car infld))
                         (show-file infld act))
                        ((equal :action (car infld))
                         (format nil "<div style=\"border: 1px solid red:\"> ~A</div>" (show-act infld)))
-                       ((equal :popbtn (car infld))
-                        (show-popbtn infld act))
                        (t (error "show-linear bad infld"))))))
     (tpl:frmobj (list :content (format nil "~{~A~}" flds)))))
 
@@ -192,7 +190,7 @@ function(){
                 (push (a-title infld) col-names)
                 (let* ((in-name (a-name infld))
                        (width   (a-width infld))
-                       (model `(("name" . ,in-name)
+                       (model `(("name"  . ,in-name)
                                 ("index" . ,in-name)
                                 ("width" . ,width)
                                 ("align" . ,(if (equal '(:num) (a-typedata infld))
@@ -200,6 +198,18 @@ function(){
                                                 "left"))
                                 ("sortable" . t)
                                 ("editable" . nil))))
+                  (push model col-model))))
+             ((equal 'btn (type-of infld))
+              (when (check-perm (a-perm infld) (cur-user))
+                (let* ((in-name "")
+                       (width   (a-width infld))
+                       (model `(("name"  . ,in-name)
+                                ("index" . ,in-name)
+                                ("width" . ,width)
+                                ("align" . "center")
+                                ("sortable" . nil)
+                                ("editable" . nil))))
+                  (push in-name col-names)
                   (push model col-model))))
              ((equal :calc (car infld))
               (when (check-perm (getf infld :perm) (cur-user))
@@ -213,23 +223,6 @@ function(){
                                 ("editable" . nil))))
                   (push in-name col-names)
                   (push model col-model))))
-             ((equal :btn (car infld))
-              (when (check-perm (getf infld :perm) (cur-user))
-                (let* ((in-name "" #|(getf infld :btn)|#)
-                       (width   (getf infld :width))
-                       ;; commented for change algorithm
-                       ;; (in-capt (getf infld :value))
-                       ;; (btn-str (format nil "\"<form method='post'><input type='submit' name='~A~~\"+cl+\"' value='~A' /></form>\"" in-name in-capt))
-                       (model `(("name" . ,in-name)
-                                ("index" . ,in-name)
-                                ("width" . ,width)
-                                ("align" . "center")
-                                ("sortable" . nil)
-                                ("editable" . nil))))
-                  (push in-name col-names)
-                  (push model col-model)
-                  ;; (push `(,in-name . ,btn-str) col-replace) ;; commented for change algorithm
-                  )))
              ((equal :popbtn (car infld))
               (when (check-perm (getf infld :perm) (cur-user))
                 (let* ((in-name "" #|(getf infld :popbtn)|#)
@@ -415,33 +408,40 @@ function(){
                                           (declare (ignore x))
                                           err-str)))))
                 (push (cons accessor perm) field-cons)))
-             ((equal :calc (car infld))
-              (let* ((perm      (getf infld :perm))
-                     (calc      (getf infld :cacl))                   ;; тут важно чтобы вычисление происходило вне лямбды
-                     (func      (getf infld :func))                  ;; тут важно чтобы вычисление происходило вне лямбды
-                     (accessor  (getf infld :func)))
-                (push (cons accessor perm) field-cons)))
-             ((equal :btn (car infld))
-              (let* ((perm      (getf infld :perm))
-                     (btn       (getf infld :btn))                    ;; тут важно чтобы вычисление происходило вне лямбды
-                     (value     (getf infld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
+
+             ((equal 'btn (type-of infld))
+              (let* ((perm      (a-perm  infld))
+                     (btn       (a-name  infld))                     ;; тут важно чтобы вычисление происходило вне лямбды
+                     (value     (a-value infld))                     ;; тут важно чтобы вычисление происходило вне лямбды
                      (accessor  (lambda (x)
                                   (declare (ignore x))
                                   (format nil "<form method='post'><input type='submit' name='~A~~%|id|%' value='~A' /></form>"
                                           btn
                                           value))))
                 (push (cons accessor perm) field-cons)))
+
              ((equal :popbtn (car infld))
+              ;; (let* ((perm      (getf infld :perm))
+              ;;        (btn       (getf infld :popbtn))                ;; тут важно чтобы вычисление происходило вне лямбды
+              ;;        (value     (getf infld :value))                 ;; тут важно чтобы вычисление происходило вне лямбды
+              ;;        (accessor  (lambda (x)
+              ;;                     (declare (ignore x))
+              ;;                     (format nil "<input type='button' name='~A~~%|id|%' value='~A' onclick='ShowHide(\"~A\")' />"
+              ;;                             btn
+              ;;                             value
+              ;;                             btn))))
+              ;;   (push (cons accessor perm) field-cons))
+              "zzz"
+              )
+
+             ((equal :calc (car infld))
               (let* ((perm      (getf infld :perm))
-                     (btn       (getf infld :popbtn))                 ;; тут важно чтобы вычисление происходило вне лямбды
-                     (value     (getf infld :value))                  ;; тут важно чтобы вычисление происходило вне лямбды
-                     (accessor  (lambda (x)
-                                  (declare (ignore x))
-                                  (format nil "<input type='button' name='~A~~%|id|%' value='~A' onclick='ShowHide(\"~A\")' />"
-                                          btn
-                                          value
-                                          btn))))
+                     (calc      (getf infld :cacl))                  ;; тут важно чтобы вычисление происходило вне лямбды
+                     (func      (getf infld :func))                  ;; тут важно чтобы вычисление происходило вне лямбды
+                     (accessor  (getf infld :func)))
                 (push (cons accessor perm) field-cons)))
+
+
              (t (error "unk pager directive"))
              ) ;; end cond
        ) ;; end loop field cons (innerloop)

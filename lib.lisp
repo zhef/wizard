@@ -619,13 +619,24 @@ If objs are of different classes the result is NIL."
 
 ;; CLASS FLD
 (with-defclass (fld ())
-  (title "")
   (name "")
+  (title "")
   (typedata '(:str))
   (width 200)
   (perm (mi 'perm)))
 
-;; (with-defclass (btn ())
+(with-defclass (btn ())
+  (name "")
+  (width 200)
+  (value "")
+  (perm :all))
+
+(with-defclass (popbtn ())
+  (name "")
+  (width 200)
+  (value "")
+  (perm :all)
+  (action ""))
 
 
 
