@@ -83,9 +83,7 @@
            (tpl:fld
             (list :fldname captfld
                   :fldcontent (tpl:strview (list :value (let ((it (a-fld namefld val)))
-                                                          (if (null it)
-                                                              ""
-                                                              (a-name it))))))))
+                                                          (if (null it) "" (a-name it))))))))
           ((equal typedata '(:link tender))
            (tpl:fld
             (list :fldname captfld
@@ -139,11 +137,10 @@
       ""))
 
 
-(defun show-file (infld act)
-  (declare (ignore act))
+(defmethod show ((infld file) &key)
   (tpl:fld
-   (list :fldname (getf infld :value)
-         :fldcontent (tpl:fileupd (list :name (getf infld :file))))))
+   (list :fldname (a-value infld)
+         :fldcontent (tpl:fileupd (list :name (a-name infld))))))
 
 
 (defun show-linear (act val)
@@ -154,8 +151,8 @@
                         (show infld))
                        ((equal 'popbtn (type-of infld))
                         (show infld))
-                       ((equal :file (car infld))
-                        (show-file infld act))
+                       ((equal 'file (type-of infld))
+                        (showinfld))
                        ((equal :action (car infld))
                         (format nil "<div style=\"border: 1px solid red:\"> ~A</div>" (show-act infld)))
                        (t (error "show-linear bad infld"))))))

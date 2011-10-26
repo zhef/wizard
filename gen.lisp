@@ -87,7 +87,7 @@
                                :val      (getf action :val)
                                :entity   (getf action :entity)
                                :fields   (getf action :fields)))))
-      (:file        (format nil "~%~25T (list :file \"~A\" :perm ~A :value \"~A\")"
+      (:file        (format nil "~%~25T (mi 'file :name \"~A\" :perm ~A :value \"~A\")"
                             (getf fld instr)
                             (bprint (getf fld :perm))
                             (getf fld :name))))))

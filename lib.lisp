@@ -638,6 +638,12 @@ If objs are of different classes the result is NIL."
   (perm :all)
   (action ""))
 
+(with-defclass (file ())
+  (name "")
+  (value "")
+  (perm :all))
+
+
 
 
 ;; (maphash #'(lambda (k v)
