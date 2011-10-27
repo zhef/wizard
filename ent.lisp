@@ -256,7 +256,7 @@
     (:entity               category
      :container            category
      :fields
-     ((name                "Имя"                        (:str) 700)
+     ((name                "Имя"                        (:str) 900)
       (parent              "Родительская группа"        (:link category))
       (child-categoryes    "Дочерние группы"            (:list-of-links category))
       (resources           "Ресурсы"                    (:list-of-links resource)))
@@ -272,8 +272,8 @@
     (:entity               resource
      :container            resource
      :fields
-     ((name                "Наименование"               (:str) 650)
-      (category            "Группы"                     (:link category))
+     ((name                "Наименование"               (:str) 900)
+      (category            "Группа"                     (:link category))
       (resource-type       "Тип ресурса"                (:list-of-keys resource-types))
       (unit                "Единица измерения"          (:str))
       (suppliers           "Поставляющие организации"   (:list-box supplier))
@@ -468,7 +468,10 @@
         :perm              :all
         :entity            post
         :val               (cons-hash-list *POST*)
-        :fields            '(title date photo-announce announce
+        :fields            '((:fld title)
+                             (:fld date)
+                             (:fld photo-announce)
+                             (:fld announce)
                              (:btn  "Страница новости"
                               :perm :all
                               :act  (to "/post/~A" (caar (form-data))))))))
@@ -482,7 +485,10 @@
         :perm              :all
         :entity            post
         :val               (gethash (cur-id) *POST*)
-        :fields            '(title date photo-text text))))
+        :fields            '((:fld title)
+                             (:fld date)
+                             (:fld photo-text)
+                             (:fld text)))))
 
 
     ;; Аналитика
@@ -509,11 +515,12 @@
                              (cdr (car (remove-if-not #'(lambda (x)
                                                           (null (a-parent (cdr x))))
                                                       (cons-hash-list *CATEGORY*))))))
-        :fields            '(name
-                             (:btn "Показать ресурсы"
-                              :perm :all
-                              :width 120
-                              :act (to "/category/~A" (caar (form-data))))))))
+        :fields            '((:fld name :xref "category")
+                             ;; (:btn "Показать ресурсы"
+                             ;;  :perm :all
+                             ;;  :width 120
+                             ;;  :act (to "/category/~A" (caar (form-data))))
+                             ))))
 
 
     ;; Каталог материалов
@@ -530,11 +537,7 @@
                              (cdr (cadr (remove-if-not #'(lambda (x)
                                                           (null (a-parent (cdr x))))
                                                       (cons-hash-list *CATEGORY*))))))
-        :fields            '(name
-                             (:btn "Показать ресурсы"
-                              :perm :all
-                              :width 120
-                              :act (to "/category/~A" (caar (form-data))))))))
+        :fields            '((:fld name :xref "category")))))
 
 
     ;; Каталог ресурсов - содержимое категории
@@ -551,12 +554,7 @@
                                :perm              :all
                                :entity            category
                                :val               (cons-inner-objs *CATEGORY* (a-child-categoryes (gethash (cur-id) *CATEGORY*)))
-                               :fields            '(name
-                                                    ;; parent child-categoryes
-                                                    (:btn "Показать ресурсы"
-                                                     :perm :all
-                                                     :width 120
-                                                     :act (to "/category/~A" (caar (form-data))))))
+                               :fields            '((:fld name :xref "category")))
                               (:action            "Ресурсы группы"
                                :showtype          :grid
                                :perm              :all
@@ -565,11 +563,7 @@
                                                                      (equal (a-category (cdr x))
                                                                             (gethash (cur-id) *CATEGORY*)))
                                                    (cons-hash-list *RESOURCE*))
-                               :fields            '(name
-                                                    (:btn "Страница ресурса"
-                                                     :perm :all
-                                                     :width 120
-                                                     :act (to "/resource/~A" (caar (form-data))))))))))
+                               :fields            '((:fld name :xref "resource")))))))
 
     ;; Страница ресурса (ресурсы редактированию не подвергаются)
     (:place                resource
@@ -580,7 +574,10 @@
         :showtype          :linear
         :entity            resource
         :val               (gethash (cur-id) *RESOURCE*)
-        :fields            '(name category resource-type unit))))
+        :fields            '((:fld name)
+                             (:fld category)
+                             (:fld resource-type)
+                             (:fld unit)))))
 
     ;; Личный кабинет Администратора
     (:place                admin
@@ -592,7 +589,8 @@
         :perm              :admin
         :entity            admin
         :val               (cur-user)
-        :fields            '(login password
+        :fields            '((:fld login)
+                             (:fld password)
                              (:btn "Изменить пароль"
                               :perm :all
                               :act (let ((obj (cur-user)))
@@ -606,7 +604,8 @@
                                        :perm              :admin
                                        :entity            admin
                                        :val               (cur-user)
-                                       :fields            '(login password
+                                       :fields            '((:fld login)
+                                                            (:fld password)
                                                             (:btn "Изменить пароль"
                                                             :perm :all
                                                              :act (let ((obj (cur-user)))
@@ -618,7 +617,9 @@
         :perm              :admin
         :entity            expert
         :val               :clear
-        :fields            '(login password name
+        :fields            '((:fld login)
+                             (:fld password)
+                             (:fld name)
                              (:btn "Создать новый аккаунт эксперта"
                               :perm :all
                               :act (progn
@@ -634,7 +635,8 @@
                                               (equal 'expert (type-of (cdr x))))
                             (cons-hash-list *USER*))
         :showtype          :grid
-        :fields            '(name login
+        :fields            '((:fld name)
+                             (:fld login)
                              (:btn  "Удалить"
                               :perm :all
                               :act  (let ((key (get-btn-key (caar (form-data)))))
@@ -652,7 +654,8 @@
                                                    (equal (a-status (cdr x)) :request)
                                                    ))
                             (cons-hash-list *USER*))
-        :fields            '(name login
+        :fields            '((:fld name)
+                             (:fld login)
                              (:btn "Сделать добросовестным"
                               :perm :all
                               :act (let ((key (get-btn-key (caar (form-data)))))
@@ -669,7 +672,8 @@
         :perm              :all
         :entity            expert
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'EXPERT)) (cons-hash-list *USER*))
-        :fields            '(name login
+        :fields            '((:fld name)
+                             (:fld login)
                              (:btn  "Страница эксперта"
                               :perm :all
                               :act  (to "/expert/~A" (caar (form-data))))))))
@@ -682,7 +686,8 @@
         :perm              :all
         :entity            expert
         :val               (gethash (cur-id) *USER*)
-        :fields            '(name login))))
+        :fields            '((:fld name)
+                             (:fld login)))))
 
     ;; Список поставщиков
     (:place                suppliers
@@ -694,7 +699,9 @@
         :perm              :all
         :entity            supplier
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'SUPPLIER))  (cons-hash-list *USER*))
-        :fields            '(name #|login|# actual-address
+        :fields            '((:fld name)
+                             #|login|#
+                             (:fld actual-address)
                              (:btn "Страница поставщика"
                               :perm :all
                               :width 130
@@ -708,8 +715,25 @@
         :perm              :all
         :entity            supplier
         :val               (gethash (cur-id) *USER*)
-        :fields            '(name status juridical-address actual-address contacts email site heads inn kpp ogrn
-                             bank-name bik corresp-account client-account addresses contact-person contact-phone contact-email
+        :fields            '((:fld name)
+                             (:fld status)
+                             (:fld juridical-address)
+                             (:fld actual-address)
+                             (:fld contacts)
+                             (:fld email)
+                             (:fld site)
+                             (:fld heads)
+                             (:fld inn)
+                             (:fld kpp)
+                             (:fld ogrn)
+                             (:fld bank-name)
+                             (:fld bik)
+                             (:fld corresp-account)
+                             (:fld client-account)
+                             (:fld addresses)
+                             (:fld contact-person)
+                             (:fld contact-phone)
+                             (:fld contact-email)
                              (:btn               "Сохранить"
                               :perm              '(or :admin :self)
                               :act (let ((obj (gethash (cur-id) *USER*)))
@@ -725,7 +749,9 @@
                               :val               (remove-if-not #'(lambda (x)
                                                                     (equal (a-owner (cdr x)) (gethash (cur-id) *user*)))
                                                   (cons-hash-list *supplier-resource-price-elt*))
-                              :fields            '(name unit price
+                              :fields            '((:fld name)
+                                                   (:fld unit)
+                                                   (:fld price)
                                                    (:btn    "Удалить"
                                                     :perm   '(or :admin :owner)
                                                     :width  100
@@ -762,7 +788,7 @@
                               :perm              :all
                               :entity            supplier-resource
                               :val               (cons-inner-objs *SUPPLIER-RESOURCE* (a-resources (gethash (cur-id) *USER*)))
-                              :fields            '(resource
+                              :fields            '((:fld resource)
                                                    (:btn   "Удалить"
                                                     :perm  :all
                                                     :width 60
@@ -777,7 +803,7 @@
                                        :perm               :all
                                        :entity             resource
                                        :val                (cons-hash-list *RESOURCE*)
-                                       :fields             '(name
+                                       :fields             '((:fld name)
                                                              (:btn "Добавить ресурс"
                                                               :perm :all
                                                               :act
@@ -795,7 +821,7 @@
                               :perm              :all
                               :entity            sale
                               :val               (cons-inner-objs *SALE* (a-sales (gethash (cur-id) *USER*)))
-                              :fields            '(name
+                              :fields            '((:fld name)
                                                    (:btn "Страница распродажи"
                                                     :perm :all
                                                     :act (to "/sale/~A"  (caar (form-data))))
@@ -820,7 +846,7 @@
                               :perm              :admin
                               :entity            offer
                               :val               (cons-inner-objs *OFFER* (a-offers (gethash (cur-id) *USER*)))
-                              :fields            '(tender
+                              :fields            '((:fld tender)
                                                    (:btn "Страница заявки"
                                                     :perm :all
                                                     :width 105
@@ -870,7 +896,7 @@
         :perm              :all
         :entity            sale
         :val               (cons-hash-list *SALE*)
-        :fields            '(name
+        :fields            '((:fld name)
                              (:btn "Страница распродажи"
                               :perm :all
                               :act (to "/sale/~A" (caar (form-data))))))))
@@ -884,8 +910,12 @@
         :perm              :all
         :entity            sale
         :val               (gethash (cur-id) *SALE*)
-        :fields            '(name owner procent price notes
-                             resource
+        :fields            '((:fld name)
+                             (:fld owner)
+                             (:fld procent)
+                             (:fld price)
+                             (:fld notes)
+                             (:fld resource)
                               (:btn "Сохранить"
                                :perm :all
                                :act (let ((obj (gethash (cur-id) *SALE*)))
@@ -902,7 +932,8 @@
         :perm              :all
         :entity            builder
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'BUILDER)) (cons-hash-list *USER*))
-        :fields            '(name login
+        :fields            '((:fld name)
+                             (:fld login)
                              (:btn  "Страница застройщика"
                               :perm :all
                               :act  (to "/builder/~A" (caar (form-data))))))))
@@ -916,7 +947,16 @@
         :perm              :all
         :entity            builder
         :val               (gethash (cur-id) *USER*)
-        :fields            '(name juridical-address inn kpp ogrn bank-name bik corresp-account client-account rating
+        :fields            '((:fld name)
+                             (:fld juridical-address)
+                             (:fld inn)
+                             (:fld kpp)
+                             (:fld ogrn)
+                             (:fld bank-name)
+                             (:fld bik)
+                             (:fld corresp-account)
+                             (:fld client-account)
+                             (:fld rating)
                              (:btn "Сохранить"
                               :perm :all
                               :act (let ((obj (gethash (cur-id) *USER*)))
@@ -928,7 +968,9 @@
                               :perm             :all
                               :entity           tender
                               :val              (cons-inner-objs *TENDER* (a-tenders (gethash (cur-id) *USER*)))
-                              :fields           '(name status all
+                              :fields           '((:fld name)
+                                                  (:fld status)
+                                                  (:fld all)
                                                   (:btn "Страница тендера"
                                                    :perm :all
                                                    :width 120
@@ -939,7 +981,12 @@
         :perm              :self
         :entity            tender
         :val               :clear
-        :fields            '(name all claim analize interview result
+        :fields            '((:fld name)
+                             (:fld all)
+                             (:fld claim)
+                             (:fld analize)
+                             (:fld interview)
+                             (:fld result)
                              (:btn "Объявить тендер"
                               :perm :all
                               :act ;;(format nil "~A" (form-data))
@@ -975,7 +1022,9 @@
         :perm              :all
         :entity            tender
         :val               (cons-hash-list *TENDER*)
-        :fields            '(name status owner
+        :fields            '((:fld name)
+                             (:fld status)
+                             (:fld owner)
                              (:btn "Страница тендера"
                               :perm :all
                               :act (to "/tender/~A" (caar (form-data))))
@@ -990,7 +1039,15 @@
         :perm              :all
         :entity            tender
         :val               (gethash (cur-id) *TENDER*)
-        :fields            '(name status owner all claim analize interview result ;; winner price
+        :fields            '((:fld name)
+                             (:fld status)
+                             (:fld owner)
+                             (:fld all)
+                             (:fld claim)
+                             (:fld analize)
+                             (:fld interview)
+                             (:fld result)
+                             ;; winner price
                              (:btn "Сохранить"
                               :perm :all
                               :act (let ((obj (gethash (cur-id) *TENDER*)))
@@ -1002,12 +1059,15 @@
                               :perm             :all
                               :entity           tender-resource
                               :val              (cons-inner-objs *TENDER-RESOURCE* (a-resources (gethash (cur-id) *TENDER*)))
-                              :fields '(resource
+                              :fields '((:fld resource)
                                         (:calc  "Ед.изм."
                                          :perm :all
                                          :width 40
                                          :func (lambda (x) (a-unit (a-resource x))))
-                                        quantity price delivery basic
+                                        (:fld quantity)
+                                        (:fld price)
+                                        (:fld delivery)
+                                        (:fld basic)
                                         (:btn   "Удалить из тендера"
                                          :perm  :all
                                          :width 130
@@ -1028,7 +1088,7 @@
                                        :perm              :all ;;'(and :active :fair)
                                        :entity            resource
                                        :val               (cons-hash-list *RESOURCE*)
-                                       :fields            '(name
+                                       :fields            '((:fld name)
                                                             (:btn      "Добавить к тендеру"
                                                              :perm     :all
                                                              :width    140
@@ -1048,7 +1108,7 @@
                               :perm             :all
                               :entity           document
                               :val              (cons-inner-objs *DOCUMENT* (a-documents (gethash (cur-id) *TENDER*)))
-                              :fields '(name
+                              :fields '((:fld name)
                                         (:btn   "Удалить из тендера"
                                          :perm  :all
                                          :act   (let* ((key       (get-btn-key (caar (last (form-data)))))
@@ -1099,7 +1159,9 @@
                                                         (if (equal rd (cdr as))
                                                             (push as rs))))
                                                   rs)
-                              :fields           '(name email inn
+                              :fields           '((:fld name)
+                                                  (:fld email)
+                                                  (:fld inn)
                                                   (:btn "Отправить приглашение"
                                                    :perm :all
                                                    :width 140
@@ -1117,7 +1179,8 @@
                               :perm             :all
                               :entity           offer
                               :val              (cons-inner-objs *OFFER* (a-offers (gethash (cur-id) *TENDER*)))
-                              :fields '(owner status
+                              :fields '((:fld owner)
+                                        (:fld status)
                                         (:btn "Просмотр заявки"
                                          :perm :all
                                          :width 140
@@ -1162,7 +1225,14 @@
         :perm              :all
         :entity            tender-resource
         :val               (gethash (cur-id) *TENDER-RESOURCE*)
-        :fields            '(tender resource quantity price price-date comment delivery basic
+        :fields            '((:fld tender)
+                             (:fld resource)
+                             (:fld quantity)
+                             (:fld price)
+                             (:fld price-date)
+                             (:fld comment)
+                             (:fld delivery)
+                             (:fld basic)
                              (:btn "Сохранить"
                               :perm :all
                               :act  (let ((obj (gethash (cur-id) *TENDER-RESOURCE*)))
@@ -1192,7 +1262,8 @@
         :perm              :all
         :entity            offer
         :val               (cons-hash-list *OFFER*)
-        :fields            '(owner tender
+        :fields            '((:fld owner)
+                             (:fld tender)
                              (:btn "Страница заявки"
                               :perm :all
                               :width 120
@@ -1218,7 +1289,9 @@
         :entity            offer
         :perm              :all
         :val               (gethash (cur-id) *OFFER*)
-        :fields            '(owner tender status
+        :fields            '((:fld owner)
+                             (:fld tender)
+                             (:fld status)
                              ;; resources
                              (:action           "Ресурсы заявки"
                               :showtype         :grid
@@ -1228,7 +1301,11 @@
                               ;;             (cons (car x) (a-resources (cdr x))))
                               ;;  (cons-hash-list *OFFER*))
                               :val              (cons-inner-objs *OFFER-RESOURCE* (a-resources (gethash (cur-id) *OFFER*)))
-                              :fields '(tender-resource quantity price price-result #| comment delivery delivery-price market rank |#
+                              :fields '((:fld tender-resource)
+                                        (:fld quantity)
+                                        (:fld price)
+                                        (:fld price-result)
+                                        #| comment delivery delivery-price market rank |#
                                         (:btn "Удалить из заявки"
                                          :perm :owner
                                          :width 110
@@ -1248,7 +1325,7 @@
                                        :perm              :all ;; '(and :active :fair)
                                        :entity            tender-resource
                                        :val               (cons-inner-objs *TENDER-RESOURCE* (a-resources (a-tender (gethash (cur-id) *OFFER*))))
-                                       :fields            '(resource
+                                       :fields            '((:fld resource)
                                                             (:btn  "Добавить к заявке"
                                                              :perm :all
                                                              :act  (let* ((key             (get-btn-key (caar (last (form-data)))))
@@ -1280,7 +1357,15 @@
         :perm              :all
         :entity            offer-resource
         :val               (gethash (cur-id) *OFFER-RESOURCE*)
-        :fields            '(#|offer|# tender-resource quantity price price-result comment delivery delivery-price #|marked rank|#
+        :fields            '(#|offer|#
+                             (:fld tender-resource)
+                             (:fld quantity)
+                             (:fld price)
+                             (:fld price-result)
+                             (:fld comment)
+                             (:fld delivery)
+                             (:fld delivery-price)
+                             #|marked rank|#
                              (:btn "Сохранить"
                               :perm :all
                               :act  (let ((obj (gethash (cur-id) *OFFER-RESOURCE*)))

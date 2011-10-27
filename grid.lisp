@@ -367,9 +367,12 @@ function(){
                 (cond ((equal '(:bool)                             (a-typedata infld))
                        (setf accessor (lambda (x) (format nil "~A" (aif (funcall symb x) "да" "нет")))))
                       ((equal '(:str)                              (a-typedata infld))
-                       (if (equal 'a-name symb)
-                           (setf accessor (lambda (x) (format nil "<a href=\"/\">~A</a>" (funcall symb x))))
-                           (setf accessor (lambda (x) (format nil "~A" (funcall symb x))))))
+                       (let ((tmp (a-xref infld)))
+                           (if (null tmp)
+                               (setf accessor (lambda (x) (format nil "~A" (funcall symb x))))
+                               (setf accessor (lambda (x) (format nil "<a href=\"/~A/%|id|%\">~A</a>"
+                                                                  tmp
+                                                                  (funcall symb x)))))))
                       ((equal '(:text)                             (a-typedata infld))
                        (setf accessor (lambda (x) (format nil "~A" (aif (funcall symb x) it "")))))
                       ((equal '(:num)                              (a-typedata infld))

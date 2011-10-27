@@ -5,46 +5,43 @@
 (defparameter *ajaxdataset*        nil)
 (defparameter *param-id-flag*      nil)
 
-
-(defun gen-fld-symb (fld entity-param)
-  (let* ((entity    (find-if #'(lambda (entity)  (equal (getf entity :entity) entity-param))  *entityes*))
-         (record    (find-if #'(lambda (x)       (equal (car x) fld))                         (getf entity :fields)))
-         (obj-perm  (getf entity :perm))
-         (fld-perm  obj-perm)
-         (width     200))
-    (destructuring-bind (fld name typedata &rest rest)
-        record
-      (ecase (length rest)
-        (0 nil)
-        (1 (etypecase (car rest)
-             (cons    (setf fld-perm (car rest)))
-             (integer (setf width (car rest)))))
-        (2 (progn
-             (etypecase (car rest)
-               (cons    (setf fld-perm (car rest)))
-               (integer (setf width (car rest))))
-             (etypecase (cadr rest)
-               (cons    (setf fld-perm (cadr rest)))
-               (integer (setf width (cadr rest)))))))
-      (format nil "~%~25T (mi 'fld :name \"~A\" :typedata '~A :title \"~A\" :width ~A ~%~31T :perm ~A)"
-              fld
-              (bprint typedata)
-              name
-              width
-              (let ((res-perm))
-                (loop :for perm :in obj-perm :by #'cddr :do
-                   (if (null (getf fld-perm perm))
-                       (setf (getf res-perm perm) (getf obj-perm perm))
-                       (setf (getf res-perm perm) (getf fld-perm perm))))
-                (push ''perm res-perm)
-                (push 'mi res-perm)
-                (bprint res-perm))))))
-
-
-
-(defun gen-fld-cons (fld)
+(defun gen-fld-cons (fld entity-param)
   (let ((instr (car fld)))
     (ecase instr
+      (:fld         (let* ((oldfld fld)
+                           (entity    (find-if #'(lambda (entity)  (equal (getf entity :entity) entity-param))  *entityes*))
+                           (record    (find-if #'(lambda (x)       (equal (car x) (cadr fld)))       (getf entity :fields)))
+                           (obj-perm  (getf entity :perm))
+                           (fld-perm  obj-perm)
+                           (width     200))
+                      (destructuring-bind (fld name typedata &rest rest)
+                          record
+                        (ecase (length rest)
+                          (0 nil)
+                          (1 (etypecase (car rest)
+                               (cons    (setf fld-perm (car rest)))
+                               (integer (setf width (car rest)))))
+                          (2 (progn
+                               (etypecase (car rest)
+                                 (cons    (setf fld-perm (car rest)))
+                                 (integer (setf width (car rest))))
+                               (etypecase (cadr rest)
+                                 (cons    (setf fld-perm (cadr rest)))
+                                 (integer (setf width (cadr rest)))))))
+                        (format nil "~%~25T (mi 'fld :name \"~A\" :typedata '~A :title \"~A\" :width ~A :xref ~A ~%~31T :perm ~A)"
+                                fld
+                                (bprint typedata)
+                                name
+                                width
+                                (bprint (getf oldfld :xref))
+                                (let ((res-perm))
+                                  (loop :for perm :in obj-perm :by #'cddr :do
+                                     (if (null (getf fld-perm perm))
+                                         (setf (getf res-perm perm) (getf obj-perm perm))
+                                         (setf (getf res-perm perm) (getf fld-perm perm))))
+                                  (push ''perm res-perm)
+                                  (push 'mi res-perm)
+                                  (bprint res-perm))))))
       (:btn         (cond ((not (null (getf fld :act)))
                            (let ((genid (string-downcase (symbol-name (gensym "B")))))
                              ;; add controller
@@ -98,8 +95,8 @@
   (format nil "(list ~{~A~})"
           (loop :for fld :in fields :collect
              (etypecase fld
-               (symbol  (gen-fld-symb fld entity))
-               (cons    (gen-fld-cons fld))))))
+               (symbol  (error (format nil "unexpected symbol ~A in entity ~A (expected cons)" entity fld)))
+               (cons    (gen-fld-cons fld entity))))))
 
 
 (defmethod gen ((action action))
