@@ -595,6 +595,8 @@ If objs are of different classes the result is NIL."
   (showtype :none)
   (perm :all)
   (val nil)
+  (grid nil)
+  (param-id nil)
   (height "180")
   (entity nil)
   (fields nil))

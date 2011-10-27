@@ -127,7 +127,7 @@
         (let ((in-action (a-action infld)))
           (push
            (list :id (a-name infld)
-                 :title (getf in-action :action)
+                 :title (a-title in-action)
                  :content (show-act in-action)
                  :left 200
                  :width 800)
@@ -144,7 +144,7 @@
 
 
 (defun show-linear (act val)
-  (let ((flds (loop :for infld :in (getf act :fields) :collect
+  (let ((flds (loop :for infld :in (a-fields act) :collect
                  (cond ((equal 'fld (type-of infld))
                         (show infld :val val))
                        ((equal 'btn (type-of infld))
@@ -153,7 +153,7 @@
                         (show infld))
                        ((equal 'file (type-of infld))
                         (showinfld))
-                       ((equal :action (car infld))
+                       ((equal 'action (type-of infld))
                         (format nil "<div style=\"border: 1px solid red:\"> ~A</div>" (show-act infld)))
                        (t (error "show-linear bad infld"))))))
     (tpl:frmobj (list :content (format nil "~{~A~}" flds)))))
@@ -181,7 +181,7 @@ function(){
         (col-model)
         (col-replace))
     (declare (special *popups*))
-    (loop :for infld :in (getf act :fields) :collect
+    (loop :for infld :in (a-fields act) :collect
        (cond ((equal 'fld (type-of infld))
               (when (check-perm (a-show (a-perm infld)) (cur-user))
                 (push (a-title infld) col-names)
@@ -240,8 +240,8 @@ function(){
     (grid-helper grid-id pager-id (replace-all
                                    (json:encode-json-to-string
                                     `(("url" . ,(format nil "/~A~A"
-                                                        (getf act :grid)
-                                                        (if (getf act :param-id) (format nil "/~A" (cur-id)) "")
+                                                        (a-grid act)
+                                                        (if (a-param-id act) (format nil "/~A" (cur-id)) "")
                                                         )) ;; absolute uri
                                       ("datatype" . "json")
                                       ("colNames" . ,(reverse col-names))
@@ -252,10 +252,10 @@ function(){
                                       ("sortname" . "id")
                                       ("viewrecords" . t)
                                       ("sortorder" . "desc")
-                                      ("height" . ,(aif (getf act :height) it "180"))
+                                      ("height" . ,(aif (a-height act) it "180"))
                                       ("editurl" . "/edit_url")
                                       ("gridComplete" . "-=|=-")
-                                      ("caption" . ,(getf act :action))))
+                                      ("caption" . ,(a-title act))))
                                    "\"-=|=-\"" ;; замена после кодирования в json - иначе никак не вставить js :)
                                    (grid-replace-helper grid-id col-replace)))))
 
@@ -283,20 +283,20 @@ function(){
 
 
 (defun show-act (act)
-  (if (not (check-perm (getf act :perm) (cur-user) (getf act :val)))
+  (if (not (check-perm (a-perm act) (cur-user) (a-val act)))
       ""
       ;; (format nil "permission denied in defun show-act: ~A"
       ;;         (bprint (getf act :perm) #| act |#))
       ;; else
-      (let ((val (funcall (getf act :val))))
-        (case (getf act :showtype)
+      (let ((val (funcall (a-val act))))
+        (case (a-showtype act)
           (:none     "Раздел в разработке")
           (:linear   (show-linear act val))
           (:grid     (show-grid   act val))
           (:map      (show-map    act val))
           (otherwise (format nil "unknown showtype [~A] in defun show-act [~A]"
-                             (bprint (getf act :showtype))
-                             (bprint (getf act :action))))))))
+                             (bprint (a-showtype act))
+                             (bprint (a-title act))))))))
 
 
 (defun show-acts (acts)
@@ -308,9 +308,9 @@ function(){
                        (list :id "trest"      :title "Регистрация" :content "TODO"           :left 200 :width 500)
                        (list :id "popupLogin" :title "Вход"        :content (tpl:popuplogin) :left 720 :width 196)))
            (content   (format nil "~{~A~}"
-                              (loop :for act :in acts :when (check-perm (getf act :perm) (cur-user) (getf act :val))  :collect
+                              (loop :for act :in acts :when (check-perm (a-perm act) (cur-user) (a-val act))  :collect
                                  (tpl:content-block
-                                  (list :title (getf act :action)
+                                  (list :title (a-title act)
                                         :content (show-act act)))))))
       (declare (special *popups*))
       (tpl:root
