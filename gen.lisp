@@ -5,7 +5,7 @@
 (defparameter *ajaxdataset*        nil)
 (defparameter *param-id-flag*      nil)
 
-(defun gen-fld-cons (fld entity-param)
+(defmethod gen ((fld list) &key entity-param)
   (let ((instr (car fld)))
     (ecase instr
       (:fld         (let* ((oldfld fld)
@@ -90,18 +90,11 @@
                             (getf fld :name))))))
 
 
-(defun gen-fields (fields entity)
-  ;; (format t "~%gen-fields : ~A : ~A" fields entity)
-  (format nil "(list ~{~A~})"
-          (loop :for fld :in fields :collect
-             (etypecase fld
-               (symbol  (error (format nil "unexpected symbol ~A in entity ~A (expected cons)" entity fld)))
-               (cons    (gen-fld-cons fld entity))))))
-
-
-(defmethod gen ((action action))
+(defmethod gen ((action action) &key)
   ;; (format t "~%--------------------action: ~A" (getf action :action)) ;;
-  (let ((pre-generated-fields (gen-fields (eval (a-fields action)) (a-entity action))))
+  (let ((pre-generated-fields (format nil "(list ~{~A~})"
+                                      (loop :for fld :in (eval (a-fields action)) :collect
+                                         (gen fld :entity-param (a-entity action))))))
     (format nil "~%~14T (list :action \"~A\" ~%~20T :showtype ~A ~%~20T :perm '~A ~A ~%~20T :val (named-lambda ~A () ~A)~% ~20T :fields ~A)"
             (a-title action)
             (bprint (a-showtype action))
