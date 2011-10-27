@@ -537,6 +537,7 @@
                              (cdr (cadr (remove-if-not #'(lambda (x)
                                                           (null (a-parent (cdr x))))
                                                       (cons-hash-list *CATEGORY*))))))
+        :height            500
         :fields            '((:fld name :xref "category")))))
 
 

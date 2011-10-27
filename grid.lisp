@@ -252,6 +252,7 @@ function(){
                                       ("sortname" . "id")
                                       ("viewrecords" . t)
                                       ("sortorder" . "desc")
+                                      ("height" . ,(aif (getf act :height) it "180"))
                                       ("editurl" . "/edit_url")
                                       ("gridComplete" . "-=|=-")
                                       ("caption" . ,(getf act :action))))

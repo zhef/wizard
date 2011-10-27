@@ -117,9 +117,10 @@
                                                     (bprint (a-val action)))
                                             pre-generated-fields
                                             *param-id-flag*))))
-                  (format nil "~%~20T :grid \"~A\" ~%~20T :param-id ~A"
+                  (format nil "~%~20T :grid \"~A\" ~%~20T :param-id ~A :height \"~A\""
                           grid
-                          *param-id-flag*)))
+                          *param-id-flag*
+                          (a-height action))))
             (symbol-name (gensym "ACTNL-"))
             (bprint (a-val action))
             pre-generated-fields)))
@@ -173,6 +174,7 @@
                          :showtype (getf action :showtype)
                          :perm     (getf action :perm)
                          :val      (getf action :val)
+                         :height   (getf action :height)
                          :entity   (getf action :entity)
                          :fields   (getf action :fields)))))
      ;; CONTROLLERS for this place
