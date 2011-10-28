@@ -152,7 +152,7 @@
                        ((equal 'popbtn (type-of infld))
                         (show infld))
                        ((equal 'file (type-of infld))
-                        (showinfld))
+                        (show infld))
                        ((equal 'action (type-of infld))
                         (format nil "<div style=\"border: 1px solid red:\"> ~A</div>" (show-act infld)))
                        (t (error "show-linear bad infld"))))))
@@ -301,7 +301,6 @@ function(){
           (otherwise (format nil "unknown showtype [~A] in defun show-act [~A]"
                              (bprint (a-showtype act))
                              (bprint (a-title act))))))))
-
 
 (defun show-acts (acts)
     (let* ((personal  (let ((userid (hunchentoot:session-value 'userid)))

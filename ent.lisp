@@ -834,7 +834,7 @@
                                                           *SALE*
                                                           (a-sales (gethash (cur-id) *USER*))))))
                              (:btn "Добавить распродажу"
-                              :perm :all
+                              :perm :nobody
                               :popup '(:action             "Добавление расподажи"
                                        :showtype           :linear
                                        :perm               :self

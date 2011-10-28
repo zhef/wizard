@@ -42,8 +42,12 @@
            (:builder     nil) ;; "Пользователь-Застройщик"
            (:supplier    nil) ;; "Пользователь-Поставщик"
            ;; Objects
-           (:fair        nil) ;; "Обьект является добросовестным поставщиком"
-           (:unfair      nil) ;; "Объект является недобросовестным поставщиком"
+           (:fair        (if (equal (type-of subj) 'SUPPLIER)        ;; "Объект является добросовестным поставщиком"
+                             (if (equal (a-status (cur-user)) :fair) t nil)
+                             nil))
+           (:unfair      (if (equal (type-of subj) 'SUPPLIER)        ;; "Объект является недобросовестным поставщиком"
+                             (if (equal (a-status (cur-user)) :unfair) t nil)
+                             nil))
            (:active      nil) ;; "Объект является активным тендером, т.е. время подачи заявок не истекло"
            (:unacitve    nil) ;; "Объект является неакивным тендером, т.е. время подачи заявок не наступило"
            (:fresh       nil) ;; "Объект является свежим тендером, т.е. недавно стал активным"
@@ -51,7 +55,7 @@
            (:finished    nil) ;; "Объект является завершенным тендером"
            (:cancelled   nil) ;; "Объект является отмененным тендером"
            ;; Mixed
-           (:self        (progn
+           (:self        (progn ;; TODO проверять соответствие типов
                            ;; (safe-write (path "perm-log.txt") (format nil "cur-user: ~A; cur-id ~A; ~%" (cur-user-id) (cur-id)))
                            (equal (cur-user-id) (cur-id))))          ;; "Объект олицетворяет пользователя, который совершает над ним действие"
            (:owner       nil) ;; "Объект, над которым совершается действие имеет поле owner содержащее ссылку на объект текущего пользователя"
@@ -66,7 +70,7 @@
 (defun check-perm (perm subj &optional (obj (make-instance 'DYMMY)))
   (let ((rs (eval (perm-check perm subj obj))))
     (safe-write (path "perm-log.txt") (format nil "perm: ~A; result: ~A; subj: ~A; obj: ~A~%" perm rs subj obj))
-    rs
+    (eval rs)
   ;; t
   ))
 
