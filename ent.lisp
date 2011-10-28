@@ -864,7 +864,7 @@
        (:action            "Адрес поставщика"
         :showtype          :map
         :perm              :all
-        :val               (let ((addr (a-actual-address (gethash 2 *USER*))))
+        :val               (let ((addr (a-actual-address (gethash (cur-id) *USER*))))
                              (list (list (geo-coder addr) addr (a-name (gethash 2 *USER*))))))
 
        (:action            "Отправить заявку на добросовестность" ;; заявка на статус добросовестного поставщика (изменяет статус поставщика)
