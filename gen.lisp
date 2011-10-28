@@ -5,6 +5,12 @@
 (defparameter *ajaxdataset*        nil)
 (defparameter *param-id-flag*      nil)
 
+(defmacro ent-to-mi (ent-list)
+  `(let ((result (mi (intern (symbol-name (car ,ent-list))) :title (cadr ,ent-list))))
+     (loop :for key :in (cddr ,ent-list) :by #'cddr :do
+        (setf (slot-value result (intern (symbol-name key))) (getf ,ent-list key)))
+     result))
+
 (defmethod gen ((fld list) &key entity-param)
   (let ((instr (car fld)))
     (ecase instr
@@ -64,26 +70,14 @@
                                      (bprint (getf fld :perm))
                                      (getf fld instr)
                                      (let ((action (eval (getf fld :popup))))
-                                       (gen (mi 'ACTION
-                                                :title    (getf action :action)
-                                                :showtype (getf action :showtype)
-                                                :perm     (getf action :perm)
-                                                :val      (getf action :val)
-                                                :entity   (getf action :entity)
-                                                :fields   (getf action :fields)))))))))
+                                       (gen (ent-to-mi action))))))))
       (:calc        (format nil "~%~25T (list :calc \"~A\" :perm ~A :width ~A :func #'~A)"
                             (getf fld :calc)
                             (bprint (getf fld :perm))
                             (bprint (getf fld :width))
                             (bprint (getf fld :func))))
       (:action      (let ((action fld))
-                      (gen (mi 'ACTION
-                               :title    (getf action :action)
-                               :showtype (getf action :showtype)
-                               :perm     (getf action :perm)
-                               :val      (getf action :val)
-                               :entity   (getf action :entity)
-                               :fields   (getf action :fields)))))
+                      (gen (ent-to-mi ACTION))))
       (:file        (format nil "~%~25T (mi 'file :name \"~A\" :perm ~A :value \"~A\")"
                             (getf fld instr)
                             (bprint (getf fld :perm))
@@ -162,14 +156,7 @@
      (format out "~A~%  (let ((session (hunchentoot:start-session))~%~7T (acts (list ~{~A~})))~%~5T(declare (ignore session))~%~5T(show-acts acts)))"
              (if *param-id-flag* (format nil "~%  (declare (ignore id))") "")
              (loop :for action :in (eval (getf place :actions)) :collect
-                (gen (mi 'ACTION
-                         :title    (getf action :action)
-                         :showtype (getf action :showtype)
-                         :perm     (getf action :perm)
-                         :val      (getf action :val)
-                         :height   (getf action :height)
-                         :entity   (getf action :entity)
-                         :fields   (getf action :fields)))))
+                (gen (ent-to-mi action))))
      ;; CONTROLLERS for this place
      ;; (unless (null *controllers*) ;; всегда нужно иметь контроллеры, т.к. есть логин на всех страницах
      (format out "~%~%(restas:define-route ~A/ctrs (\"~A\" :method :post)"

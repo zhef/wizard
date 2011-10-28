@@ -49,7 +49,7 @@ label {
 	cursor:pointer;
 }
 
-ol, ul {list-style:none;overflow:hidden;}
+/* ol, ul {list-style:none;overflow:hidden;} */
 a img {border:none;outline:none;}
 
 /*a:visited {color:#662d91;}*/
@@ -144,48 +144,53 @@ small {font-size:0.8em;}
 }
 
 /* ================ ol ================= */
-.default ol {
-	list-style-position:outside;
-	padding-left:30px;
-	margin-bottom:17px;
-}
-.default ol li ol, .default ul li ol  {
-	list-style-position:outside;
-	margin:10px 0 6px;
-}
-.default ol li {
-	list-style-type:decimal;
-	margin-bottom:3px;
-}
-.default ol li ul li {
-	list-style-type:none;
-	background:url(/img/ul.gif) no-repeat 0 9px;
-	padding-left:8px;
-	margin-bottom:3px;
-}
+/* .default ol { */
+/* 	list-style-position:outside; */
+/* 	padding-left:30px; */
+/* 	margin-bottom:17px; */
+/* } */
+/* .default ol li ol, .default ul li ol  { */
+/* 	list-style-position:outside; */
+/* 	margin:10px 0 6px; */
+/* } */
+/* .default ol li { */
+/* 	list-style-type:decimal; */
+/* 	margin-bottom:3px; */
+/* } */
+/* .default ol li ul li { */
+/* 	list-style-type:none; */
+/* 	background:url(/img/ul.gif) no-repeat 0 9px; */
+/* 	padding-left:8px; */
+/* 	margin-bottom:3px; */
+/* } */
 
 /* ================ ul ============== === */
-.default ul {
-	margin-bottom:17px;
+
+ul {
+    margin-left: 20px;
 }
-.default ul li ul , .default ol li ul {
-	margin:10px 0 6px 5px;
-}
-.default ul li {
-	background:url(/img/ul.gif) no-repeat 0 9px;
-	padding-left:8px;
-	margin-bottom:3px;
-}
-.default ul li ul li,
-.default ol li ul li ul li,
-.default ul li ol li ul li {
-	background:url(/img/ul-ul.gif) no-repeat 0 10px;
-	padding-left:20px;
-}
-.default ul li ol li {
-	background:none;
-	padding-left:0;
-}
+
+/* .default ul { */
+/* 	margin-bottom:17px; */
+/* } */
+/* .default ul li ul , .default ol li ul { */
+/* 	margin:10px 0 6px 5px; */
+/* } */
+/* .default ul li { */
+/* 	background:url(/img/ul.gif) no-repeat 0 9px; */
+/* 	padding-left:8px; */
+/* 	margin-bottom:3px; */
+/* } */
+/* .default ul li ul li, */
+/* .default ol li ul li ul li, */
+/* .default ul li ol li ul li { */
+/* 	background:url(/img/ul-ul.gif) no-repeat 0 10px; */
+/* 	padding-left:20px; */
+/* } */
+/* .default ul li ol li { */
+/* 	background:none; */
+/* 	padding-left:0; */
+/* } */
 
 /* ================ main blocks ================= */
 .main {

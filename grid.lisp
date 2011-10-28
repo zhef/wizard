@@ -281,6 +281,9 @@ function(){
                                          val))))
     (show yamap)))
 
+(defun show-tpl (act val)
+  (funcall val))
+
 
 (defun show-act (act)
   (if (not (check-perm (a-perm act) (cur-user) (a-val act)))
@@ -294,6 +297,7 @@ function(){
           (:linear   (show-linear act val))
           (:grid     (show-grid   act val))
           (:map      (show-map    act val))
+          (:tpl      (show-tpl    act val))
           (otherwise (format nil "unknown showtype [~A] in defun show-act [~A]"
                              (bprint (a-showtype act))
                              (bprint (a-title act))))))))
@@ -303,7 +307,9 @@ function(){
     (let* ((personal  (let ((userid (hunchentoot:session-value 'userid)))
                         (if (null userid)
                             (tpl:loginform)
-                            (tpl:logoutform (list :user (a-login (gethash userid *USER*)))))))
+                            (tpl:logoutform (list :user (a-name (gethash userid *USER*))
+                                                  :usertype (string-downcase (type-of (gethash userid *USER*)))
+                                                  :userid userid)))))
            (*popups*  (list
                        (list :id "trest"      :title "Регистрация" :content "TODO"           :left 200 :width 500)
                        (list :id "popupLogin" :title "Вход"        :content (tpl:popuplogin) :left 720 :width 196)))

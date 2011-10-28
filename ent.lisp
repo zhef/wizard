@@ -515,6 +515,7 @@
                              (cdr (car (remove-if-not #'(lambda (x)
                                                           (null (a-parent (cdr x))))
                                                       (cons-hash-list *CATEGORY*))))))
+        :height            400
         :fields            '((:fld name :xref "category")
                              ;; (:btn "Показать ресурсы"
                              ;;  :perm :all
@@ -537,7 +538,7 @@
                              (cdr (cadr (remove-if-not #'(lambda (x)
                                                           (null (a-parent (cdr x))))
                                                       (cons-hash-list *CATEGORY*))))))
-        :height            500
+        :height            400
         :fields            '((:fld name :xref "category")))))
 
 
@@ -983,11 +984,6 @@
         :entity            tender
         :val               :clear
         :fields            '((:fld name)
-                             (:fld all)
-                             (:fld claim)
-                             (:fld analize)
-                             (:fld interview)
-                             (:fld result)
                              (:btn "Объявить тендер"
                               :perm :all
                               :act ;;(format nil "~A" (form-data))
@@ -1385,17 +1381,6 @@
                                           (offer-id (caar (remove-if-not #'(lambda (x) (equal offer (cdr x))) (cons-hash-list *OFFER*)))))
                                      (hunchentoot:redirect (format nil "/offer/~A" offer-id))))))))
 
-
-    ;; Рейтинг компаний
-    (:place                rating
-     :url                  "/rating"
-     :navpoint             "Рейтинг компаний"
-     :actions
-     '((:action            "Рейтинг компаний"
-        :showtype          :none
-        :perm              :all)))
-
-
     ;; Календарь событий
     (:place                calendar
      :url                  "/calender"
@@ -1405,23 +1390,25 @@
         :showtype          :none
         :perm              :all)))
 
-    ;; Ссылки
-    (:place                links
-     :url                  "/links"
-     :navpoint             "Ссылки"
-     :actions
-     '((:action            "Ссылки"
-        :showtype          :none
-        :perm              :all)))
-
     ;; О портале
     (:place                about
      :url                  "/about"
      :navpoint             "О портале"
      :actions
      '((:action            "О портале"
-        :showtype          :none
-        :perm              :all)))
+        :showtype          :tpl
+        :perm              :all
+        :val               #'tpl:about)))
+
+    ;; Услуги портала
+    (:place                services
+     :url                  "/services"
+     :navpoint             "Услуги портала"
+     :actions
+     '((:action            "Услуги портала"
+        :showtype          :tpl
+        :perm              :all
+        :val               #'tpl:services)))
 
     ;; Контакты
     (:place                contacts
@@ -1429,7 +1416,7 @@
      :navpoint             "Контакты"
      :actions
      '((:action            "Контакты"
-        :showtype          :none
-        :perm              :all)))
-
+        :showtype          :tpl
+        :perm              :all
+        :val               #'tpl:contacts)))
    ))
