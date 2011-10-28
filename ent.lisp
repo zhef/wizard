@@ -867,7 +867,7 @@
         :showtype          :map
         :perm              :all
         :val               (let ((addr (a-actual-address (gethash (cur-id) *USER*))))
-                             (list (list (geo-coder addr) addr (a-name (gethash 2 *USER*))))))
+                             (list (list (geo-coder addr) addr (a-name (gethash (cur-id) *USER*))))))
 
        (:action            "Отправить заявку на добросовестность" ;; заявка на статус добросовестного поставщика (изменяет статус поставщика)
         :showtype          :linear
@@ -985,8 +985,7 @@
         :perm              :self
         :entity            tender
         :val               :clear
-        :fields            '((:fld name)
-                             (:btn "Объявить тендер"
+        :fields            '((:btn "Объявить тендер"
                               :perm :all
                               :act ;;(format nil "~A" (form-data))
                               (let* ((id     (hash-table-count *TENDER*))

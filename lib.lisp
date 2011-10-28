@@ -651,14 +651,14 @@ If objs are of different classes the result is NIL."
 
 
 (defun passwd ()
-  (with-open-file ("passwd.txt" :direction :output)
+  (with-open-file (file-stream "passwd.txt" :direction :output)
     (maphash #'(lambda (k v)
                  (unless (equal 'admin(type-of v))
-                   (format t "~%\"~A\" ~30t : ~A | ~A - ~A"
+                   (format file-stream "~%\"~A\" ~30t : ~A | ~A - ~A"
                            (a-name v)
                            (a-login v)
                            (a-password v)
                            (type-of v))))
              *USER*)))
 
-(passwd)
+;; (passwd)
