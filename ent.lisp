@@ -68,6 +68,7 @@
      (:view                :self
       :update              :self))
 
+
     ;; Эксперт - имеет доступ не ко всем тендерам (в будущем!)
     (:entity               expert
      :container            user
@@ -439,7 +440,8 @@
       :delete (and :owner :unactive)
       :view   :all
       :show   :all
-      :update :owner))))
+      :update :owner))
+    ))
 
 
 ;; Мы считаем, что если у пользователя есть права на редактирование
@@ -1213,6 +1215,7 @@
                                                                       (hunchentoot:redirect (hunchentoot:request-uri*)))))))
                              ))))
 
+
     ;; Ресурс тендера
     (:place                tender-resource
      :url                  "/tender-resource/:id"
@@ -1381,6 +1384,8 @@
                                           (offer-id (caar (remove-if-not #'(lambda (x) (equal offer (cdr x))) (cons-hash-list *OFFER*)))))
                                      (hunchentoot:redirect (format nil "/offer/~A" offer-id))))))))
 
+
+
     ;; Календарь событий
     (:place                calendar
      :url                  "/calender"
@@ -1390,6 +1395,7 @@
         :showtype          :none
         :perm              :all)))
 
+
     ;; О портале
     (:place                about
      :url                  "/about"
@@ -1398,7 +1404,7 @@
      '((:action            "О портале"
         :showtype          :tpl
         :perm              :all
-        :val               #'tpl:about)))
+        :val               (lambda () (funcall (find-symbol "ABOUT" 'tpl))))))
 
     ;; Услуги портала
     (:place                services
@@ -1408,7 +1414,7 @@
      '((:action            "Услуги портала"
         :showtype          :tpl
         :perm              :all
-        :val               #'tpl:services)))
+        :val               (lambda () (funcall (find-symbol "SERVICES" 'tpl))))))
 
     ;; Контакты
     (:place                contacts
@@ -1418,5 +1424,6 @@
      '((:action            "Контакты"
         :showtype          :tpl
         :perm              :all
-        :val               #'tpl:contacts)))
-   ))
+        :val               (lambda () (funcall (find-symbol "CONTACTS" 'tpl))))))
+
+    ))

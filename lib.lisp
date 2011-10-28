@@ -650,10 +650,15 @@ If objs are of different classes the result is NIL."
 
 
 
-;; (maphash #'(lambda (k v)
-;;              (unless (equal 'admin(type-of v))
-;;                (format t "~%\"~A\" ~30t : ~A | ~A"
-;;                        (a-name v)
-;;                        (a-login v)
-;;                        (a-password v))))
-;;          *USER*)
+(defun passwd ()
+  (with-open-file ("passwd.txt" :direction :output)
+    (maphash #'(lambda (k v)
+                 (unless (equal 'admin(type-of v))
+                   (format t "~%\"~A\" ~30t : ~A | ~A - ~A"
+                           (a-name v)
+                           (a-login v)
+                           (a-password v)
+                           (type-of v))))
+             *USER*)))
+
+(passwd)
