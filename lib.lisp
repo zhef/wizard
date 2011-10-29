@@ -572,13 +572,6 @@ If objs are of different classes the result is NIL."
 
 ;; with-defclass
 
-(defun get-slots-by-obj (obj)
-  (mapcar #'(lambda (x)
-              (closer-mop:slot-definition-name x))
-          (closer-mop:class-slots (find-class (type-of obj)))))
-
-(eval '(get-slots-by-class-name 'zzz))
-
 (defmacro with-defclass ((class-name super-class-names) &body slots)
   `(prog1
        (defclass ,class-name ,super-class-names
@@ -586,8 +579,6 @@ If objs are of different classes the result is NIL."
              `(,slot-name :initarg  ,(intern (symbol-name slot-name) :keyword)
                           :initform ,initform
                           :accessor ,(intern (format nil "A-~A" (symbol-name slot-name))))))
-     (mi ',class-name)
-     (eval '(get-slots-by-class-name ',class-name))
      (defmethod print-object ((obj ,class-name) stream)
        (format stream
                (format nil "#[ ~A | ~A]"
@@ -595,10 +586,7 @@ If objs are of different classes the result is NIL."
                        (loop :for slot :in (closer-mop:class-slots (find-class ',class-name)) :collect
                           (format nil ":~A ~A"
                                   (closer-mop:slot-definition-name slot)
-                                  (bprint (funcall (intern (format nil "A-~A" (symbol-name (closer-mop:slot-definition-name slot)))) obj))
-                                  )))))))
-               ,@(loop :for slot :in  (closer-mop:class-slots (find-class class-name))
-                    :collect `(bprint (,(intern (format nil "A-~A" (symbol-name (closer-mop:slot-definition-name slot)))) obj)))))))
+                                  (bprint (funcall (intern (format nil "A-~A" (symbol-name (closer-mop:slot-definition-name slot)))) obj)))))))))
 
 
 ;; CLASS ACTION - superclass for all actions (:none :linear :grid :tpl :map etc)
@@ -619,7 +607,9 @@ If objs are of different classes the result is NIL."
   (param-id nil)
   (height "180"))
 
-(with-defclass (map (action)))
+(with-defclass (yamap (action))
+  (center-coord "")
+  (mark-points nil))
 
 (with-defclass (tpl (action)))
 
@@ -629,11 +619,6 @@ If objs are of different classes the result is NIL."
   (title "")
   (descr "")
   (coord ""))
-
-;; CLASS YAMAP
-(with-defclass (yamap ())
-  (center-coord "")
-  (mark-points nil))
 
 ;; CLASS PERM
 (with-defclass (perm ())
@@ -654,6 +639,7 @@ If objs are of different classes the result is NIL."
 
 (with-defclass (btn ())
   (name "")
+  (title "")
   (width 200)
   (value "")
   (perm :all))
@@ -669,8 +655,6 @@ If objs are of different classes the result is NIL."
   (name "")
   (value "")
   (perm :all))
-
-
 
 
 (defun passwd ()
