@@ -11,6 +11,7 @@
         (setf (slot-value result (intern (symbol-name key))) (getf ,ent-list key)))
      result))
 
+
 (defmethod gen ((fld list) &key entity-param)
   (let ((instr (car fld)))
     (ecase instr

@@ -572,6 +572,13 @@ If objs are of different classes the result is NIL."
 
 ;; with-defclass
 
+(defun get-slots-by-obj (obj)
+  (mapcar #'(lambda (x)
+              (closer-mop:slot-definition-name x))
+          (closer-mop:class-slots (find-class (type-of obj)))))
+
+(eval '(get-slots-by-class-name 'zzz))
+
 (defmacro with-defclass ((class-name super-class-names) &body slots)
   `(prog1
        (defclass ,class-name ,super-class-names
@@ -579,27 +586,43 @@ If objs are of different classes the result is NIL."
              `(,slot-name :initarg  ,(intern (symbol-name slot-name) :keyword)
                           :initform ,initform
                           :accessor ,(intern (format nil "A-~A" (symbol-name slot-name))))))
+     (mi ',class-name)
+     (eval '(get-slots-by-class-name ',class-name))
      (defmethod print-object ((obj ,class-name) stream)
-       (format stream ,(format nil "#[~A | ~A]"
-                               (symbol-name class-name)
-                               (loop :for (slot-name initform) :in slots :collect
-                                  (format nil ":~A ~~A"
-                                          slot-name)))
-                ,@(loop :for (slot-name initform) :in slots :collect
-                     `(bprint (,(intern (format nil "A-~A" (symbol-name slot-name))) obj)))))))
+       (format stream
+               (format nil "#[ ~A | ~A]"
+                       ',class-name
+                       (loop :for slot :in (closer-mop:class-slots (find-class ',class-name)) :collect
+                          (format nil ":~A ~A"
+                                  (closer-mop:slot-definition-name slot)
+                                  (bprint (funcall (intern (format nil "A-~A" (symbol-name (closer-mop:slot-definition-name slot)))) obj))
+                                  )))))))
+               ,@(loop :for slot :in  (closer-mop:class-slots (find-class class-name))
+                    :collect `(bprint (,(intern (format nil "A-~A" (symbol-name (closer-mop:slot-definition-name slot)))) obj)))))))
 
 
-;; CLASS ACTION
+;; CLASS ACTION - superclass for all actions (:none :linear :grid :tpl :map etc)
 (with-defclass (action ())
   (title "")
-  (showtype :none)
   (perm :all)
   (val nil)
-  (grid nil)
-  (param-id nil)
-  (height "180")
   (entity nil)
   (fields nil))
+
+
+(with-defclass (none (action)))
+
+(with-defclass (linear (action)))
+
+(with-defclass (grid (action))
+  (grid nil)
+  (param-id nil)
+  (height "180"))
+
+(with-defclass (map (action)))
+
+(with-defclass (tpl (action)))
+
 
 ;; CLASS YAPOINT
 (with-defclass (yapoint ())
