@@ -159,20 +159,6 @@
 ;;     (tpl:frmobj (list :content (format nil "~{~A~}" flds)))))
 
 
-(defun grid-replace-helper (grid-id col-replace)
-  (format nil "
-function(){
-  var ids = jQuery(\"#~A\").jqGrid('getDataIDs');
-  for(var i=0;i < ids.length;i++){
-    var cl = ids[i];
-    ~{~A~%~}
-  }
-}
-" grid-id (loop :for (in-name btn-str) :in (reverse col-replace) :collect
-             (format nil "jQuery(\"#~A\").jqGrid('setRowData',ids[i],{~A: ~A});"
-                     grid-id in-name btn-str))))
-
-
 ;; (defmethod show ((obj yamap) &key)
 ;;   (tpl:map (list :center (a-center-coord obj)
 ;;                  :placemarks (format nil "~{~A~}"
@@ -275,27 +261,41 @@ function(){
              (t (error "show-grid unk fld" ))))
     (tpl:content-block
      (list :title   (a-title param)
-           :content (grid-helper grid-id pager-id (replace-all
-                                                   (json:encode-json-to-string
-                                                    `(("url" . ,(format nil "/~A~A"
-                                                                        (a-grid param)
-                                                                        (if (a-param-id param) (format nil "/~A" (cur-id)) "")
-                                                                        )) ;; absolute uri
-                                                      ("datatype" . "json")
-                                                      ("colNames" . ,(reverse col-names))
-                                                      ("colModel" . ,(reverse col-model))
-                                                      ("rowNum" . 10)
-                                                      ("rowList" . (10 20 30))
-                                                      ("pager" . ,(format nil "#~A" pager-id))
-                                                      ("sortname" . "id")
-                                                      ("viewrecords" . t)
-                                                      ("sortorder" . "desc")
-                                                      ("height" . ,(aif (a-height param) it "180"))
-                                                      ("editurl" . "/edit_url")
-                                                      ("gridComplete" . "-=|=-")
-                                                      ("caption" . ,(a-title param))))
-                                                   "\"-=|=-\"" ;; замена после кодирования в json - иначе никак не вставить js :)
-                                                   (grid-replace-helper grid-id col-replace)))))))
+           :content (tpl:gridview
+                     (list :idgrid grid-id
+                           :idpager pager-id
+                           :json (replace-all
+                                  (json:encode-json-to-string
+                                   `(("url" . ,(format nil "/~A~A"
+                                                       (a-grid param)
+                                                       (if (a-param-id param) (format nil "/~A" (cur-id)) "")
+                                                       )) ;; absolute uri
+                                     ("datatype" . "json")
+                                     ("colNames" . ,(reverse col-names))
+                                     ("colModel" . ,(reverse col-model))
+                                     ("rowNum" . 10)
+                                     ("rowList" . (10 20 30))
+                                     ("pager" . ,(format nil "#~A" pager-id))
+                                     ("sortname" . "id")
+                                     ("viewrecords" . t)
+                                     ("sortorder" . "desc")
+                                     ("height" . ,(aif (a-height param) it "180"))
+                                     ("editurl" . "/edit_url")
+                                     ("gridComplete" . "-=|=-")
+                                     ("caption" . ,(a-title param))))
+                                  "\"-=|=-\"" ;; замена после кодирования в json - иначе никак не вставить js :)
+                                  (format nil "
+function(){
+  var ids = jQuery(\"#~A\").jqGrid('getDataIDs');
+  for(var i=0;i < ids.length;i++){
+    var cl = ids[i];
+    ~{~A~%~}
+  }
+}
+" grid-id (loop :for (in-name btn-str) :in (reverse col-replace) :collect
+             (format nil "jQuery(\"#~A\").jqGrid('setRowData',ids[i],{~A: ~A});"
+                     grid-id in-name btn-str)))
+                                  )))))))
 
 
 (defun show-act (act)
@@ -325,31 +325,16 @@ function(){
       :content  content))))
 
 
-(defun grid-helper (grid-id pager-id json-code)
-  (format nil "<div style=\"margin: 10px 0 10px 0\">
-               <table id=\"~A\"></table><div id=\"~A\"></div>
-               <script type=\"text/javascript\">
-               jQuery('#~A').jqGrid(~A);
-               jQuery('#~A').jqGrid('navGrid','#~A',{edit:false,add:false,del:false});
-               </script>
-               </div>"
-          grid-id pager-id grid-id json-code grid-id pager-id))
-
-
 (defun json-assembly (cur-page total-page rows-per-page rows)
-  "rows: `(id fld1 fld2 fld3...)"
+  "example call: (json-assembly 1 2 2 '( (1 \"one\" \"two\") (2 \"three\" \"fourth\")))"
   (json:encode-json-to-string
    `(("page"    . ,cur-page)
      ("total"   . ,total-page)
      ("records" . ,rows-per-page)
      ("rows"    . ,(loop :for row :in rows :collect
                       `(("id"   . ,(car row))
-                        ("cell" . ,
-                                ;; (list*
-                                    ;; "<a href=\"sss\">fdd</a>"
-                                    (cdr row)
-                                    ;; )
-                                ))))))) ;; <------ here inserted
+                        ("cell" . ,(cdr row))))))))
+
 
 (defun pager (val fields page rows-per-page)
   ;; (error (format nil "~A"val)))
@@ -464,8 +449,11 @@ function(){
 
 
 (defun example-json (val fields)
-  (let* ((page            (- (parse-integer (hunchentoot:get-parameter "page")) 1))
-         (rows-per-page   (parse-integer (hunchentoot:get-parameter "rows"))))
-    (multiple-value-bind (slice cnt-rows)
-        (pager val fields page rows-per-page)
-      (json-assembly  (+ page 1)  (ceiling cnt-rows rows-per-page)  (length slice) slice))))
+  "Выясняем страницу и кол-во строк в ней, вызываем pager и формируем вывод с помощью json-assembly"
+  ;; (let* ((page            (- (parse-integer (hunchentoot:get-parameter "page")) 1))
+  ;;        (rows-per-page   (parse-integer (hunchentoot:get-parameter "rows"))))
+  ;;   (multiple-value-bind (slice cnt-rows)
+  ;;       (pager val fields page rows-per-page)
+  ;;     (json-assembly  (+ page 1)  (ceiling cnt-rows rows-per-page)  (length slice) slice)))
+  (json-assembly 1 2 2 '( (1 "one" "two") (2 "three" "fourth")))
+)

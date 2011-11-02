@@ -22,7 +22,6 @@
                (:file "defmodule")
                (:file "init")
                (:static-file "migration.lisp")
-               (:static-file "universal-accessor.lisp")
                (:static-file "README")
                (:static-file "wizard.asd")
                (:static-file "templates.soy")
