@@ -336,124 +336,130 @@ function(){
                         ("cell" . ,(cdr row))))))))
 
 
+(defmethod get-accessor-perm ((infld fld))
+  (let ((perm  (a-show (a-perm infld)))
+        (symb  (find-symbol (format nil "A-~A" (a-name infld)) (find-package "WIZARD")))
+        (accessor))
+    (cond ((equal '(:bool)                             (a-typedata infld))
+           (setf accessor (lambda (x) (format nil "~A" (aif (funcall symb x) "да" "нет")))))
+          ((equal '(:str)                              (a-typedata infld))
+           (let ((tmp (a-xref infld)))
+             (if (null tmp)
+                 (setf accessor (lambda (x) (format nil "~A" (funcall symb x))))
+                 (setf accessor (lambda (x) (format nil "<a href=\"/~A/%|id|%\">~A</a>"
+                                                    tmp
+                                                    (funcall symb x)))))))
+          ((equal '(:text)                             (a-typedata infld))
+           (setf accessor (lambda (x) (format nil "~A" (aif (funcall symb x) it "")))))
+          ((equal '(:num)                              (a-typedata infld))
+           (setf accessor (lambda (x)
+                            (let ((val (funcall symb x)))
+                              (if (realp val)
+                                  (format nil "~F" val)
+                                  (format nil "~A" val))))))
+          ((equal '(:link resource)                    (a-typedata infld))
+           (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
+          ((equal '(:link tender)                      (a-typedata infld))
+           (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
+          ((equal '(:list-of-keys tender-status)       (a-typedata infld))
+           (setf accessor (lambda (x) (format nil "~A" (getf *tender-status* (funcall symb x))))))
+          ((equal '(:list-of-keys offer-status)        (a-typedata infld))
+           (setf accessor (lambda (x) (format nil "~A" (getf *offer-status* (funcall symb x))))))
+          ((equal '(:link builder)                     (a-typedata infld))
+           (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
+          ((equal '(:link supplier)                    (a-typedata infld))
+           (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
+          ((equal '(:link tender-resource)             (a-typedata infld))
+           (setf accessor (lambda (x) (format nil "~A" (a-name (a-resource (funcall symb x)))))))
+          ((equal '(:list-of-keys resource-types)      (a-typedata infld))
+           (setf accessor (lambda (x) (format nil "~A" (getf *resource-types* (funcall symb x))))))
+          ((equal '(:interval)                         (a-typedata infld))
+           (setf accessor (lambda (x)  (let ((val (funcall symb x)))
+                                         (format nil "~A-~A"
+                                                 (decode-date (interval-begin val))
+                                                 (decode-date (interval-end val)))))))
+          (t ;; default - print unknown type message in grid field
+           (let ((err-str (format nil "unk typedata: ~A" (a-typedata infld))))
+             (setf accessor (lambda (x)
+                              (declare (ignore x))
+                              err-str)))))
+    (values
+     accessor
+     perm)))
+
+
+(defmethod get-accessor-perm ((infld btn))
+  (let* ((perm      (a-perm  infld))
+         (btn       (a-name  infld))                     ;; тут важно чтобы вычисление происходило вне лямбды
+         (value     (a-value infld))                     ;; тут важно чтобы вычисление происходило вне лямбды
+         (accessor  (lambda (x)
+                      (declare (ignore x))
+                      (format nil "<form method='post'><input type='submit' name='~A~~%|id|%' value='~A' /></form>"
+                              btn
+                              value))))
+    (values accessor perm)))
+
+
+(defmethod get-accessor-perm ((infld popbtn))
+  ;; (let* ((perm      (getf infld :perm))
+  ;;        (btn       (getf infld :popbtn))                ;; тут важно чтобы вычисление происходило вне лямбды
+  ;;        (value     (getf infld :value))                 ;; тут важно чтобы вычисление происходило вне лямбды
+  ;;        (accessor  (lambda (x)
+  ;;                     (declare (ignore x))
+  ;;                     (format nil "<input type='button' name='~A~~%|id|%' value='~A' onclick='ShowHide(\"~A\")' />"
+  ;;                             btn
+  ;;                             value
+  ;;                             btn))))
+  ;;   (push (cons accessor perm) field-cons))
+  (error "TODO-ERROR: generic method (get-accessor-perm (popbtn)) not implemented"))
+
+
+;; (defmethod get-accessor-perm ((infld calc))
+;;    (let* ((perm      (getf infld :perm))
+;;           (calc      (getf infld :cacl))                  ;; тут важно чтобы вычисление происходило вне лямбды
+;;           (func      (getf infld :func))                  ;; тут важно чтобы вычисление происходило вне лямбды
+;;           (accessor  (getf infld :func)))
+;;      (push (cons accessor perm) field-cons)))
+
+
+(defmethod get-accessor-perm (infld)
+  (error "unk pager directive"))
+
+
 (defun pager (val fields page rows-per-page)
-  ;; (error (format nil "~A"val)))
+  ;; Полезная отладка, чтобы определить, какой контроллер вызывает ошибку
+  ;; (error (format nil "~A" val))) ;;
   (let* ((rows             (funcall val))
          (cnt-rows         (length rows))
          (slice-cons)      ;; many of (id . #<object>)
          (field-cons))     ;; manu of (#<function-accessor> . plist-permlist)
-    ;; slice-cons (overloop)
+    ;; slice-cons (overloop) - выбираем те объекты, которые попадают на страницу
     (loop :for num :from (* page rows-per-page) :below (* (+ 1 page) rows-per-page) :do
        (let ((row (nth num rows)))
          (unless (null row)
            (push (nth num rows) slice-cons))))
-    ;; field-cons (innerloop)
+    ;; field-cons (innerloop) - получаем для каждого поля функцию-accessor и права
     (loop :for infld :in fields :collect
-       (cond ((equal 'fld (type-of infld))
-              (let ((perm  (a-show (a-perm infld)))
-                    (symb  (find-symbol (format nil "A-~A" (a-name infld)) (find-package "WIZARD")))
-                    (accessor))
-                (cond ((equal '(:bool)                             (a-typedata infld))
-                       (setf accessor (lambda (x) (format nil "~A" (aif (funcall symb x) "да" "нет")))))
-                      ((equal '(:str)                              (a-typedata infld))
-                       (let ((tmp (a-xref infld)))
-                           (if (null tmp)
-                               (setf accessor (lambda (x) (format nil "~A" (funcall symb x))))
-                               (setf accessor (lambda (x) (format nil "<a href=\"/~A/%|id|%\">~A</a>"
-                                                                  tmp
-                                                                  (funcall symb x)))))))
-                      ((equal '(:text)                             (a-typedata infld))
-                       (setf accessor (lambda (x) (format nil "~A" (aif (funcall symb x) it "")))))
-                      ((equal '(:num)                              (a-typedata infld))
-                       (setf accessor (lambda (x)
-                                        (let ((val (funcall symb x)))
-                                          (if (realp val)
-                                              (format nil "~F" val)
-                                              (format nil "~A" val))))))
-                      ((equal '(:link resource)                    (a-typedata infld))
-                       (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
-                      ((equal '(:link tender)                      (a-typedata infld))
-                       (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
-                      ((equal '(:list-of-keys tender-status)       (a-typedata infld))
-                       (setf accessor (lambda (x) (format nil "~A" (getf *tender-status* (funcall symb x))))))
-                      ((equal '(:list-of-keys offer-status)        (a-typedata infld))
-                       (setf accessor (lambda (x) (format nil "~A" (getf *offer-status* (funcall symb x))))))
-                      ((equal '(:link builder)                     (a-typedata infld))
-                       (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
-                      ((equal '(:link supplier)                    (a-typedata infld))
-                       (setf accessor (lambda (x) (format nil "~A" (a-name (funcall symb x))))))
-                      ((equal '(:link tender-resource)             (a-typedata infld))
-                       (setf accessor (lambda (x) (format nil "~A" (a-name (a-resource (funcall symb x)))))))
-                      ((equal '(:list-of-keys resource-types)      (a-typedata infld))
-                       (setf accessor (lambda (x) (format nil "~A" (getf *resource-types* (funcall symb x))))))
-                      ((equal '(:interval)                         (a-typedata infld))
-                       (setf accessor (lambda (x)  (let ((val (funcall symb x)))
-                                                     (format nil "~A-~A"
-                                                             (decode-date (interval-begin val))
-                                                             (decode-date (interval-end val)))))))
-                      (t ;; default - print unknown type message in grid field
-                       (let ((err-str (format nil "unk typedata: ~A" (a-typedata infld))))
-                         (setf accessor (lambda (x)
-                                          (declare (ignore x))
-                                          err-str)))))
-                (push (cons accessor perm) field-cons)))
-
-             ((equal 'btn (type-of infld))
-              (let* ((perm      (a-perm  infld))
-                     (btn       (a-name  infld))                     ;; тут важно чтобы вычисление происходило вне лямбды
-                     (value     (a-value infld))                     ;; тут важно чтобы вычисление происходило вне лямбды
-                     (accessor  (lambda (x)
-                                  (declare (ignore x))
-                                  (format nil "<form method='post'><input type='submit' name='~A~~%|id|%' value='~A' /></form>"
-                                          btn
-                                          value))))
-                (push (cons accessor perm) field-cons)))
-
-             ((equal :popbtn (car infld))
-              ;; (let* ((perm      (getf infld :perm))
-              ;;        (btn       (getf infld :popbtn))                ;; тут важно чтобы вычисление происходило вне лямбды
-              ;;        (value     (getf infld :value))                 ;; тут важно чтобы вычисление происходило вне лямбды
-              ;;        (accessor  (lambda (x)
-              ;;                     (declare (ignore x))
-              ;;                     (format nil "<input type='button' name='~A~~%|id|%' value='~A' onclick='ShowHide(\"~A\")' />"
-              ;;                             btn
-              ;;                             value
-              ;;                             btn))))
-              ;;   (push (cons accessor perm) field-cons))
-              "zzz"
-              )
-
-             ((equal :calc (car infld))
-              (let* ((perm      (getf infld :perm))
-                     (calc      (getf infld :cacl))                  ;; тут важно чтобы вычисление происходило вне лямбды
-                     (func      (getf infld :func))                  ;; тут важно чтобы вычисление происходило вне лямбды
-                     (accessor  (getf infld :func)))
-                (push (cons accessor perm) field-cons)))
-
-
-             (t (error "unk pager directive"))
-             ) ;; end cond
-       ) ;; end loop field cons (innerloop)
-    (values
-     ;; result: get values from obj
-     (loop :for (id . obj) :in (reverse slice-cons) :collect
-        (list* id
-               (loop :for (accessor . perm) :in (reverse field-cons) :collect
-                  (if (check-perm perm (cur-user) obj)
-                      (replace-all (funcall accessor obj)
-                                   "%|id|%"
-                                   (format nil "~A" id))
-                      (if (boundp '*dbg*) "permission denied in grid pager" "")))))
-     ;; cnt-rows - two result
-     cnt-rows)))
+       (multiple-value-bind (accessor perm)
+           (get-accessor-perm infld)
+       (push (cons accessor perm) field-cons)))
+    ;; Применяем к каждому выбранному на первом шаге объекту функции-accessor-ы полученные на втором
+    (let ((result
+           (loop :for (id . obj) :in (reverse slice-cons) :collect
+              (list* id
+                     (loop :for (accessor . perm) :in (reverse field-cons) :collect
+                        (if (check-perm perm (cur-user) obj)
+                            (replace-all (funcall accessor obj)
+                                         "%|id|%"
+                                         (format nil "~A" id))
+                            (if (boundp '*dbg*) "permission denied in grid pager" "")))))))
+      (values result cnt-rows))))
 
 
 (defun example-json (val fields)
   "Выясняем страницу и кол-во строк в ней, вызываем pager и формируем вывод с помощью json-assembly"
-  ;; (let* ((page            (- (parse-integer (hunchentoot:get-parameter "page")) 1))
-  ;;        (rows-per-page   (parse-integer (hunchentoot:get-parameter "rows"))))
-  ;;   (multiple-value-bind (slice cnt-rows)
-  ;;       (pager val fields page rows-per-page)
-  ;;     (json-assembly  (+ page 1)  (ceiling cnt-rows rows-per-page)  (length slice) slice)))
-  (json-assembly 1 2 2 '( (1 "one" "two") (2 "three" "fourth")))
-)
+  (let* ((page            (- (parse-integer (hunchentoot:get-parameter "page")) 1))
+         (rows-per-page   (parse-integer (hunchentoot:get-parameter "rows"))))
+    (multiple-value-bind (slice cnt-rows)
+        (pager val fields page rows-per-page)
+      (json-assembly  (+ page 1)  (ceiling cnt-rows rows-per-page)  (length slice) slice))))

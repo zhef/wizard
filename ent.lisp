@@ -73,13 +73,6 @@
 (defparameter *types* (loop :for ftype :in *fld-types* :by #'cddr :collect ftype))
 
 
-#| Это кусок json-ответа для страницы поставщиков - нужен для отладки диспетчеризации
-
-{"page":1,"total":1,"records":7,"rows":[{"id":2,"cell":["\u0411\u0430\u0437\u0438\u0441 \u041E\u041E\u041E","\u0415\u043A\u0430\u0442\u0435\u0440\u0438\u043D\u0438\u043D\u0441\u043A\u0438\u0439 \u043F\u0440\u043E\u0441\u043F\u0435\u043A\u0442 3","<form method='post'><input type='submit' name='b1248~2' value='\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u043F\u043E\u0441\u0442\u0430\u0432\u0449\u0438\u043A\u0430' \/><\/form>"]},{"id":3,"cell":["\u0410\u0420\u0412\u042D\u041B \u041E\u041E\u041E","\u0443\u043B\u0438\u0446\u0430 \u041E\u043B\u044C\u0433\u0438 \u0411\u0435\u0440\u0433\u0433\u043E\u043B\u044C\u0446 40","<form method='post'><input type='submit' name='b1248~3' value='\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u043F\u043E\u0441\u0442\u0430\u0432\u0449\u0438\u043A\u0430' \/><\/form>"]},{"id":4,"cell":["\u0412\u042D\u041C\u0417-\u042D\u041D\u0415\u0420\u0413\u041E \u041E\u041E\u041E","\u0425\u0438\u043C\u0438\u0447\u0435\u0441\u043A\u0438\u0439 \u043F\u0435\u0440\u0435\u0443\u043B\u043E\u043A 1, \u043B\u0438\u0442. \u0411\u0415","<form method='post'><input type='submit' name='b1248~4' value='\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u043F\u043E\u0441\u0442\u0430\u0432\u0449\u0438\u043A\u0430' \/><\/form>"]},{"id":5,"cell":["\u0412\u044B\u043C\u043F\u0435\u043B \u041E\u041E\u041E","\u041F\u043E\u043B\u0438\u0442\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u0443\u043B\u0438\u0446\u0430 6, \u043B\u0438\u0442.\u0412","<form method='post'><input type='submit' name='b1248~5' value='\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u043F\u043E\u0441\u0442\u0430\u0432\u0449\u0438\u043A\u0430' \/><\/form>"]},{"id":1973,"cell":["\u0410\u0441\u0442\u0440\u0435\u0439 \u041E\u041E\u041E","\u041C\u0438\u043D\u0435\u0440\u0430\u043B\u044C\u043D\u0430\u044F \u0443\u043B. 13","<form method='post'><input type='submit' name='b1248~1973' value='\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u043F\u043E\u0441\u0442\u0430\u0432\u0449\u0438\u043A\u0430' \/><\/form>"]},{"id":1969,"cell":["\u0410\u0412\u041D-\u0421\u0422\u0420\u041E\u0419 \u041E\u041E\u041E","\u0410\u043B\u0435\u043A\u0441\u0430\u043D\u0434\u0440\u043E\u0432\u0441\u043A\u043E\u0439 \u0424\u0435\u0440\u043C\u044B \u043F\u0440. 29","<form method='post'><input type='submit' name='b1248~1969' value='\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u043F\u043E\u0441\u0442\u0430\u0432\u0449\u0438\u043A\u0430' \/><\/form>"]},{"id":1971,"cell":["\u0415\u0432\u0440\u043E\u043F\u043E\u043B\u0438\u0441 \u041E\u041E\u041E","\u041E\u043A\u0442\u044F\u0431\u0440\u044C\u0441\u043A\u0430\u044F \u043D\u0430\u0431. 104","<form method='post'><input type='submit' name='b1248~1971' value='\u0421\u0442\u0440\u0430\u043D\u0438\u0446\u0430 \u043F\u043E\u0441\u0442\u0430\u0432\u0449\u0438\u043A\u0430' \/><\/form>"]}]}
-
-|#
-
-
 ;; Сущности, используемые в программе, по ним строятся объекты и контейнеры, в которых они хранятся.
 ;; Также названия полей используются для построения интерфейсов CRUD
 ;; Для полей наследуются разрешения объекта, если иное явно не указано в поле
@@ -713,13 +706,12 @@
         :perm              :all
         :entity            supplier
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'SUPPLIER))  (cons-hash-list *USER*))
-        :fields            '((:fld name)
-                             #|login|#
-                             (:fld actual-address)
-                             ;; (:btn "Страница поставщика"
-                             ;;  :perm :all
-                             ;;  :width 130
-                             ;;  :act (to "/supplier/~A" (caar (form-data))))
+        :fields            '((:fld   name)
+                             (:fld   actual-address)
+                             (:btn   "Страница поставщика"
+                              :perm  :all
+                              :width 130
+                              :act   (to "/supplier/~A" (caar (form-data))))
                              ))))
     ;; ;; Страница поставщика
     ;; (:place                supplier

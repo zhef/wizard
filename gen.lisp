@@ -6,11 +6,11 @@
 (defparameter *param-id-flag*      nil)
 
 (defmacro ent-to-mi (ent-list)
+  "Translate action to object"
   `(let ((result (mi (intern (symbol-name (car ,ent-list))) :title (cadr ,ent-list))))
      (loop :for key :in (cddr ,ent-list) :by #'cddr :do
         (setf (slot-value result (intern (symbol-name key))) (getf ,ent-list key)))
      result))
-
 
 ;; (defmethod gen ((fld list) &key entity-param)
 ;;   (let ((instr (car fld)))
@@ -174,21 +174,10 @@
             pre-generated-fields)))
 
 
-;; dispatcher
+;; dispatcher -->
 (defmethod gen ((param list) &key entity-param)
   (gen (ent-to-mi param) :entity-param entity-param))
 
-
-(pprint (macroexpand-1 '(ent-to-mi '(:fld name :xref "category"))))
-(cddr '(:fld name :xref "category"))
-
-(LET ((RESULT
-       (MI (INTERN (SYMBOL-NAME (CAR '(:FLD NAME :XREF "category"))))
-           :TITLE (CADR '(:FLD NAME :XREF "category")))))
-  ;; (LOOP :FOR KEY :IN (CDDR '(:FLD NAME :XREF "category")) :BY #'CDDR
-  ;;    :DO (SETF (SLOT-VALUE RESULT (INTERN (SYMBOL-NAME KEY)))
-  ;;              (GETF '(:FLD NAME :XREF "category") KEY)))
-  RESULT)
 
 (defmethod gen ((param fld) &key entity-param)
   (let* ((entity    (find-if #'(lambda (entity)
@@ -228,6 +217,20 @@
                 (push ''perm res-perm)
                 (push 'mi res-perm)
                 (bprint res-perm))))))
+
+
+(defmethod gen ((param btn) &key entity-param)
+  (let ((genid (string-downcase (symbol-name (gensym "B")))))
+    ;; add controller
+    (setf *controllers*
+          (append *controllers*
+                  (list (list genid (a-act param)))))
+    ;; output
+    (format nil "~%~25T (mi 'btn :name \"~A\" :width ~A :perm ~A :value \"~A\")"
+            genid
+            (aif (a-width param) it "200")
+            (bprint (a-perm param))
+            (a-title param))))
 
 
 (with-open-file (out (path "defmodule.lisp") :direction :output :if-exists :supersede)
@@ -271,7 +274,7 @@
      (format out "~A~%  (let ((session (hunchentoot:start-session))~%~7T (acts (list ~{~A~})))~%~4T(declare (ignore session))~%~4T(show-acts acts)))"
              (if *param-id-flag* (format nil "~% (declare (ignore id))") "")
              (loop :for action :in (eval (getf place :actions)) :collect
-                (gen action)
+                (gen action) ;; <-- dispatcher: (defmethod gen ((param list) &key entity-param)
                 ))
      ;; CONTROLLERS for this place
      ;; (unless (null *controllers*) ;; всегда нужно иметь контроллеры, т.к. есть логин на всех страницах

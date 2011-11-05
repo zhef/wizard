@@ -579,14 +579,15 @@ If objs are of different classes the result is NIL."
              `(,slot-name :initarg  ,(intern (symbol-name slot-name) :keyword)
                           :initform ,initform
                           :accessor ,(intern (format nil "A-~A" (symbol-name slot-name))))))
-     (defmethod print-object ((obj ,class-name) stream)
-       (format stream
-               (format nil "#[ ~A | ~A]"
-                       ',class-name
-                       (loop :for slot :in (closer-mop:class-slots (find-class ',class-name)) :collect
-                          (format nil ":~A ~A"
-                                  (closer-mop:slot-definition-name slot)
-                                  (bprint (funcall (intern (format nil "A-~A" (symbol-name (closer-mop:slot-definition-name slot)))) obj)))))))))
+     ;; (defmethod print-object ((obj ,class-name) stream)
+     ;;   (format stream
+     ;;           (format nil "#[ ~A | ~A]"
+     ;;                   ',class-name
+     ;;                   (loop :for slot :in (closer-mop:class-slots (find-class ',class-name)) :collect
+     ;;                      (format nil ":~A ~A"
+     ;;                              (closer-mop:slot-definition-name slot)
+     ;;                              (bprint (funcall (intern (format nil "A-~A" (symbol-name (closer-mop:slot-definition-name slot)))) obj)))))))
+     ))
 
 
 ;; CLASS ACTION - superclass for all actions (:none :linear :grid :tpl :map etc)
@@ -642,7 +643,8 @@ If objs are of different classes the result is NIL."
   (title "")
   (width 200)
   (value "")
-  (perm :all))
+  (perm :all)
+  (act))
 
 (with-defclass (popbtn ())
   (name "")
