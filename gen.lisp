@@ -177,6 +177,19 @@
             pre-generated-fields)))
 
 
+(defmethod gen ((param announce) &key entity-param)
+  (format nil "~%~14T (mi 'announce :title ~A ~%~20T :perm '~A ~%~20T :val ~A ~%~20T :fields ~A)"
+          (bprint (a-title param))
+          (bprint (a-perm param))
+          (format nil "(named-lambda ~A () ~A)"
+                  (symbol-name (gensym "ACTNL-"))
+                  (bprint (a-val param)))
+          (format nil "(list ~{~A~})"
+                  (loop :for fld :in (eval (a-fields param)) :collect
+                     (gen fld :entity-param (a-entity param))))))
+
+
+
 ;; dispatcher -->
 (defmethod gen ((param list) &key entity-param)
   (gen (ent-to-mi param) :entity-param entity-param))
@@ -250,7 +263,6 @@
 
 
 (with-open-file (out (path "defmodule.lisp") :direction :output :if-exists :supersede)
-  (declare (ignore entity-param))
   ;; Required
   (format out "(in-package #:~A)"  (package-name *package*))
   ;; Containers

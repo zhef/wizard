@@ -265,6 +265,21 @@
                       ))))))))))
 
 
+(push-hash *POST* 'POST
+  :title "Первая новость"
+  :date  "07.11.2011"
+  :photo-announce nil
+  :announce "Это текст первой новости")
+
+
+(push-hash *POST* 'POST
+  :title "Вторая новость"
+  :date  "07.11.2011"
+  :photo-announce nil
+  :announce "Это текст второй новости")
+
+
+
 (categoryes-and-resources)
 (users)
 (tenders)

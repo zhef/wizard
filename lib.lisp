@@ -608,6 +608,8 @@ If objs are of different classes the result is NIL."
 
 (with-defclass (tpl (action)))
 
+(with-defclass (announce (action)))
+
 
 ;; CLASS YAPOINT
 (with-defclass (yapoint ())

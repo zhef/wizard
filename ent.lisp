@@ -482,17 +482,15 @@
      :url                  "/posts"
      :navpoint             "Новости"
      :actions
-     '((:grid              "Анонсы"
+     '((:announce          "Анонсы"
         :perm              :all
         :entity            post
         :val               (cons-hash-list *POST*)
-        :fields            '((:fld title)
-                             (:fld date)
-                             (:fld photo-announce)
-                             (:fld announce)
-                             (:btn  "Страница новости"
-                              :perm :all
-                              :act  (to "/post/~A" (caar (form-data))))))))
+        :fields            '((:fld   title
+                              :xref  "post")
+                             (:fld   date)
+                             (:fld   photo-announce)
+                             (:fld   announce)))))
 
     ;; ;; Новость
     ;; (:place                post

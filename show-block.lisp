@@ -72,3 +72,14 @@ function(){
          (flds (loop :for infld :in (a-fields param) :collect
                   (show-linear infld val)))) ;; <-- dispatcher
     (tpl:frmobj (list :content (format nil "~{~A~}" flds)))))
+
+
+(defmethod show-block ((param announce) &key)
+  (format nil "~{~A~}"
+          (loop :for (id . announce) :in (funcall (a-val param)) :append
+             (list
+              (tpl:announce (list :title (a-title announce)
+                                  :date (a-date announce)
+                                  :photoannounce (or (a-photo-announce announce) "")
+                                  :announce (a-announce announce)
+                                  :id id))))))
