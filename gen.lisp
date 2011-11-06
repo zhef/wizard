@@ -114,12 +114,14 @@
 
 
 (defmethod gen ((param none) &key entity-param)
+  (declare (ignore entity-param))
   (format nil "~%~14T (mi 'none :title ~A :perm ~A)"
           (bprint (a-title param))
           (bprint (a-perm param))))
 
 
 (defmethod gen ((param yamap) &key entity-param)
+  (declare (ignore entity-param))
   (format nil "~%~14T (mi 'yamap :title ~A :perm ~A ~%~18T :val ~A)"
           (bprint (a-title param))
           (bprint (a-perm param))
@@ -129,6 +131,7 @@
 
 
 (defmethod gen ((param tpl) &key entity-param)
+  (declare (ignore entity-param))
   (format nil "~%~14T (mi 'tpl :title ~A :perm ~A ~%~18T :val ~A)"
           (bprint (a-title param))
           (bprint (a-perm param))
@@ -234,6 +237,7 @@
 
 
 (defmethod gen ((param popbtn) &key entity-param)
+  (declare (ignore entity-param))
   (let* ((genid (string-downcase (symbol-name (gensym "P")))))
     ;; output
     (format nil "~%~25T (mi 'popbtn :name \"~A\" :width ~A :perm ~A :value \"~A\" ~%~31T :action ~A)"
@@ -246,6 +250,7 @@
 
 
 (with-open-file (out (path "defmodule.lisp") :direction :output :if-exists :supersede)
+  (declare (ignore entity-param))
   ;; Required
   (format out "(in-package #:~A)"  (package-name *package*))
   ;; Containers

@@ -327,49 +327,42 @@
 (abbrev mi make-instance)
 
 
-;; literal syntax
-
-
-(defgeneric enable-literal-syntax (which)
-  (:documentation "Dynamically modify read-table to enable some reader-macros"))
-
-(defgeneric disable-literal-syntax (which)
-  (:documentation "Dynamically modify read-table to disable some reader-macros"))
-
-(defmacro locally-enable-literal-syntax (which)
-  "Modify read-table to enable some reader-macros at compile/load time"
-  `(eval-always
-     (enable-literal-syntax ,which)))
-
-(defmacro locally-disable-literal-syntax (which)
-  "Modify read-table to disable some reader-macros at compile/load time"
-  `(eval-always
-     (disable-literal-syntax ,which)))
-
-
 ;; #` syntax
 
 
 (eval-always
   (defun |#`-reader| (stream char arg)
-    "Reader syntax for one argument lambdas. Examples:
-- #`(+ 2 _) => (lambda (x) (+ 2 x))
-- #`((1+ _) (print _)) => (lambda (x) (1+ x) (print x))"
+    "Literal syntax for zero/one/two argument lambdas.
+Use @ as the function's argument, % as the second.
+Examples:
+CL-USER> #`(+ 2 @)
+\(lambda (&optional x y)
+   (+ 2 x))
+CL-USER>  #`((1+ @) (print @))
+\(lambda (&optional x y)
+   (1+ x)
+   (print x))
+CL-USER> #`(+ 1 2)
+\(lambda (&optional x y)
+   (+ 1 2))
+CL-USER>  #`(+ @ %)
+\(lambda (&optional x y)
+   (+ x y))
+"
     (declare (ignore char arg))
     (let ((sexp (read stream t nil t))
-          (x (gensym "X")))
-      `(lambda (&optional ,x)
-         (declare (ignorable ,x))
-         ,@(subst x '_ (if (listp (car sexp)) sexp (list sexp))))))
-
-  (defmethod enable-literal-syntax ((which (eql :sharp-backq)))
-    (set-dispatch-macro-character #\# #\` #'|#`-reader|))
-
-  (defmethod disable-literal-syntax ((which (eql :sharp-backq)))
-    (set-dispatch-macro-character #\# #\` (make-reader-error-fun #\`))))
-
-;; activate #` syntax
-(locally-enable-literal-syntax :sharp-backq)
+          (x (gensym "X"))
+          (y (gensym "Y")))
+      `(lambda (&optional ,x ,y)
+         (declare (ignorable ,x)
+                  (ignorable ,y))
+         ,@(subst y '%
+                  (subst x '@
+                         (if (listp (car sexp))
+                             sexp
+                             (list sexp)))))))
+  ;; set #`
+  (set-dispatch-macro-character #\# #\` #'|#`-reader|))
 
 
 ;; anaphoric
@@ -377,39 +370,40 @@
 
 (eval-always
   (defmacro if-it (test then &optional else)
-    "Like <_:fun if />. IT is bound to <_:arg test />"
+    "Like IF. IT is bound to TEST."
     `(let ((it ,test))
        (if it ,then ,else))))
 
 (eval-always
   (defmacro when-it (test &body body)
-    "Like <_:fun when />. IT is bound to <_:arg test />"
+    "Like WHEN. IT is bound to TEST."
     `(let ((it ,test))
        (when it
          ,@body))))
 
 (eval-always
   (defmacro and-it (&rest args)
-    "Like <_:fun and />. IT is bound to the value of the previous <_:fun and /> form"
+    "Like AND. IT is bound to the value of the previous AND form."
     (cond ((null args) t)
           ((null (cdr args)) (car args))
           (t `(when-it ,(car args) (and-it ,@(cdr args)))))))
 
 (eval-always
   (defmacro dowhile-it (test &body body)
-    "Like <_:fun dowhile />. IT is bound to <_:arg test />"
+    "Like DOWHILE. IT is bound to TEST."
     `(do ((it ,test ,test))
          ((not it))
        ,@body)))
 
 (eval-always
   (defmacro cond-it (&body body)
-    "Like <_:fun cond />. IT is bound to the passed <_:fun cond /> test"
+    "Like COND. IT is bound to the passed COND test."
     `(let (it)
        (cond
-         ,@(mapcar #``((setf it ,(car _)) ,(cadr _))
+         ,@(mapcar #``((setf it ,(car @)) ,(cadr @))
                    ;; uses the fact, that SETF returns the value set
                    body)))))
+
 
 ;; maybe
 
@@ -663,6 +657,7 @@ If objs are of different classes the result is NIL."
 (defun passwd ()
   (with-open-file (file-stream "passwd.txt" :direction :output)
     (maphash #'(lambda (k v)
+                 (declare (ignore k))
                  (unless (equal 'admin(type-of v))
                    (format file-stream "~%\"~A\" ~30t : ~A | ~A - ~A"
                            (a-name v)

@@ -154,7 +154,7 @@
 
 
 (defmethod get-accessor-perm (infld)
-  (error (format nil "defmethod (get-accessor-perm (~A) not implemented)" (type-of inflf))))
+  (error (format nil "defmethod (get-accessor-perm (~A) not implemented)" (type-of infld))))
 
 
 (defun pager (val fields page rows-per-page)

@@ -66,8 +66,6 @@
   :interval             "диапазоны дат, относящиеся к тендеру"
   :img                  "изображения, картинки")
 
-;; TODO: При организации диспетчеризации использовать вместо case - спецификаторы типов
-;; См. http://love5an.livejournal.com/357147.html
 ;; TODO: при создании экземпляра entity проверять тип поля
 (defparameter *types* (loop :for ftype :in *fld-types* :by #'cddr :collect ftype))
 
@@ -479,22 +477,22 @@
      '((:none              "Главная"
         :perm              :all)))
 
-    ;; ;; Новости
-    ;; (:place                posts
-    ;;  :url                  "/posts"
-    ;;  :navpoint             "Новости"
-    ;;  :actions
-    ;;  '((:grid              "Анонсы"
-    ;;     :perm              :all
-    ;;     :entity            post
-    ;;     :val               (cons-hash-list *POST*)
-    ;;     :fields            '((:fld title)
-    ;;                          (:fld date)
-    ;;                          (:fld photo-announce)
-    ;;                          (:fld announce)
-    ;;                          (:btn  "Страница новости"
-    ;;                           :perm :all
-    ;;                           :act  (to "/post/~A" (caar (form-data))))))))
+    ;; Новости
+    (:place                posts
+     :url                  "/posts"
+     :navpoint             "Новости"
+     :actions
+     '((:grid              "Анонсы"
+        :perm              :all
+        :entity            post
+        :val               (cons-hash-list *POST*)
+        :fields            '((:fld title)
+                             (:fld date)
+                             (:fld photo-announce)
+                             (:fld announce)
+                             (:btn  "Страница новости"
+                              :perm :all
+                              :act  (to "/post/~A" (caar (form-data))))))))
 
     ;; ;; Новость
     ;; (:place                post
