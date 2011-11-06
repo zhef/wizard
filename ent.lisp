@@ -706,47 +706,69 @@
         :perm              :all
         :entity            supplier
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'SUPPLIER))  (cons-hash-list *USER*))
-        :fields            '((:fld   name)
-                             (:fld   actual-address)
-                             (:btn   "Страница поставщика"
-                              :perm  :all
-                              :width 130
-                              :act   (to "/supplier/~A" (caar (form-data))))
+        :fields            '((:fld      name)
+                             (:fld      actual-address)
+                             (:btn      "Страница поставщика"
+                              :perm     :all
+                              :width    130
+                              :act      (to "/supplier/~A" (caar (form-data))))
+                             (:popbtn   "Отменить тендер"
+                              :perm     :all
+                              :action   '(:linear            "Действительно отменить?"
+                                          :perm               :all
+                                          :entity             tender
+                                          :fields             '((:btn "Подтверждаю отмену"
+                                                                 :perm :all
+                                                                 :act  (progn
+                                                                         (setf (a-status (gethash (cur-id) *TENDER*)) :cancelled)
+                                                                         (hunchentoot:redirect (hunchentoot:request-uri*)))))))
                              ))))
-    ;; ;; Страница поставщика
-    ;; (:place                supplier
-    ;;  :url                  "/supplier/:id"
-    ;;  :actions
-    ;;  '((:linear            "Поставщик"
-    ;;     :perm              :all
-    ;;     :entity            supplier
-    ;;     :val               (gethash (cur-id) *USER*)
-    ;;     :fields            '((:fld name)
-    ;;                          (:fld status)
-    ;;                          (:fld juridical-address)
-    ;;                          (:fld actual-address)
-    ;;                          (:fld contacts)
-    ;;                          (:fld email)
-    ;;                          (:fld site)
-    ;;                          (:fld heads)
-    ;;                          (:fld inn)
-    ;;                          (:fld kpp)
-    ;;                          (:fld ogrn)
-    ;;                          (:fld bank-name)
-    ;;                          (:fld bik)
-    ;;                          (:fld corresp-account)
-    ;;                          (:fld client-account)
-    ;;                          (:fld addresses)
-    ;;                          (:fld contact-person)
-    ;;                          (:fld contact-phone)
-    ;;                          (:fld contact-email)
-    ;;                          (:btn               "Сохранить"
-    ;;                           :perm              '(or :admin :self)
-    ;;                           :act (let ((obj (gethash (cur-id) *USER*)))
-    ;;                                  (with-obj-save obj
-    ;;                                    NAME JURIDICAL-ADDRESS ACTUAL-ADDRESS CONTACTS EMAIL SITE HEADS INN KPP OGRN BANK-NAME
-    ;;                                    BIK CORRESP-ACCOUNT CLIENT-ACCOUNT ADDRESSES CONTACT-PERSON contact-phone contact-email)
-    ;;                                  (hunchentoot:redirect (hunchentoot:request-uri*))))
+
+    ;; Страница поставщика
+    (:place                supplier
+     :url                  "/supplier/:id"
+     :actions
+     '((:linear            "Поставщик"
+        :perm              :all
+        :entity            supplier
+        :val               (gethash (cur-id) *USER*)
+        :fields            '((:fld name)
+                             (:fld status)
+                             (:fld juridical-address)
+                             (:fld actual-address)
+                             (:fld contacts)
+                             (:fld email)
+                             (:fld site)
+                             (:fld heads)
+                             (:fld inn)
+                             (:fld kpp)
+                             (:fld ogrn)
+                             (:fld bank-name)
+                             (:fld bik)
+                             (:fld corresp-account)
+                             (:fld client-account)
+                             (:fld addresses)
+                             (:fld contact-person)
+                             (:fld contact-phone)
+                             (:fld contact-email)
+                             (:btn               "Сохранить"
+                              :perm              '(or :admin :self)
+                              :act (let ((obj (gethash (cur-id) *USER*)))
+                                     (with-obj-save obj
+                                       NAME JURIDICAL-ADDRESS ACTUAL-ADDRESS CONTACTS EMAIL SITE HEADS INN KPP OGRN BANK-NAME
+                                       BIK CORRESP-ACCOUNT CLIENT-ACCOUNT ADDRESSES CONTACT-PERSON contact-phone contact-email)
+                                     (hunchentoot:redirect (hunchentoot:request-uri*))))
+                             (:popbtn   "Отменить тендер"
+                              :perm     :all
+                              :action   '(:linear            "Действительно отменить?"
+                                          :perm               :all
+                                          :entity             tender
+                                          :fields             '((:btn "Подтверждаю отмену"
+                                                                 :perm :all
+                                                                 :act  (progn
+                                                                         (setf (a-status (gethash (cur-id) *TENDER*)) :cancelled)
+                                                                         (hunchentoot:redirect (hunchentoot:request-uri*)))))))
+                             ))))
     ;;                          ;; pricelist
     ;;                          (:grid              "Прайс-лист"
     ;;                           :perm              :all

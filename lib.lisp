@@ -648,6 +648,7 @@ If objs are of different classes the result is NIL."
 
 (with-defclass (popbtn ())
   (name "")
+  (title "")
   (width 200)
   (value "")
   (perm :all)

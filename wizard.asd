@@ -18,6 +18,8 @@
                (:file "ent")
                (:file "gen")
                (:file "grid")
+               (:file "show-block")
+               (:file "show-linear")
                (:file "perm")
                (:file "defmodule")
                (:file "init")

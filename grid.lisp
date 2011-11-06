@@ -2,161 +2,10 @@
 
 (defparameter *popups* nil)
 
-
-;; (defmacro a-fld (name obj)
-;;   `(if (equal val :clear)
-;;        ""
-;;        (funcall
-;;         (intern
-;;          (format nil "A-~A" ,name)
-;;          (find-package "WIZARD"))
-;;         ,obj)))
-
-
-;; (defun show-fld-helper (captfld tplfunc namefld valuefld)
-;;   (tpl:fld
-;;    (list :fldname captfld
-;;          :fldcontent (funcall tplfunc (list :name namefld
-;;                                             :value valuefld)))))
-
-
-;; (defmethod show ((infld fld) &key val) ;; keys: val
-;;   (let ((namefld   (a-name  infld))
-;;         (captfld   (a-title infld))
-;;         (permfld   (a-perm  infld))
-;;         (typedata  (a-typedata infld)))
-;;     (declare (ignore permfld))
-;;     (cond ((equal typedata '(:bool))     (show-fld-helper captfld #'tpl:flagupd namefld (a-fld namefld val)))
-;;           ((equal typedata '(:num))      (show-fld-helper captfld #'tpl:strupd  namefld (a-fld namefld val)))
-;;           ((equal typedata '(:str))      (show-fld-helper captfld #'tpl:strupd  namefld (a-fld namefld val)))
-;;           ((equal typedata '(:pswd))     (show-fld-helper captfld #'tpl:pswdupd namefld (a-fld namefld val)))
-;;           ((equal typedata '(:interval))
-;;            (let ((val (a-fld namefld val)))
-;;              (if (equal 'INTERVAL (type-of val))
-;;                  (tpl:fld
-;;                   (list :fldname captfld
-;;                         :fldcontent (tpl:intervalupd (list :name namefld
-;;                                                            :valuebegin (decode-date (interval-begin val))
-;;                                                            :valueend   (decode-date (interval-end val))))))
-;;                  (tpl:fld
-;;                   (list :fldname captfld
-;;                         :fldcontent (tpl:intervalupd (list :name namefld
-;;                                                            :valuebegin ""
-;;                                                            :valueend   "")))))))
-;;           ((equal typedata '(:date))
-;;            (let ((val (a-fld namefld val)))
-;;              (if (or (null val)
-;;                      (equal "" val))
-;;                  (tpl:fld
-;;                   (list :fldname captfld
-;;                         :fldcontent (tpl:dateupd (list :name namefld
-;;                                                        :value ""))))
-;;                  (tpl:fld
-;;                   (list :fldname captfld
-;;                         :fldcontent (tpl:dateupd (list :name namefld
-;;                                                        :value (decode-date val))))))))
-;;           ((equal typedata '(:list-of-keys supplier-status))
-;;            (tpl:fld
-;;             (list :fldname captfld
-;;                   :fldcontent (tpl:strview (list :value (getf *supplier-status* (a-fld namefld val)))))))
-;;           ((equal typedata '(:list-of-keys offer-status))
-;;            (tpl:fld
-;;             (list :fldname captfld
-;;                   :fldcontent (tpl:strview (list :value (getf *offer-status* (a-fld namefld val)))))))
-;;           ((equal typedata '(:list-of-keys resource-types))
-;;            (tpl:fld
-;;             (list :fldname captfld
-;;                   :fldcontent (tpl:strview (list :value (getf *resource-types* (a-fld namefld val)))))))
-;;           ((equal typedata '(:list-of-keys tender-status))
-;;            (tpl:fld
-;;             (list :fldname captfld
-;;                   :fldcontent (tpl:strview (list :value (getf *tender-status* (a-fld namefld val)))))))
-;;           ((equal typedata '(:link builder))
-;;            (tpl:fld
-;;             (list :fldname captfld
-;;                   :fldcontent (tpl:strview (list :value (a-name (a-fld namefld val)))))))
-;;           ((equal typedata '(:link category))
-;;            (tpl:fld
-;;             (list :fldname captfld
-;;                   :fldcontent (tpl:strview (list :value (a-name (a-fld namefld val)))))))
-;;           ((equal typedata '(:link supplier))
-;;            (tpl:fld
-;;             (list :fldname captfld
-;;                   :fldcontent (tpl:strview (list :value (let ((it (a-fld namefld val)))
-;;                                                           (if (null it) "" (a-name it))))))))
-;;           ((equal typedata '(:link tender))
-;;            (tpl:fld
-;;             (list :fldname captfld
-;;                   :fldcontent (tpl:strview (list :value (a-name (a-fld namefld val)))))))
-;;           ((equal typedata '(:link tender-resource))
-;;            (tpl:fld
-;;             (list :fldname captfld
-;;                   :fldcontent (tpl:strview (list :value (a-name (a-resource (a-fld namefld val))))))))
-;;           ((equal typedata '(:text))
-;;            (tpl:fld
-;;             (list :fldname captfld
-;;                   :fldcontent (tpl:textupd (list :name namefld
-;;                                                  :value (a-fld namefld val))))))
-;;           ((equal typedata '(:list-of-str))
-;;            (tpl:fld
-;;             (list :fldname captfld
-;;                   :fldcontent (tpl:textupd (list :name namefld
-;;                                                  :value (a-fld namefld val))))))
-;;           ((equal typedata '(:link supplier-resource-price))
-;;            (tpl:fld
-;;             (list :fldname captfld
-;;                   :fldcontent (tpl:strview (list :name namefld
-;;                                                  :value (a-name (a-fld namefld val)))))))
-;;           ((equal typedata '(:link resource))
-;;            (tpl:fld
-;;             (list :fldname captfld
-;;                   :fldcontent (tpl:strview (list :name namefld
-;;                                                  :value (a-name (a-fld namefld val)))))))
-;;           (t (format nil "<br />err:unk2 typedata: ~A | ~A" namefld typedata)))))
-
-
-;; (defmethod show ((infld btn) &key)
-;;   (if (check-perm (a-perm infld) (cur-user))
-;;       (tpl:btnlin (list :name (a-name infld) :value (a-value infld)))
-;;       ""))
-
-
-;; (defmethod show ((infld popbtn) &key)
-;;   (if (check-perm (a-perm infld) (cur-user))
-;;       (progn
-;;         (let ((in-action (a-action infld)))
-;;           (push
-;;            (list :id (a-name infld)
-;;                  :title (a-title in-action)
-;;                  :content (show-act in-action)
-;;                  :left 200
-;;                  :width 800)
-;;            *popups*))
-;;         (tpl:popbtnlin (list :popid (a-name infld)
-;;                              :value (a-value infld))))
-;;       ""))
-
-
 ;; (defmethod show ((infld file) &key)
 ;;   (tpl:fld
 ;;    (list :fldname (a-value infld)
 ;;          :fldcontent (tpl:fileupd (list :name (a-name infld))))))
-
-
-;; (defun show-linear (act val)
-;;   (let ((flds (loop :for infld :in (a-fields act) :collect
-;;                  (cond ((equal 'fld (type-of infld))
-;;                         (show infld :val val))
-;;                        ((equal 'btn (type-of infld))
-;;                         (show infld))
-;;                        ((equal 'popbtn (type-of infld))
-;;                         (show infld))
-;;                        ((equal 'file (type-of infld))
-;;                         (show infld))
-;;                        ((equal 'action (type-of infld))
-;;                         (format nil "<div style=\"border: 1px solid red:\"> ~A</div>" (show-act infld)))
-;;                        (t (error "show-linear bad infld"))))))
-;;     (tpl:frmobj (list :content (format nil "~{~A~}" flds)))))
 
 
 ;; (defmethod show ((obj yamap) &key)
@@ -181,127 +30,10 @@
 ;;     (show yamap)))
 
 
-
-(defmethod show ((param t) &key)
-  (error "no applicable method SHOW for ~A" (type-of param)))
-
-(defmethod show ((param none) &key)
-  (tpl:content-block
-   (list :title (a-title param)
-         :content "Раздел находится в разработке")))
-
-(defmethod show ((param tpl) &key)
-  (tpl:content-block
-   (list :title (a-title param)
-         :content (format nil "~A" (funcall (a-val param))))))
-
-
-(defmethod show ((param grid) &key)
-  (let ((grid-id  (gensym "J"))
-        (pager-id (gensym "P"))
-        (col-names)
-        (col-model)
-        (col-replace))
-    (declare (special *popups*))
-    (loop :for infld :in (a-fields param) :collect
-       (cond ((equal 'fld (type-of infld))
-              (when (check-perm (a-show (a-perm infld)) (cur-user))
-                (push (a-title infld) col-names)
-                (let* ((in-name (a-name infld))
-                       (width   (a-width infld))
-                       (model `(("name"  . ,in-name)
-                                ("index" . ,in-name)
-                                ("width" . ,width)
-                                ("align" . ,(if (equal '(:num) (a-typedata infld))
-                                                "center"
-                                                "left"))
-                                ("sortable" . t)
-                                ("editable" . nil))))
-                  (push model col-model))))
-             ((equal 'btn (type-of infld))
-              (when (check-perm (a-perm infld) (cur-user))
-                (let* ((in-name "")
-                       (width   (a-width infld))
-                       (model `(("name"  . ,in-name)
-                                ("index" . ,in-name)
-                                ("width" . ,width)
-                                ("align" . "center")
-                                ("sortable" . nil)
-                                ("editable" . nil))))
-                  (push in-name col-names)
-                  (push model col-model))))
-             ((equal :calc (car infld))
-              (when (check-perm (getf infld :perm) (cur-user))
-                (let* ((in-name (getf infld :calc))
-                       (width   (getf infld :width))
-                       (model `(("name" . ,in-name)
-                                ("index" . ,in-name)
-                                ("width" . ,width)
-                                ("align" . "left")
-                                ("sortable" . t)
-                                ("editable" . nil))))
-                  (push in-name col-names)
-                  (push model col-model))))
-             ((equal :popbtn (car infld))
-              (when (check-perm (getf infld :perm) (cur-user))
-                (let* ((in-name "" #|(getf infld :popbtn)|#)
-                       (width   (getf infld :width))
-                       (model `(("name" . ,in-name)
-                                ("index" . ,in-name)
-                                ("width" . ,width)
-                                ("align" . "center")
-                                ("sortable" . nil)
-                                ("editable" . nil))))
-                  (push in-name col-names)
-                  (push model col-model)
-                  (let ((in-action (getf infld :action)))
-                    (push
-                     (list :id (getf infld :popbtn) :title (getf in-action :action) :content (show-act in-action) :left 200 :width 500)
-                     *popups*)))))
-             (t (error "show-grid unk fld" ))))
-    (tpl:content-block
-     (list :title   (a-title param)
-           :content (tpl:gridview
-                     (list :idgrid grid-id
-                           :idpager pager-id
-                           :json (replace-all
-                                  (json:encode-json-to-string
-                                   `(("url" . ,(format nil "/~A~A"
-                                                       (a-grid param)
-                                                       (if (a-param-id param) (format nil "/~A" (cur-id)) "")
-                                                       )) ;; absolute uri
-                                     ("datatype" . "json")
-                                     ("colNames" . ,(reverse col-names))
-                                     ("colModel" . ,(reverse col-model))
-                                     ("rowNum" . 10)
-                                     ("rowList" . (10 20 30))
-                                     ("pager" . ,(format nil "#~A" pager-id))
-                                     ("sortname" . "id")
-                                     ("viewrecords" . t)
-                                     ("sortorder" . "desc")
-                                     ("height" . ,(aif (a-height param) it "180"))
-                                     ("editurl" . "/edit_url")
-                                     ("gridComplete" . "-=|=-")
-                                     ("caption" . ,(a-title param))))
-                                  "\"-=|=-\"" ;; замена после кодирования в json - иначе никак не вставить js :)
-                                  (format nil "
-function(){
-  var ids = jQuery(\"#~A\").jqGrid('getDataIDs');
-  for(var i=0;i < ids.length;i++){
-    var cl = ids[i];
-    ~{~A~%~}
-  }
-}
-" grid-id (loop :for (in-name btn-str) :in (reverse col-replace) :collect
-             (format nil "jQuery(\"#~A\").jqGrid('setRowData',ids[i],{~A: ~A});"
-                     grid-id in-name btn-str)))
-                                  )))))))
-
-
 (defun show-act (act)
   (unless (check-perm (a-perm act) (cur-user) (a-val act))
     (return-from show-act ""))
-  (show act))
+  (show-block act)) ;; --> dispatcher show-block
 
 
 (defun show-acts (acts)
@@ -401,20 +133,19 @@ function(){
 
 
 (defmethod get-accessor-perm ((infld popbtn))
-  ;; (let* ((perm      (getf infld :perm))
-  ;;        (btn       (getf infld :popbtn))                ;; тут важно чтобы вычисление происходило вне лямбды
-  ;;        (value     (getf infld :value))                 ;; тут важно чтобы вычисление происходило вне лямбды
-  ;;        (accessor  (lambda (x)
-  ;;                     (declare (ignore x))
-  ;;                     (format nil "<input type='button' name='~A~~%|id|%' value='~A' onclick='ShowHide(\"~A\")' />"
-  ;;                             btn
-  ;;                             value
-  ;;                             btn))))
-  ;;   (push (cons accessor perm) field-cons))
-  (error "TODO-ERROR: generic method (get-accessor-perm (popbtn)) not implemented"))
+  (let* ((perm      (a-perm  infld))
+         (btn       (a-name  infld))                ;; тут важно чтобы вычисление происходило вне лямбды
+         (value     (a-value infld))                 ;; тут важно чтобы вычисление происходило вне лямбды
+         (accessor  (lambda (x)
+                      (declare (ignore x))
+                      (format nil "<input type='button' name='~A~~%|id|%' value='~A' onclick='ShowHide(\"~A\")' />"
+                              btn
+                              value
+                              btn))))
+    (values accessor perm)))
 
 
-;; (defmethod get-accessor-perm ((infld calc))
+(defmethod get-accessor-perm ((infld calc))
 ;;    (let* ((perm      (getf infld :perm))
 ;;           (calc      (getf infld :cacl))                  ;; тут важно чтобы вычисление происходило вне лямбды
 ;;           (func      (getf infld :func))                  ;; тут важно чтобы вычисление происходило вне лямбды
@@ -423,7 +154,7 @@ function(){
 
 
 (defmethod get-accessor-perm (infld)
-  (error "unk pager directive"))
+  (error (format nil "defmethod (get-accessor-perm (~A) not implemented)" (type-of inflf))))
 
 
 (defun pager (val fields page rows-per-page)

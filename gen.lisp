@@ -233,6 +233,18 @@
             (a-title param))))
 
 
+(defmethod gen ((param popbtn) &key entity-param)
+  (let* ((genid (string-downcase (symbol-name (gensym "P")))))
+    ;; output
+    (format nil "~%~25T (mi 'popbtn :name \"~A\" :width ~A :perm ~A :value \"~A\" ~%~31T :action ~A)"
+            genid
+            (aif (a-width param) it "200")
+            (bprint (a-perm param))
+            (a-title param)
+            (let ((action (eval (a-action param))))
+              (gen (ent-to-mi action))))))
+
+
 (with-open-file (out (path "defmodule.lisp") :direction :output :if-exists :supersede)
   ;; Required
   (format out "(in-package #:~A)"  (package-name *package*))
