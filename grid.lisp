@@ -145,7 +145,7 @@
     (values accessor perm)))
 
 
-(defmethod get-accessor-perm ((infld calc))
+;; (defmethod get-accessor-perm ((infld calc))
 ;;    (let* ((perm      (getf infld :perm))
 ;;           (calc      (getf infld :cacl))                  ;; тут важно чтобы вычисление происходило вне лямбды
 ;;           (func      (getf infld :func))                  ;; тут важно чтобы вычисление происходило вне лямбды

@@ -5,16 +5,15 @@
 (defmethod show-block ((param t) &key)
   (error "no applicable method SHOW-BLOCK for ~A" (type-of param)))
 
-;; (defmethod show-block ((param none) &key)
-;;   (tpl:content-block
-;;    (list :title (a-title param)
-;;          :content "Раздел находится в разработке")))
+(defmethod show-block ((param none) &key)
+  (tpl:content-block
+   (list :title (a-title param)
+         :content "Раздел находится в разработке")))
 
-;; (defmethod show-block ((param tpl) &key)
-;;   (tpl:content-block
-;;    (list :title (a-title param)
-;;          :content (format nil "~A" (funcall (a-val param))))))
-
+(defmethod show-block ((param tpl) &key)
+  (tpl:content-block
+   (list :title (a-title param)
+         :content (format nil "~A" (funcall (a-val param))))))
 
 (defmethod show-block ((param grid) &key)
   (let ((grid-id  (gensym "J"))

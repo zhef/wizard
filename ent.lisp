@@ -21,7 +21,6 @@
        (cons 'member ,(cons 'list (loop :for key :in typelist :by #'cddr :collect key))))
      (defparameter ,varname ',typelist)))
 
-
 ;; Возможные типы ресурсов: машины, материалы etc
 (define-user-type (resource-type *resource-types*)
   :machine "машина"
@@ -706,23 +705,13 @@
         :perm              :all
         :entity            supplier
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'SUPPLIER))  (cons-hash-list *USER*))
-        :fields            '((:fld      name)
+        :fields            '((:fld      name
+                              :xref     "supplier")
                              (:fld      actual-address)
                              (:btn      "Страница поставщика"
                               :perm     :all
                               :width    130
-                              :act      (to "/supplier/~A" (caar (form-data))))
-                             (:popbtn   "Отменить тендер"
-                              :perm     :all
-                              :action   '(:linear            "Действительно отменить?"
-                                          :perm               :all
-                                          :entity             tender
-                                          :fields             '((:btn "Подтверждаю отмену"
-                                                                 :perm :all
-                                                                 :act  (progn
-                                                                         (setf (a-status (gethash (cur-id) *TENDER*)) :cancelled)
-                                                                         (hunchentoot:redirect (hunchentoot:request-uri*)))))))
-                             ))))
+                              :act      (to "/supplier/~A" (caar (form-data))))))))
 
     ;; Страница поставщика
     (:place                supplier
@@ -758,16 +747,16 @@
                                        NAME JURIDICAL-ADDRESS ACTUAL-ADDRESS CONTACTS EMAIL SITE HEADS INN KPP OGRN BANK-NAME
                                        BIK CORRESP-ACCOUNT CLIENT-ACCOUNT ADDRESSES CONTACT-PERSON contact-phone contact-email)
                                      (hunchentoot:redirect (hunchentoot:request-uri*))))
-                             (:popbtn   "Отменить тендер"
-                              :perm     :all
-                              :action   '(:linear            "Действительно отменить?"
-                                          :perm               :all
-                                          :entity             tender
-                                          :fields             '((:btn "Подтверждаю отмену"
-                                                                 :perm :all
-                                                                 :act  (progn
-                                                                         (setf (a-status (gethash (cur-id) *TENDER*)) :cancelled)
-                                                                         (hunchentoot:redirect (hunchentoot:request-uri*)))))))
+                             ;; (:popbtn   "Отменить тендер"
+                             ;;  :perm     :all
+                             ;;  :action   '(:linear            "Действительно отменить?"
+                             ;;              :perm               :all
+                             ;;              :entity             tender
+                             ;;              :fields             '((:btn "Подтверждаю отмену"
+                             ;;                                     :perm :all
+                             ;;                                     :act  (progn
+                             ;;                                             (setf (a-status (gethash (cur-id) *TENDER*)) :cancelled)
+                             ;;                                             (hunchentoot:redirect (hunchentoot:request-uri*)))))))
                              ))))
     ;;                          ;; pricelist
     ;;                          (:grid              "Прайс-лист"

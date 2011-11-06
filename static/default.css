@@ -45,6 +45,11 @@ input[type="submit"] {
     background-color: #FFFFFF;
     border:1px solid #FF6600;
 }
+input[type="button"] {
+	padding:0 3px 0 3px !important;
+    background-color: #FFFFFF;
+    border:1px solid #FF6600;
+}
 label {
 	cursor:pointer;
 }

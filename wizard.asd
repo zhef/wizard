@@ -20,6 +20,8 @@
                (:file "grid")
                (:file "show-block")
                (:file "show-linear")
+               (:file "show-linear-elt")
+               (:file "show-grid")
                (:file "perm")
                (:file "defmodule")
                (:file "init")
