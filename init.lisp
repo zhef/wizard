@@ -269,14 +269,18 @@
   :title "Первая новость"
   :date  "07.11.2011"
   :photo-announce nil
-  :announce "Это текст первой новости")
+  :announce "Это текст анонса первой новости"
+  :text "Это текст первой новости")
 
 
 (push-hash *POST* 'POST
   :title "Вторая новость"
   :date  "07.11.2011"
   :photo-announce nil
-  :announce "Это текст второй новости")
+  :announce "Это текст анонса второй новости"
+  :text "Это текст второй новости")
+
+;; (clrhash *POST*)
 
 
 

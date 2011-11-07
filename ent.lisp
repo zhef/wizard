@@ -486,24 +486,23 @@
         :perm              :all
         :entity            post
         :val               (cons-hash-list *POST*)
-        :fields            '((:fld   title
-                              :xref  "post")
+        :fields            '((:fld   title)
                              (:fld   date)
                              (:fld   photo-announce)
                              (:fld   announce)))))
 
-    ;; ;; Новость
-    ;; (:place                post
-    ;;  :url                  "/post/:id"
-    ;;  :actions
-    ;;  '((:linear            "Тут будет подставляться заголовок новости или просто оставить пустую строку"
-    ;;     :perm              :all
-    ;;     :entity            post
-    ;;     :val               (gethash (cur-id) *POST*)
-    ;;     :fields            '((:fld title)
-    ;;                          (:fld date)
-    ;;                          (:fld photo-text)
-    ;;                          (:fld text)))))
+    ;; Новость
+    (:place                post
+     :url                  "/post/:id"
+     :actions
+     '((:post              "%|title|%"
+        :perm              :all
+        :entity            post
+        :val               (gethash (cur-id) *POST*)
+        :fields            '((:fld title)
+                             (:fld date)
+                             (:fld photo-text)
+                             (:fld text)))))
 
 
     ;; Аналитика

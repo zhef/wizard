@@ -610,6 +610,13 @@ If objs are of different classes the result is NIL."
 
 (with-defclass (announce (action)))
 
+(with-defclass (post (action))
+  (date "")
+  (photo-announce nil)
+  (announce "")
+  (photo-text nil)
+  (text ""))
+
 
 ;; CLASS YAPOINT
 (with-defclass (yapoint ())

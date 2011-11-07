@@ -720,7 +720,7 @@
 {/template}
 
 
-{template announce}
+{template postannounce}
   <table border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px; font-size: 12px;">
     <tr>
       <td>
@@ -738,6 +738,32 @@
     </tr>
   </table>
 {/template}
+
+
+{template posttext}
+  <table width="80%" border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px; font-size: 12px;">
+    <tr>
+      <td>
+        <h1 style="font-size:32px">{$title}</h1>
+      </td>
+      <td width="1" align="right">
+        {$date}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        &nbsp;
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">{$phototext}</td>
+    </tr>
+    <tr>
+      <td colstan="2">{$text}</td>
+    </tr>
+  </table>
+{/template}
+
 
 
 {template contacts}

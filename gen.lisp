@@ -189,6 +189,18 @@
                      (gen fld :entity-param (a-entity param))))))
 
 
+(defmethod gen ((param post) &key entity-param)
+  (format nil "~%~14T (mi 'post :title ~A ~%~20T :perm '~A ~%~20T :val ~A ~%~20T :fields ~A)"
+          (bprint (a-title param))
+          (bprint (a-perm param))
+          (format nil "(named-lambda ~A () ~A)"
+                  (symbol-name (gensym "ACTNL-"))
+                  (bprint (a-val param)))
+          (format nil "(list ~{~A~})"
+                  (loop :for fld :in (eval (a-fields param)) :collect
+                     (gen fld :entity-param (a-entity param))))))
+
+
 
 ;; dispatcher -->
 (defmethod gen ((param list) &key entity-param)
