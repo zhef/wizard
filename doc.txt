@@ -151,3 +151,6 @@ Gregor Kiczales and Andreas Paepcke - ИМХО, более хорошее вве
 [01:15] LinkFly> rigidus: разобрался с буфером? Тм очень просто: ? -
 описание команд. Можно выделить несколько потоков, как обычно
 выделяешь текст, нажать k - и они убьются, достаточно удобно.
+
+[22:40] zeldan@jabber.ru> https://github.com/Zeldan,
+sbushnjak@gmail.com для почты и чата...

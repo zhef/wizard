@@ -164,6 +164,14 @@
          (cnt-rows         (length rows))
          (slice-cons)      ;; many of (id . #<object>)
          (field-cons))     ;; manu of (#<function-accessor> . plist-permlist)
+    ;; если запрос с поиском - отфильтровываем из rows объекты, не подходящие под фильтр
+    (when (equal "true" (hunchentoot:get-parameter "_search"))
+      (flet ((fltr (x) (grid-fltr-op
+                        (intern (string-upcase (hunchentoot:get-parameter "searchOper")) :keyword)
+                        (hunchentoot:get-parameter "searchString")
+                        (funcall (intern (format nil "A-~A" (hunchentoot:get-parameter "searchField")) :wizard)
+                                 (cdr x)))))
+      (setf rows (remove-if-not #'fltr rows))))
     ;; slice-cons (overloop) - выбираем те объекты, которые попадают на страницу
     (loop :for num :from (* page rows-per-page) :below (* (+ 1 page) rows-per-page) :do
        (let ((row (nth num rows)))
