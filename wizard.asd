@@ -18,6 +18,7 @@
                (:file "ent")
                (:file "gen")
                (:file "grid")
+               (:file "grid-fltr")
                (:file "show-block")
                (:file "show-linear")
                (:file "show-linear-elt")

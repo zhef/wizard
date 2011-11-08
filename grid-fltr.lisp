@@ -2,8 +2,8 @@
 
 (defmethod grid-fltr-op ((op (eql :eq)) etalon sample)
   "равно"
-  (equal (string-trim '(#\Space #\Tab #\Newline) etalon)
-         (string-trim '(#\Space #\Tab #\Newline) sample)))
+  (equal (string-downcase (string-trim '(#\Space #\Tab #\Newline) etalon))
+         (string-downcase (string-trim '(#\Space #\Tab #\Newline) sample))))
 
 (defmethod grid-fltr-op ((op (eql :ne)) etalon sample)
   "не равно"
@@ -11,8 +11,8 @@
 
 (defmethod grid-fltr-op ((op (eql :bw)) etalon sample)
   "начинается с"
-  (equal 0 (search (string-trim '(#\Space #\Tab #\Newline) etalon)
-                   (string-trim '(#\Space #\Tab #\Newline) sample))))
+  (equal 0 (search (string-downcase (string-trim '(#\Space #\Tab #\Newline) etalon))
+                   (string-downcase(string-trim '(#\Space #\Tab #\Newline) sample)))))
 
 (defmethod grid-fltr-op ((op (eql :bn)) etalon sample)
   "не начинается с"
@@ -28,8 +28,8 @@
 
 (defmethod grid-fltr-op ((op (eql :cn)) etalon sample)
   "содержит"
-  (if (search (string-trim '(#\Space #\Tab #\Newline) etalon)
-              (string-trim '(#\Space #\Tab #\Newline) sample))
+  (if (search (string-downcase (string-trim '(#\Space #\Tab #\Newline) etalon))
+              (string-downcase (string-trim '(#\Space #\Tab #\Newline) sample)))
       t
       nil))
 
