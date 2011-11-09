@@ -500,18 +500,16 @@
     <table id="{$idgrid}"></table>
     <div id="{$idpager}"></div>
     <script type="text/javascript">
-      jQuery('#{$idgrid}').jqGrid({$json |noAutoescape});
-      jQuery('#{$idgrid}').jqGrid('navGrid','#{$idpager}',{lb}edit:false,add:false,del:false{rb});
-      /* jQuery('#{$idgrid}').searchGrid({lb}sopt:['eq','ne','bw','bn','ew','en','cn','nc']{rb}); */
-      /* jQuery('#{$idgrid}').jqGrid('searchGrid', */
-      /* {lb} */
-      /* sopt:['eq','ne','bw','bn','ew','en','cn','nc'], */
-      /* drag: false, */
-      /* closeOnEscape: true, */
-      /* showOnLoad: false */
-      /* {rb}); */
-
-
+      jQuery("#{$idgrid}").jqGrid({$json |noAutoescape}).navGrid('#{$idpager}',{lb}edit:false,add:false,del:false{rb},
+        {lb}{rb}, // use default settings for edit
+        {lb}{rb}, // use default settings for add
+        {lb}{rb},  // delete instead that del:false we need this
+        {lb}
+          closeOnEscape : true,
+          sopt          : ['eq','ne','bw','bn','ew','en','cn','nc']
+        {rb}, // enable the advanced searching
+        {lb}{rb} // use default settings for view
+        );
     </script>
   </div>
 {/template}

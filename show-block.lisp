@@ -52,13 +52,6 @@
                                      ("editurl" . "/edit_url")
                                      ("gridComplete" . "-=|=-")
                                      ("caption" . ,(a-title param))
-                                     ;; ("search" . ((caption . "Search")
-                                     ;;              (Find . "Find")
-                                     ;;              (Reset . "Reset")
-                                     ;;              (odata . ("equal"  "not equal"))
-                                     ;;              (matchText . " match")
-                                     ;;              (rulesText . " rules")
-                                     ;;              ))
                                      ))
                                   "\"-=|=-\"" ;; замена после кодирования в json - иначе никак не вставить js :)
                                   (format nil "
