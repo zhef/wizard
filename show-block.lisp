@@ -51,7 +51,15 @@
                                      ("height" . ,(aif (a-height param) it "180"))
                                      ("editurl" . "/edit_url")
                                      ("gridComplete" . "-=|=-")
-                                     ("caption" . ,(a-title param))))
+                                     ("caption" . ,(a-title param))
+                                     ;; ("search" . ((caption . "Search")
+                                     ;;              (Find . "Find")
+                                     ;;              (Reset . "Reset")
+                                     ;;              (odata . ("equal"  "not equal"))
+                                     ;;              (matchText . " match")
+                                     ;;              (rulesText . " rules")
+                                     ;;              ))
+                                     ))
                                   "\"-=|=-\"" ;; замена после кодирования в json - иначе никак не вставить js :)
                                   (format nil "
 function(){
@@ -65,6 +73,8 @@ function(){
              (format nil "jQuery(\"#~A\").jqGrid('setRowData',ids[i],{~A: ~A});"
                      grid-id in-name btn-str)))
                                   )))))))
+
+
 
 
 (defmethod show-block ((param linear) &key)
