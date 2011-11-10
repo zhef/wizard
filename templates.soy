@@ -2,29 +2,34 @@
 
 {namespace tpl}
 
-
 {template root}
-  <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">{\n}
-  <html xml:lang="ru-ru" xmlns="http://www.w3.org/1999/xhtml" lang="ru-ru" xmlns:vml="urn:schemas-microsoft-com:vml">{\n}
+  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">{\n}
+  <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru-ru" xmlns:vml="urn:schemas-microsoft-com:vml">{\n}
     <head>{\n}
-      <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-      <script src="http://api-maps.yandex.ru/1.1/index.xml?key={$mapkey}" type="text/javascript"></script>
-      <link rel="stylesheet" href="/default.css" type="text/css" />{\n}
-      <link rel="stylesheet" href="/unique.css" type="text/css" />{\n}
-      <link rel="stylesheet" href="/content.css" type="text/css" />{\n}
-      <link rel="stylesheet" href="/general.css" type="text/css" />{\n}
-      <link rel="stylesheet" href="/templateBanner.css" type="text/css" />{\n}
-      <script type="text/javascript" src="/general.js"></script>{\n}
-      <meta http-equiv="content-type" content="text/html; charset=UTF-8" />{\n}
+	  <meta http-equiv="content-type" content="text/html; charset=utf-8" />{\n}
+      <meta name="viewport" content="initial-scale=1.0, user-scalable=no" /><!-- YandexMaps recommended fix -->{\n}
+	  <title>{$headtitle}</title>{\n}
+	  <meta name="keywords" content="" />{\n}
+	  <meta name="description" content="" />{\n}
       <meta name="robots" content="index, follow" />{\n}
-      <title>{$headtitle}</title>
+	  <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen, projection" />{\n}
+   	  <link rel="stylesheet" href="css/print.css" type="text/css" media="print" />{\n}
+   	  <link rel="stylesheet" href="css/typograf.css" type="text/css" media="screen, projection" />{\n}
+   	  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen, projection" />{\n}
+      <!--[if IE 6]>{\n}
+	  <link rel="stylesheet" href="css/ie6.css" type="text/css" media="screen, projection" />{\n}
+	  <![endif]-->{\n}
+      <!-- YandexMaps -->{\n}
+      <script src="http://api-maps.yandex.ru/1.1/index.xml?key={$mapkey}" type="text/javascript"></script>{\n}
+      <!-- RSS -->{\n}
       <link href="/index.php?format=feed&amp;type=rss" rel="alternate" type="application/rss+xml" title="RSS 2.0" />{\n}
       <link href="/index.php?format=feed&amp;type=atom" rel="alternate" type="application/atom+xml" title="Atom 1.0" />{\n}
+      <!-- Favicon -->{\n}
       <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />{\n}
-      <!-- jquery -->
+      <!-- JQuery -->
       <script type="text/javascript" src="/jquery-1.6.2.min.js"></script>{\n}
       <script type="text/javascript" src="/jquery-ui-1.8.16.custom.min.js"></script>{\n}
-      <link rel="stylesheet" type="text/css" media="screen" href="/jquery-ui-1.8.16.custom.min.css">{\n}
+      <link rel="stylesheet" type="text/css" media="screen" href="/jquery-ui-1.8.16.custom.min.css" />{\n}
       <!-- fix images -->
       <link rel="stylesheet" type="text/css" media="screen" href="/jquery-ui-1.8.1.custom.css" />{\n}
       <!-- legacy -->
@@ -38,9 +43,369 @@
       <script src="/jquery.jqGrid.min.js" type="text/javascript"></script>{\n}
       <!-- my -->
       <script src="/my.js" type="text/javascript"></script>{\n}
-      <style>{\n}
-        html, body {sp}{lb}{sp} margin: 0; padding: 0; font-size: 75%; {sp}{rb}{sp} {\n}
-      </style>{\n}
+    </head>
+    <body>
+      <div class="banner_top"></div>
+      <div class="wraper">
+        <div id="header">
+          <a href="index.html"><span class="logo"></span></a>
+          <div class="autorisation">
+            <!--
+               <div class="enter">
+                 <a class="key dot" href="#"><span>Вход</span></a>| <a href="#">Регистрация</a>
+               </div>
+               -->
+            <div class="cabinet">
+              <a href="#" class="right">Выйти</a>
+              <strong>Вы вошли как:</strong>
+              <a href="#">ОАО Трансгенерирующая компания “Сибирь - СтройИнвест холдинг” </a>
+            </div>
+          </div>
+          <div class="search corners">
+            <form action="/search" method="post" class="searh">
+              <input type="text" name="text" value="Быстрый поиск" maxlength="128" />
+              <select size="1" name="spisok">
+                <option value="all">везде</option>
+                <option value="tender">по тендерам</option>
+                <option value="builder">по застройщикам</option>
+                <option value="supplier">по поставщикам</option>
+                <option value="matherials">по материалам</option>
+                <option value="tech">по технологиям</option>
+              </select>
+              <button type="button" name="test" id="test">Искать</button>
+            </form>
+            <!--
+               <span class="left">например <a href="#">пескосоляная смесь</a></span>
+               <span class="right">или воспользуйтесь <a href="#">расширенным поиском</a></span>
+               -->
+            <em class="tl"></em><em class="tr"></em><em class="bl"></em><em class="br"></em>
+          </div>
+        </div>
+        <div class="tools_menu">
+          <span class="fast">
+            <span></span>
+            <a class="new_tender" href="#">Объявить тендер</a>
+            <a class="kotirovki" href="#">Запросить котировку</a>
+          </span>
+          <a class="help" href="#">Помощь</a>
+          <a class="board" href="#">Доска объявлений</a>
+          <a class="services" href="#">О портале</a>
+          <a class="action" href="#">Акции</a>
+          <a class="rating" href="#">Рейтинги</a>
+        </div>
+        <div id="container">
+          <div id="content">
+            <div class="news_list">
+              <a href="news_list.html" class="right">Все новости</a>
+              <h2><img src="img/icons/rss_add.png" alt="" /> Новости строительной индустрии </h2>
+              <table>
+                <tr>
+                  <th colspan="2">Сегодня, 08 ноября 2011</th>
+                </tr>
+                <tr>
+                  <td>14:56</td>
+                  <td>
+                    <img src="img/trash/183208801_6.jpg" alt="Картинка в новости" />
+                    <a href="news.html">Построен новый жилой комплекс в Купчино в соотвествии с новыми трендами и ГОСТами.</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>13:42</td>
+                  <td>
+                    <img src="img/trash/1.jpg" alt="Картинка в новости" />
+                    <a href="news.html">В Каргополе прошел ежегодный конкурс архитекторов-самоучек "СамСебеАрхитектор'2011"</a></td>
+                </tr>
+                <tr>
+                  <td>12:30</td>
+                  <td>
+                    <a href="news.html">Это текст анонса новости, который не сопровождается изображением</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>10:25</td>
+                  <td>
+                    <img src="img/trash/smeta_stroitelnykh_rabot.jpg" alt="Картинка в новости" />
+                    <a href="news.html">
+                      Разработка нового закона о кладке кирпичей может нанести существенные убытки печникам Центрального района
+                      России
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div class="banner_center"></div>
+            <div class="news_law">
+              <a href="news_law.html" class="right">Все новости</a>
+              <h2><img src="img/icons/rss_add.png" alt="" /> Новости законодательства</h2>
+              <table>
+                <tr>
+                  <td>08.11.2011</td>
+                  <td>
+                    <a href="news.html">
+                      Поправки к закону №345-23 87 от 23 марта 1987 года "О возведении усадьб в черте города"
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>07.11.2011</td>
+                  <td>
+                    <a href="news.html">
+                      Новый пакет нормативных документов по закупке стройматериалов на черном рынке
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>29.10.2011</td>
+                  <td>
+                    <a href="news.html">
+                      С ноября вступает в силу закон "О вольном наеме граждан из Северной Кореи" №32453-2010 от 13 октября 2011 года
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div class="action">
+              <a href="news_list.html" class="right">Все акции</a><h2><img src="img/icons/rss_add.png" alt="" /> Акции, скидки и предложения</h2>
+              <table>
+                <tr>
+                  <td>
+                    <img src="img/trash/file-roller.png" alt="" />
+                    <h3>Акция от компании "Невастрой"</h3>
+                    <a href="news.html">
+                      Комплект включает в себя материалы, значительный набор крепежа, полный ассортимент торцевых шпонок. Доставка
+                      бесплатно
+                    </a>
+                  </td>
+                  <!--
+                     <td>
+                       <img src="img/trash/navigation-right-button_basic_red.png" alt="Картинка в новости" />
+                     </td>
+                     -->
+                </tr>
+                <tr>
+                  <td>
+                    <img src="img/trash/cad.png" alt="" />
+                    <h3>Сезонное предложение от "КирпичПром"</h3>
+                    <a href="news.html">
+                      При покупке 5000 шт. Вам предоставляется еще 100 шт. бесплатно
+                    </a>
+                  </td>
+                  <!--
+                     <td>
+                       <img src="img/trash/hard-drive-download_sticker.png" alt="Картинка в новости" />
+                     </td>
+                     -->
+                </tr>
+                <tr>
+                  <td>
+                    <img src="img/trash/561612.jpg" alt="" />
+                    <h3>Распродажа со складов "ГипроРусь"</h3>
+                    <a href="news.html">
+                      Беспрецендентное предложени - гипсокартон по цене туалетной бумаги. До 3000 листов в одни руки. Скидки
+                      постоянным покупателям. Самовывоз. Оплата по безналу.
+                    </a>
+                  </td>
+                  <!--
+                     <td>
+                       <img src="img/trash/icq_protoco2l.png" alt="Картинка в новости" />
+                     </td>-->
+                </tr>
+              </table>
+            </div>
+            <div class="new_company">
+              <a href="#" class="right">Все новые поставщики</a>
+              <h2>Обновления в каталоге поставщиков</h2>
+              <table>
+                <tr>
+                  <td>
+                    <h3>
+                      <a href="#">ОАО "Росинка"</a>
+                    </h3>
+                    <span>В разделе:</span>
+                    <a href="#">Каркасные конструкции</a>,
+                    <a href="#">Кирпич</a>,
+                    <a href="#">Вентиляторы.</a></td>
+                </tr>
+                <tr>
+                  <td>
+                    <h3>
+                      <a href="#">ЗАО "СургутБетон - дистрибьютед"</a>
+                    </h3>
+                    <span>В разделе:</span>
+                    <a href="#">Сендвич-панели</a>,
+                    <a href="#">Бетон</a>,
+                    <a href="#">Арматура</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <h3>
+                      <a href="#">ИП Печкин А.И.</a>
+                    </h3>
+                    <span>В разделе:</span>
+                    <a href="#">Металлочерепица</a>,
+                    <a href="#">Строительные работы</a>,
+                    <a href="#">Печные работы</a>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div class="new_tech">
+              <a href="#" class="right">Все технологии</a>
+              <h2>Технологии</h2>
+              <table>
+                <tr>
+                  <td>23.10.2011</td>
+                  <td>
+                    <h3>Открывая двери - сохраняем тепло!</h3>
+                    <a href="#">
+                      Технология аккумуляции тепла в отдельном помещении за счет применения кинетической энергии при открывании
+                      дверей
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>12.10.2011</td>
+                  <td>
+                    <h3>Кирпич-долгожитель</h3>
+                    <a href="#">
+                      Новый тип кирпичей. Теперь кирпич может прослужить до 1000 лет. Огнеупорен и морозоустойчив. Применена новая
+                      технология обжига.
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>04.10.2011</td>
+                  <td>
+                    <h3>Новый типовой проект (№2002) жилого дома</h3>
+                    <a href="#">
+                      Разработан новый типовой проект жилого дома. Проект отличается простотой монтажа, устойчивостью к
+                      сейсмоактивности и высоким температурам.
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <!--
+               <div class="raiting_company left">
+                 <h2>Рейтинг компаний</h2>
+                 <table>
+                   <tr>
+                     <td>ЗАО "МоскоуПрезент"</td>
+                     <td>*****</td>
+                   </tr>
+                   <tr>
+                     <td>ОАО "Питерские Печные Работы"</td>
+                     <td>****</td>
+                   </tr>
+                   <tr>
+                     <td>ЗАО "СтройИнвест ОптТорг РетейлГрупп Охтинские Мастера"</td>
+                     <td>******</td>
+                   </tr>
+                 </table>
+               </div>
+               -->
+	      </div>
+        </div>
+        <div class="sidebar" id="left">
+	      <ul id="menu">
+            <li><a href="#">Главная</a></li>
+            <li><a href="#">Поставщики</a></li>
+            <li><a href="#">Каталог продукции</a></li>
+            <li><a href="#">Строительная техника</a></li>
+            <li>Новости</li>
+            <li><a href="#">Аналитика</a></li>
+            <li><a href="#">Технологии</a></li>
+	        <li><a href="#">Календарь событий</a></li>
+          </ul>
+          <div class="banner_left"></div>
+          <div class="tender_day corners">
+            <h1>Тендер дня</h1>
+            <strong><a href="#">Ремонт кровли ГДОУ Детский сад №56 Выборгского района Санкт-Петербург</a></strong>
+            <i>Открытый аукцион в электронной форме</i>
+            <table cellpadding="0" cellspacing="0">
+              <tr>
+                <td><p>Начало:</p></td>
+                <td>20.10.2011 <img src="img/icons/today.png" width="45" height="12" alt="Сегодня" /></td>
+              </tr>
+              <tr>
+                <td><p>Окончание:</p></td>
+                <td>27.10.2011</td>
+              </tr>
+            </table>
+            <span><a class="all_tender" href="#">Все тендеры</a></span>
+            <em class="tl"></em><em class="tr"></em><em class="bl"></em><em class="br"></em>
+          </div>
+        </div>
+        <div class="sidebar" id="right">
+          <style>
+            #content {lb}padding-right: 260px;{rb}
+            #right {lb}
+   	        float: left;
+	        width: 220px;
+	        margin-left: -240px;
+            margin-top: 10px;
+	        position: relative;
+            {rb}
+          </style>
+	      <div class="expert corners">
+            <h1>Мнение эксперта</h1>
+            <img src="img/experts/1.png" width="70" height="53" alt="Виталий Мутько" />
+            <span class="name">Виталий Мутько</span>
+            <span class="position">Министр спорта, туризма и молодежной политики России. Председатель орг.комитета "Россия-2018""</span>
+            <p>Если кто считает, что принесет в федеральное правтиельство новую программу, где ее без проблем подпишут, то сильно ошибается.</p>
+            <a class="right" href="#">Подробнее</a>
+            <em class="tl"></em><em class="tr"></em><em class="bl"></em><em class="br"></em>
+          </div>
+          <div class="banner_right"></div>
+          <div class="gray corners">
+            <div class="euro">
+              <h1>Курсы валют</h1>
+              <table>
+                <tr>
+                  <td><strong>&euro;</strong></td>
+                  <td>40.035 <span class="up">+0.045</span></td>
+                </tr>
+                <tr>
+                  <td><strong>$</strong></td>
+                  <td>32.056 <span class="down">-0.121</span></td>
+                </tr>
+                <tr>
+                  <td><strong>&pound;</strong></td>
+                  <td>43.361 <span class="up">+0.357</span></td>
+                </tr>
+              </table>
+            </div>
+            <em class="tl"></em><em class="tr"></em><em class="bl"></em><em class="br"></em>
+          </div>
+        </div>
+        <span class="footer_reserve"></span>
+      </div>
+      <div id="footer">
+        <ul>
+          <li><a href="#">Главная</a></li>
+          <li><a href="#">Техническая поддержка</a></li>
+          <li><a href="#">Подписка</a></li>
+          <li><a href="#">Реклама</a></li>
+          <li><a href="#">О портале</a></li>
+          <li><a href="#">Помощь</a></li>
+        </ul>
+        <span class="copyright left">2010 &mdash; 2011 (c) <strong>ГдеСтройТорг.ру</strong> <br />&mdash; <a href="#">Единая система поиска поставщиков</a></span>
+        <span class="copyright right"><strong>При поддержке:</strong><br/><a href="www.ktostroit.ru"><img src="img/ktostroit.png" width="133" height="31" alt="" /></a></span> </div>
+
+    </body>
+  </html>
+{/template}
+
+
+{template old}
+      <link rel="stylesheet" href="/default.css" type="text/css" />{\n}
+      <link rel="stylesheet" href="/unique.css" type="text/css" />{\n}
+      <link rel="stylesheet" href="/content.css" type="text/css" />{\n}
+      <link rel="stylesheet" href="/general.css" type="text/css" />{\n}
+      <link rel="stylesheet" href="/templateBanner.css" type="text/css" />{\n}
+      <script type="text/javascript" src="/general.js"></script>{\n}
+      <title>{$headtitle}</title>
     </head>{\n}
     <body>{\n}
 
