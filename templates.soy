@@ -12,12 +12,12 @@
 	  <meta name="keywords" content="" />{\n}
 	  <meta name="description" content="" />{\n}
       <meta name="robots" content="index, follow" />{\n}
-	  <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen, projection" />{\n}
-   	  <link rel="stylesheet" href="css/print.css" type="text/css" media="print" />{\n}
-   	  <link rel="stylesheet" href="css/typograf.css" type="text/css" media="screen, projection" />{\n}
-   	  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen, projection" />{\n}
+	  <link rel="stylesheet" href="/css/reset.css" type="text/css" media="screen, projection" />{\n}
+   	  <link rel="stylesheet" href="/css/print.css" type="text/css" media="print" />{\n}
+   	  <link rel="stylesheet" href="/css/typograf.css" type="text/css" media="screen, projection" />{\n}
+   	  <link rel="stylesheet" href="/css/style.css" type="text/css" media="screen, projection" />{\n}
       <!--[if IE 6]>{\n}
-	  <link rel="stylesheet" href="css/ie6.css" type="text/css" media="screen, projection" />{\n}
+	  <link rel="stylesheet" href="/css/ie6.css" type="text/css" media="screen, projection" />{\n}
 	  <![endif]-->{\n}
       <!-- YandexMaps -->{\n}
       <script src="http://api-maps.yandex.ru/1.1/index.xml?key={$mapkey}" type="text/javascript"></script>{\n}
@@ -27,39 +27,30 @@
       <!-- Favicon -->{\n}
       <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />{\n}
       <!-- JQuery -->
-      <script type="text/javascript" src="/jquery-1.6.2.min.js"></script>{\n}
-      <script type="text/javascript" src="/jquery-ui-1.8.16.custom.min.js"></script>{\n}
-      <link rel="stylesheet" type="text/css" media="screen" href="/jquery-ui-1.8.16.custom.min.css" />{\n}
+      <script type="text/javascript" src="/js/jquery-1.6.2.min.js"></script>{\n}
+      <script type="text/javascript" src="/js/jquery-ui-1.8.16.custom.min.js"></script>{\n}
+      <link rel="stylesheet" type="text/css" media="screen" href="/css/jquery-ui-1.8.16.custom.css" />{\n}
       <!-- fix images -->
-      <link rel="stylesheet" type="text/css" media="screen" href="/jquery-ui-1.8.1.custom.css" />{\n}
-      <!-- legacy -->
-      <link rel="stylesheet" href="/jextcurrency.css" type="text/css" />{\n}
-      <script type="text/javascript" src="/video.js"></script>{\n}
-      <script type="text/javascript" src="/mootools.js"></script>{\n}
-      <script type="text/javascript" src="/caption.js"></script>{\n}
+      <link rel="stylesheet" type="text/css" media="screen" href="/css/jquery-ui-1.8.1.custom.css" />{\n}
       <!-- jqgrid -->
-      <link rel="stylesheet" type="text/css" media="screen" href="/ui.jqgrid.css" />{\n}
-      <script src="/grid.locale-ru.js" type="text/javascript"></script>{\n}
-      <script src="/jquery.jqGrid.min.js" type="text/javascript"></script>{\n}
+      <link rel="stylesheet" type="text/css" media="screen" href="/css/ui.jqgrid.css" />{\n}
+      <script type="text/javascript" src="/js/grid.locale-ru.js"></script>{\n}
+      <script type="text/javascript" src="/js/jquery.jqGrid.min.js"></script>{\n}
       <!-- my -->
-      <script src="/my.js" type="text/javascript"></script>{\n}
+      <script src="/js/my.js" type="text/javascript"></script>{\n}
     </head>
     <body>
+
+      {foreach $popup in $popups}
+        {call popup data="$popup" /}
+      {/foreach}
+
       <div class="banner_top"></div>
       <div class="wraper">
         <div id="header">
           <a href="index.html"><span class="logo"></span></a>
           <div class="autorisation">
-            <!--
-               <div class="enter">
-                 <a class="key dot" href="#"><span>Вход</span></a>| <a href="#">Регистрация</a>
-               </div>
-               -->
-            <div class="cabinet">
-              <a href="#" class="right">Выйти</a>
-              <strong>Вы вошли как:</strong>
-              <a href="#">ОАО Трансгенерирующая компания “Сибирь - СтройИнвест холдинг” </a>
-            </div>
+            {$personal |noAutoescape}
           </div>
           <div class="search corners">
             <form action="/search" method="post" class="searh">
@@ -409,117 +400,9 @@
     </head>{\n}
     <body>{\n}
 
-      <!-- div class="main" id="main">{\n}
-        <div class="bannerTop">{\n}
-          <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"{\n}
-                  codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0"{\n}
-                  height="90"{\n}
-                  width="970"{\n}
-                  border="0">{\n}
-			<param name="movie"{\n}
-                   value="http://gdetorg.ru/images/banners/fce0fe9db7e465113e59b2c5225e70f4.swf" />{\n}
-            <embed src="/fce0fe9db7e465113e59b2c5225e70f4.swf"{\n}
-                   loop="false"{\n}
-                   pluginspage="http://www.macromedia.com/go/get/flashplayer"{\n}
-                   type="application/x-shockwave-flash"{\n}
-                   height="90"{\n}
-                   width="970" />{\n}
-		  </object>{\n}
-        </div -->{\n}
 
-        <div class="header">{\n}
-
-          <div class="syslinks">{\n}
-            <span>{\n}
-              <a href="/"{\n}
-                 title="ГдеСтройТорг.ру"{\n}
-                 onclick="setThisHomePage(); return false;">{\n}
-                <img src="i_files/make_startup.png" />{\n}
-              </a>{\n}
-              <a href="/"{\n}
-                 title="ГдеСтройТорг.ру"{\n}
-                 onclick="try{lb}window.external.AddFavorite(this.href, this.title); return false;{rb}{sp} catch(e) {lb}{rb}"{\n}
-                 rel="sidebar">{\n}
-                <img src="/add_favorite.png" alt="добавить в избранное" />{\n}
-              </a>{\n}
-              <a href="#">{\n}
-                <img src="/rss.png" />{\n}
-              </a>{\n}
-              <div style="position: relative; top: 15px">
-                {$personal |noAutoescape}
-              </div>
-            </span>{\n}
-          </div><!-- syslinks -->{\n}
-
-          <div class="headerMainBlock">{\n}
-
-            <div class="headerLogoBox">{\n}
-              <a href="/">{\n}
-                <img src="/logo.png" alt="" />{\n}
-              </a>{\n}
-              <span>{\n}
-                Единый строительный портал Cеверо-Запада{\n}
-              </span>{\n}
-            </div><!-- headerLogoBox -->{\n}
-
-            <div class="headerHorzMenuBlock">{\n}
-              <div>{\n}
-                <table width="100%" border="0" cellpadding="0" cellspacing="1">{\n}
-                  <tbody>{\n}
-                    <tr>{\n}
-                      <td nowrap="nowrap">{\n}
-                        <div class="mainlevel">{\n}
-                          <div class="horzmenu_item_left"></div>{\n}
-                          <div class="horzmenu_item_center">{\n}
-                            <a href="#newtender">Объявить тендер</a>{\n}
-                          </div>{\n}
-                          <div class="horzmenu_item_right"></div>{\n}
-                          <div style="clear: both;"></div>{\n}
-                        </div>{\n}
-                        <div class="mainlevel">{\n}
-                          <div class="horzmenu_item_left">{\n}
-                          </div>{\n}
-                          <div class="horzmenu_item_center">{\n}
-                            <a href="#ratings">Рейтинги</a>{\n}
-                          </div>{\n}
-                          <div class="horzmenu_item_right"></div>{\n}
-                          <div style="clear: both;"></div>{\n}
-                        </div>{\n}
-                        <div class="mainlevel">{\n}
-                          <div class="horzmenu_item_left">{\n}
-                          </div>{\n}
-                          <div class="horzmenu_item_center">{\n}
-                            <a href="#bonuses">Акции</a>{\n}
-                          </div>{\n}
-                          <div class="horzmenu_item_right"></div>{\n}
-                          <div style="clear: both;"></div>{\n}
-                        </div>{\n}
-                        <div class="mainlevel">{\n}
-                          <div class="horzmenu_item_left"></div>{\n}
-                          <div class="horzmenu_item_center">{\n}
-                            <a href="#services">Услуги портала</a>{\n}
-                          </div>{\n}
-                          <div class="horzmenu_item_right"></div>{\n}
-                          <div style="clear: both;"></div>{\n}
-                        </div>{\n}
-                      </td>{\n}
-                    </tr>{\n}
-                  </tbody>{\n}
-                </table>{\n}
-              </div>{\n}
-              <div class="headerHorzMenuBlockLine"></div>{\n}
-            </div><!-- headerHorzMenuBlock -->{\n}
-            <div style="clear: both;"></div>{\n}
-
-          </div> <!-- headerMainBlock -->{\n}
-
-        </div><!-- header -->{\n}
 
         <div class="body">{\n}
-
-          {foreach $popup in $popups}
-            {call popup data="$popup" /}
-          {/foreach}
 
           <div class="sidebarR">{\n}
 
@@ -773,45 +656,26 @@
 
 
 {template loginform}
-  <div class="headerPersonalBox italic personEnter">{\n}
-    <a class="icoLink showAuth"{\n}
-       href="http://gdetorg.ru/component/user/login?backurl=%2Findex.php">{\n}
-      <img src="/ico_key.png" alt="" />{\n}
-    </a>{\n}
-    <a class="dashedLink showAuth" href="#"{\n}
-       onclick="ShowHide('popupLogin'); return false;">Вход</a>{\n}
-    <span>|</span>{\n}
-    <a href="#"{\n}
-       onclick="ShowHide('trest'); return false;">{\n}
-      Регистрация{\n}
-    </a>{\n}
-  </div>{\n}
+  <div class="enter">
+    <a class="key dot" href="#" onclick="ShowHide('popupLogin'); return false;">
+      <span>Вход</span>
+    </a>|
+    <a href="#" onclick="ShowHide('trest'); return false;">Регистрация</a>
+  </div>
 {/template}
 
 
 {template logoutform}
-  <div class="headerPersonalBox italic personEnter">{\n}
-    <div style="position: absolute; top: 0px; right: 0px; z-index: 1000; font-size: 14px;">
-      <table>{\n}
-        <tr>{\n}
-          <td>{\n}
-            Добро пожаловать, <a href="/{$usertype}/{$userid}">{$user}</a>{\n}
-            &nbsp;&nbsp;
-          </td>{\n}
-          <td>{\n}
-            <form method="post" style="display:inline">{\n}
-              <input type="hidden" name="LOGOUT" value="Выход" />{\n}
-              <div class="button" onclick="jQuery(this).parent('form').submit()">{\n}
-                <div class="left"></div>{\n}
-                <div class="text">Выход</div>{\n}
-                <div class="right"></div>{\n}
-              </div>{\n}
-            </form>{\n}
-          </td>{\n}
-        </tr>{\n}
-      </table>{\n}
-    </div>{\n}
-  </div>{\n}
+  <div class="cabinet">
+    <form method="post" style="display:inline">{\n}
+      <input type="hidden" name="LOGOUT" value="Выход" />{\n}
+      <a href="#" class="right" onclick="jQuery(this).parent('form').submit()">{\n}
+        Выйти
+      </a>
+    </form>{\n}
+    <strong>Вы вошли как:</strong>
+    <a href="/{$usertype}/{$userid}">{$user}</a>
+  </div>
 {/template}
 
 
