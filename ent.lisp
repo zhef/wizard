@@ -1,6 +1,12 @@
 (in-package #:WIZARD)
 
-(closure-template:compile-template :common-lisp-backend #P"templates.soy")
+(closure-template:compile-template :common-lisp-backend #P"tpl/root.htm")
+(closure-template:compile-template :common-lisp-backend #P"tpl/templates.htm")
+(closure-template:compile-template :common-lisp-backend #P"tpl/main.htm")
+(closure-template:compile-template :common-lisp-backend #P"tpl/about.htm")
+(closure-template:compile-template :common-lisp-backend #P"tpl/contacts.htm")
+(closure-template:compile-template :common-lisp-backend #P"tpl/services.htm")
+
 
 ;; (restas:mount-submodule -static- (#:restas.directory-publisher)
 ;;   (restas.directory-publisher:*directory* (path "static/")))
