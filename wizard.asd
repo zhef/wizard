@@ -19,6 +19,7 @@
                  (:file "ent")
                  (:file "gen")
                  (:file "grid")
+                 (:file "searching")
                  (:file "grid-fltr")
                  (:file "show-block")
                  (:file "show-linear")

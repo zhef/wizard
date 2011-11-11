@@ -44,7 +44,6 @@
                                                 :usertype (string-downcase (type-of (gethash userid *USER*)))
                                                 :userid userid)))))
          (*popups*  (list
-                     (list :id "trest"      :title "Регистрация" :content "TODO"           :left 200 :width 500)
                      (list :id "popupLogin" :title "Вход"        :content (tpl:popuplogin) :left 720 :width 196)))
          (content   (format nil "~{~A~}" (loop :for act :in acts :collect (show-act act)))))
     (declare (special *popups*))
@@ -53,6 +52,9 @@
       :mapkey    *mapkey*
       :personal  personal
       :popups    *popups*
+      :right (if (eql 1 (length (request-list))) ;; main page
+                 (tpl:right)
+                 "")
       :navpoints (menu)
       :content  content))))
 

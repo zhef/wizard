@@ -1,6 +1,7 @@
 (in-package #:WIZARD)
 
 (closure-template:compile-template :common-lisp-backend #P"tpl/root.htm")
+(closure-template:compile-template :common-lisp-backend #P"tpl/right.htm")
 (closure-template:compile-template :common-lisp-backend #P"tpl/templates.htm")
 (closure-template:compile-template :common-lisp-backend #P"tpl/main.htm")
 (closure-template:compile-template :common-lisp-backend #P"tpl/about.htm")
@@ -494,8 +495,9 @@
      :url                  "/"
      :navpoint             "Главная"
      :actions
-     '((:none              "Главная"
-        :perm              :all)))
+     '((:tpl               "Главная"
+        :perm              :all
+        :val               (funcall (find-symbol "MAIN" 'tpl)))))
 
     ;; Новости
     (:place                posts
@@ -722,11 +724,7 @@
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'SUPPLIER))  (cons-hash-list *USER*))
         :fields            '((:fld      name
                               :xref     "supplier")
-                             (:fld      actual-address)
-                             (:btn      "Страница поставщика"
-                              :perm     :all
-                              :width    130
-                              :act      (to "/supplier/~A" (caar (form-data))))))))
+                             (:fld      actual-address)))))
 
     ;; Страница поставщика
     (:place                supplier
