@@ -499,6 +499,46 @@
         :perm              :all
         :val               (funcall (find-symbol "MAIN" 'tpl)))))
 
+    ;; Страница регистрации
+    (:place                main
+     :url                  "/register"
+     :actions
+     '((:linear            "Регистрация"
+        :entity            supplier
+        :perm              :all
+        :val               :clear
+        :fields            '((:fld login)
+                             (:fld password)
+                             (:fld email)
+                             (:fld name)
+                             (:fld inn)
+                             (:fld ogrn)
+                             (:fld juridical-address)
+                             (:fld actual-address)
+                             (:fld contact-person)
+                             (:fld contact-phone)
+                             (:btn "Зарегистрироваться"
+                              :perm :all
+                              :width 120
+                              :act (multiple-value-bind (obj id)
+                                       (push-hash *USER* 'SUPPLIER)
+                                     (PROGN
+                                       (SETF (A-LOGIN OBJ) (CDR (ASSOC "LOGIN" (FORM-DATA) :TEST #'EQUAL)))
+                                       (SETF (A-PASSWORD OBJ) (CDR (ASSOC "PASSWORD" (FORM-DATA) :TEST #'EQUAL)))
+                                       (SETF (A-EMAIL OBJ) (CDR (ASSOC "EMAIL" (FORM-DATA) :TEST #'EQUAL)))
+                                       (SETF (A-NAME OBJ) (CDR (ASSOC "NAME" (FORM-DATA) :TEST #'EQUAL)))
+                                       (SETF (A-INN OBJ) (CDR (ASSOC "INN" (FORM-DATA) :TEST #'EQUAL)))
+                                       (SETF (A-OGRN OBJ) (CDR (ASSOC "OGRN" (FORM-DATA) :TEST #'EQUAL)))
+                                       (SETF (A-JURIDICAL-ADDRESS OBJ) (CDR (ASSOC "JURIDICAL-ADDRESS" (FORM-DATA) :TEST #'EQUAL)))
+                                       (SETF (A-ACTUAL-ADDRESS OBJ) (CDR (ASSOC "ACTUAL-ADDRESS" (FORM-DATA) :TEST #'EQUAL)))
+                                       (SETF (A-CONTACT-PERSON OBJ) (CDR (ASSOC "CONTACT-PERSON" (FORM-DATA) :TEST #'EQUAL)))
+                                       (SETF (A-CONTACT-PHONE OBJ) (CDR (ASSOC "CONTACT-PHONE" (FORM-DATA) :TEST #'EQUAL)))
+                                       (setf (a-status obj) :unfair)
+                                       (hunchentoot:redirect (format nil "/supplier/~A" id))
+                                       )))
+                             ))))
+
+
     ;; Новости
     (:place                posts
      :url                  "/posts"
