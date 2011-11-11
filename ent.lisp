@@ -16,13 +16,23 @@
                         (restas.directory-publisher:*baseurl* '("css"))
                         (restas.directory-publisher:*directory* "css/"))
 
+(restas:mount-submodule -js- (#:restas.directory-publisher)
+  (restas.directory-publisher:*baseurl* '("js"))
+  (restas.directory-publisher:*directory* "js/"))
+
 (restas:mount-submodule -img- (#:restas.directory-publisher)
   (restas.directory-publisher:*baseurl* '("img"))
   (restas.directory-publisher:*directory* "img/"))
 
-(restas:mount-submodule -js- (#:restas.directory-publisher)
-  (restas.directory-publisher:*baseurl* '("js"))
-  (restas.directory-publisher:*directory* "js/"))
+(restas:mount-submodule -img-popups- (#:restas.directory-publisher)
+  (restas.directory-publisher:*baseurl* '("img/popups"))
+  (restas.directory-publisher:*directory* "img/popups/"))
+
+(restas:mount-submodule -img-jqgrid- (#:restas.directory-publisher)
+  (restas.directory-publisher:*baseurl* '("img/jqgrid"))
+  (restas.directory-publisher:*directory* "img/jqgrid/"))
+
+
 
 
 
