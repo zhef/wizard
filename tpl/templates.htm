@@ -96,7 +96,7 @@
 
 
 {template fld}
-  <table style="font-size: 12px; vertical-align: middle;">{\n}
+  <table cellpadding="0" cellspacing="0" style="font-size: 12px; vertical-align: middle;">{\n}
     <tbody style="vertical-align: middle;">{\n}
       <tr style="vertical-align: middle;">{\n}
         <td width="250" style="padding: 0px; vertical-align: middle;">{\n}
@@ -200,43 +200,25 @@
 
 
 {template btn}
-  <input type="hidden" name="{$name}" value="{$value}" />
-  <div class="button" onclick="jQuery(this).parent('form').submit()">
-    <div class="left"></div>
-    <div class="text">{$value}</div>
-    <div class="right"></div>
-  </div>
+  <input type="button" name="{$name}" value="{$value}" onclick="jQuery(this).parent('form').submit()"/>
 {/template}
 
 
 {template btnlin}
   <input type="hidden" name="{$name}" value="{$value}" />
-  <div class="button" onclick="jQuery(this).parent('form').submit()" style="margin: 10px 0 10px 0;">
-    <div class="left"></div>
-    <div class="text">{$value}</div>
-    <div class="right"></div>
-  </div>
+  <input type="button" onclick="jQuery(this).parent('form').submit()" style="margin: 10px 0 10px 0;" value="{$value}">
 {/template}
 
 
 {template btncol}
   <form method="post">
-    <input type="hidden" name="{$name}" value="{$value}" />
-    <div class="button" onclick="jQuery(this).parent('form').submit()">
-      <div class="left"></div>
-      <div class="text">{$value}</div>
-      <div class="right"></div>
-    </div>
+    <input type="button" name="{$name}" value="{$value}" onclick="jQuery(this).parent('form').submit()" value="{$value}">
   </form>
 {/template}
 
 
 {template popbtnlin}
-  <div class="button" onclick="ShowHide('{$popid}');" style="margin: 10px 0 10px 0;">
-    <div class="left"></div>
-    <div class="text">{$value}</div>
-    <div class="right"></div>
-  </div>
+  <input type="button" onclick="ShowHide('{$popid}');" style="margin: 10px 0 10px 0;" value="{$value}" />
 {/template}
 
 

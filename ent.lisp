@@ -8,7 +8,6 @@
 (closure-template:compile-template :common-lisp-backend #P"tpl/contacts.htm")
 (closure-template:compile-template :common-lisp-backend #P"tpl/services.htm")
 
-
 ;; (restas:mount-submodule -static- (#:restas.directory-publisher)
 ;;   (restas.directory-publisher:*directory* (path "static/")))
 
@@ -31,9 +30,6 @@
 (restas:mount-submodule -img-jqgrid- (#:restas.directory-publisher)
   (restas.directory-publisher:*baseurl* '("img/jqgrid"))
   (restas.directory-publisher:*directory* "img/jqgrid/"))
-
-
-
 
 
 (defclass entity () ())
@@ -155,7 +151,7 @@
      :fields
      ((login               "Логин"                      (:str))
       (password            "Пароль"                     (:pswd))
-      (name                "Название организации"       (:str))
+      (name                "Название организации"       (:str) 300)
       (referal             "Реферал"                    (:link user)
                            '(:create :system             ;; Если застройщик привел этого поставщика
                              :view   (or :admin :expert) ;; то здесь ссылка на застройщика
@@ -165,7 +161,7 @@
                              :update :admin))
       (juridical-address   "Юридический адрес"          (:str)
                            '(:view   :logged))          ;; Гость не видит
-      (actual-address      "Фактический адрес"          (:str))
+      (actual-address      "Фактический адрес"          (:str) 600)
       (contacts            "Контактные телефоны"        (:list-of-str)     ;; cписок телефонов с возможностью ввода
                            '(:view   (or :logged :fair)))                  ;; незалогиненные могут видеть только тел. добросовестных
       (email               "Email"                      (:str)             ;; отображение как ссылка mailto://....
@@ -373,7 +369,7 @@
     (:entity               tender
      :container            tender
      :fields
-     ((name                "Название"                   (:str) 450
+     ((name                "Название"                   (:str) 550
                            '(:view   :all))
       (status              "Статус"                     (:list-of-keys tender-status) 120
                            '(:view   :all))
@@ -1021,14 +1017,9 @@
                               :perm             :all
                               :entity           tender
                               :val              (cons-inner-objs *TENDER* (a-tenders (gethash (cur-id) *USER*)))
-                              :fields           '((:fld name)
+                              :fields           '((:fld name :xref "tender")
                                                   (:fld status)
-                                                  (:fld all)
-                                                  (:btn "Страница тендера"
-                                                   :perm :all
-                                                   :width 120
-                                                   :act (to "/tender/~A" (caar (last (form-data)))))))
-                             ))
+                                                  (:fld all)))))
 
        (:linear            "Объявить новый тендер"
         :perm              :self
@@ -1069,13 +1060,9 @@
         :perm              :all
         :entity            tender
         :val               (cons-hash-list *TENDER*)
-        :fields            '((:fld name)
+        :fields            '((:fld name :xref "tender")
                              (:fld status)
-                             (:fld owner)
-                             (:btn "Страница тендера"
-                              :perm :all
-                              :act (to "/tender/~A" (caar (form-data))))
-                             ))))
+                             (:fld owner)))))
 
     ;; Страница тендера (поставщик может откликнуться)
     (:place                tender
