@@ -500,7 +500,7 @@
         :val               (funcall (find-symbol "MAIN" 'tpl)))))
 
     ;; Страница регистрации
-    (:place                main
+    (:place                register
      :url                  "/register"
      :actions
      '((:linear            "Регистрация"
