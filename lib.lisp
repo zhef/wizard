@@ -584,6 +584,7 @@ If objs are of different classes the result is NIL."
 
 (with-defclass (tpl (action)))
 
+
 (with-defclass (announce (action)))
 
 (with-defclass (post (action))

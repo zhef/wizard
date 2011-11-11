@@ -2,33 +2,6 @@
 
 (defparameter *popups* nil)
 
-;; (defmethod show ((infld file) &key)
-;;   (tpl:fld
-;;    (list :fldname (a-value infld)
-;;          :fldcontent (tpl:fileupd (list :name (a-name infld))))))
-
-
-;; (defmethod show ((obj yamap) &key)
-;;   (tpl:map (list :center (a-center-coord obj)
-;;                  :placemarks (format nil "~{~A~}"
-;;                                      (mapcar #'(lambda (point)
-;;                                                  (tpl:placemark
-;;                                                   (list :title (a-title point)
-;;                                                         :coord (a-coord point)
-;;                                                         :descr (a-descr point))))
-;;                                              (a-mark-points obj))))))
-
-;; (defun show-map (act val)
-;;   (let ((yamap (mi 'YAMAP
-;;                    :center-coord (nth 0 (car val))
-;;                    :mark-points  (mapcar #'(lambda (point)
-;;                                              (mi 'YAPOINT
-;;                                                  :title (aif (nth 2 point) it "")
-;;                                                  :descr (aif (nth 1 point) it "")
-;;                                                  :coord (aif (nth 0 point) it "")))
-;;                                          val))))
-;;     (show yamap)))
-
 
 (defun show-act (act)
   (unless (check-perm (a-perm act) (cur-user) (a-val act))

@@ -37,6 +37,11 @@
                              :value (a-value infld))))
       ""))
 
+
+(defmethod show-linear ((infld grid) val &key)
+  (format nil "<div style=\"border: 1px solid red:\"> ~A</div>" (show-act infld)))
+
+
 ;; (cond ((equal 'fld (type-of infld))
 ;;        (show infld :val val))
 ;; ((equal 'btn (type-of infld))
