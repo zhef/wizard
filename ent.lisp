@@ -232,7 +232,7 @@
      :fields
      ((owner               "Поставщик"                  (:link supplier)
                            '(:update :nobody))
-      (resource            "Ресурс"                     (:link resource) 485)
+      (resource            "Ресурс"                     (:link resource) 800)
       (price               "Цена поставщика"            (:num) 55))
      :perm
      (:create :owner
@@ -846,8 +846,8 @@
                               :val               (cons-inner-objs *SUPPLIER-RESOURCE* (a-resources (gethash (cur-id) *USER*)))
                               :fields            '((:fld resource)
                                                    (:btn   "Удалить"
-                                                    :perm  :all
-                                                    :width 60
+                                                    :perm  :self
+                                                    :width 65
                                                     :act (del-inner-obj
                                                           (caar (form-data))
                                                           *SUPPLIER-RESOURCE*
