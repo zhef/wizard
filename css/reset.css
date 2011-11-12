@@ -12,7 +12,7 @@ table, caption, tbody, tfoot, thead, tr, th, td {
 	border: 0;
 	outline: 0;
 	font-size: 100%;
-	vertical-align: baseline;
+	vertical-align: top;
 	background: transparent;}
 ol, ul {	list-style: none;}
 blockquote, q {	quotes: none;}
@@ -39,7 +39,7 @@ span.left {
 	display: block;
 	float: left;}
 #content .right {
-	position: relative	
+	position: relative;	
 	display: block;
 	float: right;
 } 

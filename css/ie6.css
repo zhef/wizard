@@ -1,6 +1,6 @@
 body { behavior: url("css/csshover2.htc"); }
 img, #left_shadow, #right_shadow, .corners em.tl, 
-.corners em.tr, .corners em.bl, .corners em.br, p, span { behavior: url("css/iepngfix.htc"); }
+.corners em.tr, .corners em.bl, .corners em.br, p, span, .logo, a { behavior: url("css/iepngfix.htc"); }
 
 /*
 	IE min-width & max-width

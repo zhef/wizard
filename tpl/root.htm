@@ -48,49 +48,46 @@
       <div class="banner_top"></div>
       <div class="wraper">
         <div id="header">
-          <a href="/"><span class="logo"></span></a>
+          <span class="service_link">
+            <a class="start_page" href="#">Сделать стартовой</a>
+            <a class="favorite" href="#">В избранное</a>
+          </span>
+          <a href="index.html"><div class="logo"></div></a>
+          <div class="speed_buttons">
+            <a class="new_tender" href="#"><span>Объявить тендер</span></a>
+            <a class="express" href="#"><span>Экспресс-котировка</span></a>
+            <a class="store_map" href="#"><span>Ката поставщиков</span></a>
+          </div>
           <div class="autorisation">
             {$personal |noAutoescape}
           </div>
-          <div class="search corners">
-            <form action="/search" method="post" class="searh">
-              <input type="text" name="text" value="Быстрый поиск" maxlength="128" />
-              <select size="1" name="category">
-                <!--
-                <option value="all">везде</option>
-                <option value="tender">по тендерам</option>
-                <option value="builder">по застройщикам</option>
-                -->
-                <option value="supplier">по поставщикам</option>
-                <option value="map">по карте</option>
-                <!--
-                <option value="matherials">по материалам</option>
-                <option value="tech">по технологиям</option>
-                -->
-              </select>
-              <button type="submit">Искать</button>
-            </form>
-            <!--
-               <span class="left">например <a href="#">пескосоляная смесь</a></span>
-               <span class="right">или воспользуйтесь <a href="#">расширенным поиском</a></span>
-               -->
-            <em class="tl"></em><em class="tr"></em><em class="bl"></em><em class="br"></em>
-          </div>
-        </div>
-        <div class="tools_menu">
-          <span class="fast">
-            <span></span>
-            <a class="new_tender" href="#">Объявить тендер</a>
-            <a class="kotirovki" href="#">Запросить котировку</a>
-          </span>
-          <a class="help" href="#">Помощь</a>
-          <a class="board" href="#">Доска объявлений</a>
-          <a class="services" href="#">О портале</a>
-          <a class="action" href="#">Акции</a>
-          <!-- <a class="rating" href="#">Рейтинги</a> -->
         </div>
         <div id="container">
           <div id="content">
+            <div class="search corners">
+              <form action="/search" method="post" class="searh">
+                <input type="text" name="text" value="Быстрый поиск" maxlength="128" />
+                <select size="1" name="spisok">
+                  <!--
+                     <option value="all">везде</option>
+                  <option value="tender">по тендерам</option>
+                  <option value="builder">по застройщикам</option>
+                  -->
+                  <option value="supplier">по поставщикам</option>
+                  <option value="map">по карте</option>
+                  <!--
+                     <option value="matherials">по материалам</option>
+                  <option value="tech">по технологиям</option>
+                  -->
+                </select>
+                <button type="submit">Искать</button>
+              </form>
+              <!--
+                 <span class="left">например <a href="#">пескосоляная смесь</a></span>
+                 <span class="right">или воспользуйтесь <a href="#">расширенным поиском</a></span>
+                 -->
+              <em class="tl"></em><em class="tr"></em><em class="bl"></em><em class="br"></em>
+            </div>
 
             {$content |noAutoescape}
 
