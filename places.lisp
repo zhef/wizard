@@ -307,6 +307,12 @@
                                        NAME JURIDICAL-ADDRESS ACTUAL-ADDRESS CONTACTS EMAIL SITE HEADS INN KPP OGRN BANK-NAME
                                        BIK CORRESP-ACCOUNT CLIENT-ACCOUNT ADDRESSES CONTACT-PERSON contact-phone contact-email)
                                      (hunchentoot:redirect (hunchentoot:request-uri*))))
+                             ;; affiliates
+                             (:grid              "Адреса филиалов и магазинов"
+                              :perm              :all
+                              :entity            supplier-affiliate
+                              :val               (cons-inner-objs *supplier-affiliate* (a-affiliates (gethash 5 *user*)))
+                              :fields            '((:fld address)))
                              ;; pricelist
                              (:grid              "Прайс-лист"
                               :perm              :all

@@ -105,13 +105,10 @@
             (setf sattlement_account* sattlement_account))
           (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_division` WHERE `company_id`='~A'" company_id)
                               ("city_id" "name" "post_index" "street" "house" "office" "phone"))
-            (let ((save-name name))
-              (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_city` WHERE `id`='~A'" city_id)
-                                  ("name"))
-                (push (format nil "~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~]"
-                              name save-name post_index street house office phone)
-                      divisions)
-                t))t)
+            (push (format nil "~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~]"
+                          (gethash city_id hash-city) name post_index street house office phone)
+                  divisions)
+            t)
           (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_phone` WHERE `company_id`='~A'" company_id)
                               ("number"))
             (append-link contacts number)
@@ -140,6 +137,13 @@
                                                      :juridical-address juridical-address
                                                      :actual-address actual-address
                                                      :contacts contacts))))
+                  ;; Адреса филиалов
+                  (mapcar #'(lambda (x)
+                              (let ((supplier-affiliate (push-hash *supplier-affiliate* 'supplier-affiliate
+                                                          :owner supplier
+                                                          :address x)))
+                                (append-link (a-affiliates supplier) supplier-affiliate)))
+                          divisions)
                   ;; Это поставщик, значит у него могут быть ресурсы
                   (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_resource` WHERE `company_id`='~A'" company_id)
                                       ("id" "resource_id" "price"))

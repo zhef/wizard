@@ -187,6 +187,7 @@
                            '(:view   :logged))                              ;; Гость не видит банковские реквизиты
       (addresses           "Адреса офисов и магазинов" (:list-of-str)
                            '(:view   (or :logged :fair)))                   ;; Гость не видит у недобросовестных
+      (affiliates          "Адреса офисов и магазинов" (:list-of-links supplier-affiliate))
       (contact-person      "Контактное лицо"           (:str)
                            '(:view   (or :logged :fair)))                   ;; Гость не видит у недобросовестных
       (contact-phone       "Контактный телефон"        (:str)
@@ -203,6 +204,20 @@
      (:create             (or :admin :not-logged)
       :delete             :admin
       :view               :all
+      :show               :all
+      :update             (or :admin :self)))
+
+
+    ;; Филиалы поставщика
+    (:entity               supplier-affiliate
+     :container            supplier-affiliate
+     :fields
+     ((owner               "Поставщик"                  (:link supplier))
+      (address             "Адрес"                      (:str) 850))
+     :perm
+     (:create             :admin
+      :delete             :admin
+      :view               :all ;; (or :logged :fair))
       :show               :all
       :update             (or :admin :self)))
 
