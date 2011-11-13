@@ -66,12 +66,18 @@
   (clrhash *USER*)
   ;; Нулевой - админ
   (push-hash *USER* 'ADMIN :login "admin" :password "admin")
-  ;; Идентификаторы всех поставщиков предзаносим в company_type
-  (let ((company_type (make-hash-table :test #'equal)))
+  ;;
+  (let ((hash-city    (make-hash-table :test #'equal))
+        (company_type (make-hash-table :test #'equal)))
+    ;; Получаем города и записываем их в хэш-таблицу
+    (with-query-select ("SELECT |:::| FROM `jos_gt_city`"
+                        ("id" "name"))
+      (setf (gethash id hash-city) name))
+    ;; Идентификаторы всех поставщиков предзаносим в company_type
     (with-query-select ("SELECT |:::| FROM `jos_gt_company_group_bind`"
-                        ("company_id" "group_id"))
-      (when (< group_id 5)
-        (setf (gethash company_id company_type) 1)))
+                          ("company_id" "group_id"))
+        (when (< group_id 5)
+          (setf (gethash company_id company_type) 1)))
     ;; Забираем все компании
     (with-query-select ("SELECT |:::| FROM `jos_gt_company`"
                         ("id" "juridical_address_id" "actual_address_id" "head_id" "details_id" "name" "email" "site" "is_diligent"))
@@ -80,11 +86,11 @@
         (let ((juridical-address) (actual-address) (contacts) (heads) (divisions)
               (inn*) (ogrn*) (bank-name*) (bik*) (correspondent_account*) (sattlement_account*))
           (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_address` WHERE `id`='~A'" juridical_address_id)
-                              ("street" "house"))
-            (setf juridical-address (format nil "~A ~A" street house)))
+                              ("city_id" "street" "house"))
+            (setf juridical-address (format nil "~A ~A ~A" (gethash city_id hash-city) street house)))
           (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_address` WHERE `id`='~A'" actual_address_id)
-                              ("street" "house"))
-            (setf actual-address (format nil "~A ~A" street house)))
+                              ("city_id" "street" "house"))
+            (setf actual-address (format nil "~A ~A ~A" (gethash city_id hash-city) street house)))
           (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_company_employee` WHERE `id`='~A'" head_id)
                               ("second_name" "name" "patronymic" "post" "phone" "email" "user_id"))
             (setf heads (format nil "~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] ~@[~A~] "
@@ -160,6 +166,7 @@
                                      :actual-address actual-address
                                      :contacts contacts))
                 nil))))))
+
   ;; ;; Эксперты
   (loop :for i :from 1 :to 9 :do
      (push-hash *USER* 'EXPERT

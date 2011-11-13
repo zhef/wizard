@@ -122,11 +122,15 @@
 
 (defmethod gen ((param yamap) &key entity-param)
   (declare (ignore entity-param))
-  (format nil "~%~14T (mi 'yamap :title ~A :perm ~A ~%~18T :val ~A)"
+  (format nil "~%~14T (mi 'yamap :title ~A :perm ~A :center-coord \"30.313622, 59.937720\" ~%~18T :mark-points ~A)"
           (bprint (a-title param))
           (bprint (a-perm param))
-          (format nil "(named-lambda ~A () ~A)"
-                  (symbol-name (gensym "GRDNL-"))
+          (format nil "(mapcar #'(lambda (x)
+                                        (mi 'yapoint
+                                            :title (nth 0 x)
+                                            :descr (nth 1 x)
+                                            :coord (geo-coder (nth 2 x))))
+                                 ~A)"
                   (bprint (a-val param)))))
 
 

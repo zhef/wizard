@@ -436,7 +436,7 @@
        (:yamap            "Адрес поставщика"
         :perm              :all
         :val               (let ((addr (a-actual-address (gethash (cur-id) *USER*))))
-                             (list (list (geo-coder addr) addr (a-name (gethash (cur-id) *USER*))))))
+                             (list (list (a-name (gethash (cur-id) *USER*)) addr (geo-coder addr) ))))
 
        ))
 
