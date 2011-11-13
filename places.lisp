@@ -441,7 +441,7 @@
 
        (:yamap            "Адрес поставщика"
         :perm              :all
-        :val               (let* ((supp (gethash 5 *USER*))
+        :val               (let* ((supp (gethash (cur-id) *USER*))
                                   (name (a-name supp))
                                   (addr (a-actual-address supp))
                                   (affi (a-affiliates supp)))
