@@ -2,6 +2,7 @@
 (defun reload ()
   (load "lib.lisp")
   (load "ent.lisp")
+  (load "places.lisp")
   (load "gen.lisp")
   (load "grid.lisp")
   (load "perm.lisp")

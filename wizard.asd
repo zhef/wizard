@@ -17,6 +17,7 @@
   :serial        t
   :components   ((:file "lib")
                  (:file "ent")
+                 (:file "places")
                  (:file "gen")
                  (:file "grid")
                  (:file "searching")

@@ -204,6 +204,8 @@
 
 ;; dispatcher -->
 (defmethod gen ((param list) &key entity-param)
+  (format t "~%-- :~A" param)
+  (format t "~%== :~A" entity-param)
   (gen (ent-to-mi param) :entity-param entity-param))
 
 
