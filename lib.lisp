@@ -533,6 +533,7 @@ If objs are of different classes the result is NIL."
                            :parameters `(("geocode" . ,addr)
                                          ("key" . ,(format nil "~A" *mapkey*))
                                          ("format" . "json")))
+    (declare (ignore status headers ret-uri stream must-close reason))
     (let ((tree (json:decode-json-from-string
                  (sb-ext:octets-to-string body))))
       ;; (print tree)

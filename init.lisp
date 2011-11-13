@@ -142,6 +142,10 @@
                               (let ((supplier-affiliate (push-hash *supplier-affiliate* 'supplier-affiliate
                                                           :owner supplier
                                                           :address x)))
+                                (append-link (a-affiliates supplier) supplier-affiliate))
+                              (let ((supplier-affiliate (push-hash *supplier-affiliate* 'supplier-affiliate
+                                                          :owner supplier
+                                                          :address x)))
                                 (append-link (a-affiliates supplier) supplier-affiliate)))
                           divisions)
                   ;; Это поставщик, значит у него могут быть ресурсы

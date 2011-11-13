@@ -441,11 +441,21 @@
 
        (:yamap            "Адрес поставщика"
         :perm              :all
-        :val               (let ((addr (a-actual-address (gethash (cur-id) *USER*))))
-                             (list (list (a-name (gethash (cur-id) *USER*)) addr (geo-coder addr) ))))
-
+        :val               (let* ((supp (gethash 5 *USER*))
+                                  (name (a-name supp))
+                                  (addr (a-actual-address supp))
+                                  (affi (a-affiliates supp)))
+                             (mapcar #'(lambda (x)
+                                         (list name x (geo-coder x)))
+                                     (remove-duplicates
+                                      (append
+                                       (mapcar #'(lambda (x)
+                                                   (a-address x))
+                                               affi)
+                                       (list addr))))))
        ))
-
+    ;; (setf (a-affiliates (gethash 5 *USER*)) (mi 'supplier-affiliate :owner (gethash 5 *USER*)
+                                             ;; :address "Проспект просвещения д 24"))
     ;; ;; Технологии
     ;; (:place                technologies
     ;;  :url                  "/technologies"
