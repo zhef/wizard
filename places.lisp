@@ -465,39 +465,36 @@
     ;;     :perm              :all)))
 
 
-    ;; ;; Распродажи
-    ;; (:place                sales
-    ;;  :url                  "/sale"
-    ;;  ;; :navpoint             "Распродажи"
-    ;;  :actions
-    ;;  '((:grid              "Распродажи"
-    ;;     :perm              :all
-    ;;     :entity            sale
-    ;;     :val               (cons-hash-list *SALE*)
-    ;;     :fields            '((:fld name)
-    ;;                          (:btn "Страница распродажи"
-    ;;                           :perm :all
-    ;;                           :act (to "/sale/~A" (caar (form-data))))))))
+    ;; Распродажи
+    (:place                sales
+     :url                  "/sale"
+     :navpoint             "Aкции"
+     :actions
+     '((:grid              "Акции"
+        :perm              :all
+        :entity            sale
+        :val               (cons-hash-list *SALE*)
+        :fields            '((:fld name :xref "sale")))))
 
-    ;; ;; Страница распродажи
-    ;; (:place                sale
-    ;;  :url                  "/sale/:id"
-    ;;  :actions
-    ;;  '((:linear            "Распродажа"
-    ;;     :perm              :all
-    ;;     :entity            sale
-    ;;     :val               (gethash (cur-id) *SALE*)
-    ;;     :fields            '((:fld name)
-    ;;                          (:fld owner)
-    ;;                          (:fld procent)
-    ;;                          (:fld price)
-    ;;                          (:fld notes)
-    ;;                          (:fld resource)
-    ;;                           (:btn "Сохранить"
-    ;;                            :perm :all
-    ;;                            :act (let ((obj (gethash (cur-id) *SALE*)))
-    ;;                                   (with-obj-save obj
-    ;;                                     name price procent notes)))))))
+    ;; Страница распродажи
+    (:place                sale
+     :url                  "/sale/:id"
+     :actions
+     '((:linear            "Распродажа"
+        :perm              :all
+        :entity            sale
+        :val               (gethash (cur-id) *SALE*)
+        :fields            '((:fld name)
+                             (:fld owner)
+                             (:fld procent)
+                             (:fld price)
+                             (:fld notes)
+                             (:fld resource)
+                             (:btn "Сохранить"
+                              :perm :self
+                              :act (let ((obj (gethash (cur-id) *SALE*)))
+                                     (with-obj-save obj
+                                       name price procent notes)))))))
 
     ;; Список застройщиков
     (:place                builders
@@ -718,11 +715,11 @@
                                                   (:fld inn)
                                                   (:btn "Отправить приглашение"
                                                    :perm :all
-                                                   :width 140
+                                                   :width 145
                                                    :act (send-offer-to-supplier-from-tender))
                                                   (:btn "Страница поставщика"
                                                    :perm :all
-                                                   :width 140
+                                                   :width 145
                                                    :act (to "/supplier/~A"  (caar (last (form-data)))))))
                              (:btn "Добавить своего поставщика"
                               :perm :nobody

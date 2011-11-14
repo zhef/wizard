@@ -596,7 +596,6 @@ If objs are of different classes the result is NIL."
   (photo-text nil)
   (text ""))
 
-
 ;; CLASS YAPOINT
 (with-defclass (yapoint ())
   (title "")
