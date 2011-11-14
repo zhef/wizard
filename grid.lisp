@@ -29,7 +29,10 @@
                  (tpl:right)
                  "")
       :navpoints (menu)
-      :content  content))))
+      :searchcategory (aif (hunchentoot:post-parameter "searchcategory") it "")
+      :searchstring   (aif (hunchentoot:post-parameter "searchstring") it "")
+      :content  content)
+      )))
 
 
 (defun json-assembly (cur-page total-page rows-per-page rows)

@@ -56,7 +56,11 @@
           <div class="speed_buttons">
             <a class="new_tender" href="#"><span>Объявить тендер</span></a>
             <a class="express" href="#"><span>Экспресс-котировка</span></a>
-            <a class="store_map" href="#"><span>Ката поставщиков</span></a>
+            <form action="/search" method="post" style="display:inline">{\n}
+              <input type="hidden" name="searchstring" value="бетон" />{\n}
+              <input type="hidden" name="searchcategory" value="map" />{\n}
+              <a class="store_map" href="#" onclick="jQuery(this).parent('form').submit(); return false;" ><span>Карта поставщиков</span></a>{\n}
+            </form>
           </div>
           <div class="autorisation">
             {$personal |noAutoescape}
@@ -69,36 +73,36 @@
           <a class="action" href="#">Акции</a>
           <!-- <a class="rating" href="#">Рейтинги</a> -->
         </div>
-        <div id="container">
-          <div id="content">
-            <div class="search corners">
-              <form action="/search" method="post" class="searh">
-                <input type="text" name="text" value="Быстрый поиск" maxlength="128" />
-                <select size="1" name="spisok">
-                  <!--
-                     <option value="all">везде</option>
-                  <option value="tender">по тендерам</option>
-                  <option value="builder">по застройщикам</option>
-                  -->
-                  <option value="supplier">по поставщикам</option>
-                  <option value="map">по карте</option>
-                  <!--
-                     <option value="matherials">по материалам</option>
-                  <option value="tech">по технологиям</option>
-                  -->
-                </select>
-                <button type="submit">Искать</button>
-              </form>
-              <!--
-                 <span class="left">например <a href="#">пескосоляная смесь</a></span>
-                 <span class="right">или воспользуйтесь <a href="#">расширенным поиском</a></span>
-                 -->
-              <em class="tl"></em><em class="tr"></em><em class="bl"></em><em class="br"></em>
-            </div>
+        <div id="container">{\n}
+          <div id="content">{\n}
+            <div class="search corners">{\n}
+              <form action="/search" method="post" class="searh">{\n}
+                <input type="text" name="searchstring" value="{$searchstring}" maxlength="128" />{\n}
+                <select size="1" name="searchcategory">{\n}
+                  <!--{\n}
+                     <option value="all">везде</option>{\n}
+                  <option value="tender">по тендерам</option>{\n}
+                  <option value="builder">по застройщикам</option>{\n}
+                  -->{\n}
+                  <option value="supplier" {if $searchcategory == 'supplier'} selected="selected"{/if}>по поставщикам</option>{\n}
+                  <option value="map"      {if $searchcategory == 'map'}      selected="selected"{/if}>по карте</option>{\n}
+                  <!--{\n}
+                     <option value="matherials">по материалам</option>{\n}
+                  <option value="tech">по технологиям</option>{\n}
+                  -->{\n}
+                </select>{\n}
+                <button type="submit">Искать</button>{\n}
+              </form>{\n}
+              <!--{\n}
+                 <span class="left">например <a href="#">пескосоляная смесь</a></span>{\n}
+                 <span class="right">или воспользуйтесь <a href="#">расширенным поиском</a></span>{\n}
+                 -->{\n}
+              <em class="tl"></em><em class="tr"></em><em class="bl"></em><em class="br"></em>{\n}
+            </div>{\n}
 
             {$content |noAutoescape}
 
-	      </div>
+	      </div>{\n}
         </div>
         <div class="sidebar" id="left">
 	      <ul id="menu">

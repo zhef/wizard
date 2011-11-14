@@ -257,3 +257,5 @@ http://www.slideshare.net/chaitanyagupta/slime-1180051
           o Lisp for the Web
           http://www.adampetersen.se/articles/lispweb.htm
 
+
+http://habrahabr.ru/blogs/algorithm/132128/ - Shift-OR

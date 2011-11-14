@@ -239,7 +239,7 @@ a.rating {	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -6
 	background: url(../img/search_block1.png) repeat-x scroll left top;
 	width: 97%;
 	color: #fff;
-	/* float: left; */
+	float: left;
 	padding: 10px 10px 10px 10px;
 	margin-bottom: 20px;}
 .search input[type='text']{
