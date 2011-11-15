@@ -10,14 +10,13 @@
 
 
 (defun show-acts (acts)
-  (let* ((personal  (let ((userid (hunchentoot:session-value 'userid)))
-                      (if (null userid)
-                          (tpl:loginform)
-                          (tpl:logoutform (list :user (a-name (gethash userid *USER*))
-                                                :usertype (string-downcase (type-of (gethash userid *USER*)))
-                                                :userid userid)))))
-         (*popups*  (list
-                     (list :id "popupLogin" :title "Вход"        :content (tpl:popuplogin) :left 720 :width 196)))
+  (let* ((personal (let ((userid (hunchentoot:session-value 'userid)))
+                     (if (null userid)
+                         (tpl:loginform)
+                         (tpl:logoutform (list :user     (a-name (gethash userid *USER*))
+                                               :usertype (string-downcase (type-of (gethash userid *USER*)))
+                                               :userid   userid)))))
+         (*popups*  (list (list :id "popupLogin" :title "Вход"        :content (tpl:popuplogin) :left 720 :width 196)))
          (content   (format nil "~{~A~}" (loop :for act :in acts :collect (show-act act)))))
     (declare (special *popups*))
     (tpl:root
@@ -32,7 +31,7 @@
       :searchcategory (aif (hunchentoot:post-parameter "searchcategory") it "")
       :searchstring   (aif (hunchentoot:post-parameter "searchstring") it "")
       :content  content)
-      )))
+     )))
 
 
 (defun json-assembly (cur-page total-page rows-per-page rows)

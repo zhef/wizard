@@ -596,6 +596,11 @@ If objs are of different classes the result is NIL."
   (photo-text nil)
   (text ""))
 
+(with-defclass (file (action))
+  (value "")
+  (name ""))
+
+
 ;; CLASS YAPOINT
 (with-defclass (yapoint ())
   (title "")
@@ -635,10 +640,6 @@ If objs are of different classes the result is NIL."
   (perm :all)
   (action ""))
 
-(with-defclass (file ())
-  (name "")
-  (value "")
-  (perm :all))
 
 
 (defun passwd ()
