@@ -3,37 +3,6 @@
 (defparameter *popups* nil)
 
 
-(defun show-act (act)
-  (unless (check-perm (a-perm act) (cur-user) (a-val act))
-    (return-from show-act ""))
-  (show-block act)) ;; --> dispatcher show-block
-
-
-(defun show-acts (acts)
-  (let* ((personal (let ((userid (hunchentoot:session-value 'userid)))
-                     (if (null userid)
-                         (tpl:loginform)
-                         (tpl:logoutform (list :user     (a-name (gethash userid *USER*))
-                                               :usertype (string-downcase (type-of (gethash userid *USER*)))
-                                               :userid   userid)))))
-         (*popups*  (list (list :id "popupLogin" :title "Вход"        :content (tpl:popuplogin) :left 720 :width 196)))
-         (content   (format nil "~{~A~}" (loop :for act :in acts :collect (show-act act)))))
-    (declare (special *popups*))
-    (tpl:root
-     (list
-      :mapkey    *mapkey*
-      :personal  personal
-      :popups    *popups*
-      :right (if (eql 1 (length (request-list))) ;; main page
-                 (tpl:right)
-                 "")
-      :navpoints (menu)
-      :searchcategory (aif (hunchentoot:post-parameter "searchcategory") it "")
-      :searchstring   (aif (hunchentoot:post-parameter "searchstring") it "")
-      :content  content)
-     )))
-
-
 (defun json-assembly (cur-page total-page rows-per-page rows)
   "example call: (json-assembly 1 2 2 '( (1 \"one\" \"two\") (2 \"three\" \"fourth\")))"
   (json:encode-json-to-string

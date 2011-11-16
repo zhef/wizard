@@ -54,12 +54,14 @@
           </span>
           <a href="index.html"><div class="logo"></div></a>
           <div class="speed_buttons">
-            <a class="new_tender" href="#"><span>Объявить тендер</span></a>
+            <form action="/newtender" method="post" style="display:inline">{\n}
+              <a class="new_tender" href="#" onclick="jQuery(this).parent('form').submit(); return false;"><span>Объявить тендер</span></a>
+            </form>
             <a class="express" href="#"><span>Экспресс-котировка</span></a>
             <form action="/search" method="post" style="display:inline">{\n}
-              <input type="hidden" name="searchstring" value="бетон" />{\n}
+              <input type="hidden" name="searchstring" value="" />{\n}
               <input type="hidden" name="searchcategory" value="map" />{\n}
-              <a class="store_map" href="#" onclick="jQuery(this).parent('form').submit(); return false;" ><span>Карта поставщиков</span></a>{\n}
+              <a class="store_map" href="#" onclick="jQuery(this).parent('form').submit(); return false;"><span>Карта поставщиков</span></a>{\n}
             </form>
           </div>
           <div class="autorisation">

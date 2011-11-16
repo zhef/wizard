@@ -548,7 +548,7 @@
                               :perm :all
                               :act ;;(format nil "~A" (form-data))
                               (let* ((id     (hash-table-count *TENDER*))
-                                     (owner  (gethash (cur-id) *USER*))
+                                     (owner  (curr-user))
                                      (tender (setf (gethash id *TENDER*)
                                                    (mi 'TENDER
                                                        :name      (cdr (ASSOC "NAME" (FORM-DATA) :test #'equal))

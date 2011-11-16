@@ -115,14 +115,14 @@
 
 (defmethod gen ((param none) &key entity-param)
   (declare (ignore entity-param))
-  (format nil "~%~14T (mi 'none :title ~A :perm ~A)"
+  (format nil "~%   (mi 'none :title ~A :perm ~A)"
           (bprint (a-title param))
           (bprint (a-perm param))))
 
 
 (defmethod gen ((param yamap) &key entity-param)
   (declare (ignore entity-param))
-  (format nil "~%~14T (mi 'yamap :title ~A :perm ~A :center-coord \"30.313622, 59.937720\" ~%~18T :mark-points ~A)"
+  (format nil "~%   (mi 'yamap :title ~A :perm ~A :center-coord \"30.313622, 59.937720\" ~%~19T :mark-points ~A)"
           (bprint (a-title param))
           (bprint (a-perm param))
           (format nil "(mapcar #'(lambda (x)
@@ -136,7 +136,7 @@
 
 (defmethod gen ((param tpl) &key entity-param)
   (declare (ignore entity-param))
-  (format nil "~%~14T (mi 'tpl :title ~A :perm ~A ~%~18T :val ~A)"
+  (format nil "~%   (mi 'tpl :title ~A :perm ~A ~%~11T :val ~A)"
           (bprint (a-title param))
           (bprint (a-perm param))
           (format nil "(named-lambda ~A () ~A)"
@@ -145,7 +145,7 @@
 
 
 (defmethod gen ((param linear) &key entity-param)
-  (format nil "~%~14T (mi 'linear :title ~A ~%~20T :perm '~A ~%~20T :val ~A ~%~20T :fields ~A)"
+  (format nil "~%   (mi 'linear :title ~A :perm '~A ~%~14T :val ~A ~%~14T :fields ~A)"
           (bprint (a-title param))
           (bprint (a-perm param))
           (format nil "(named-lambda ~A () ~A)"
@@ -169,7 +169,7 @@
                                       (bprint (a-val param)))
                               pre-generated-fields
                               *param-id-flag*))))
-    (format nil "~%~14T (mi 'grid :title ~A ~%~20T :perm '~A ~%~20T :grid ~A ~%~20T :param-id ~A ~%~20T :height ~A ~%~20T :val ~A ~%~20T :fields ~A)"
+    (format nil "~%   (mi 'grid :title ~A ~%~12T :perm '~A ~%~12T :grid ~A ~%~12T :param-id ~A ~%~12T :height ~A ~%~12T :val ~A ~%~12T :fields ~A)"
             (bprint (a-title param))
             (bprint (a-perm param))
             (bprint grid)
@@ -182,7 +182,7 @@
 
 
 (defmethod gen ((param announce) &key entity-param)
-  (format nil "~%~14T (mi 'announce :title ~A ~%~20T :perm '~A ~%~20T :val ~A ~%~20T :fields ~A)"
+  (format nil "~%   (mi 'announce :title ~A ~%~16T :perm '~A ~%~16T :val ~A ~%~16T :fields ~A)"
           (bprint (a-title param))
           (bprint (a-perm param))
           (format nil "(named-lambda ~A () ~A)"
@@ -194,7 +194,7 @@
 
 
 (defmethod gen ((param post) &key entity-param)
-  (format nil "~%~14T (mi 'post :title ~A ~%~20T :perm '~A ~%~20T :val ~A ~%~20T :fields ~A)"
+  (format nil "~%   (mi 'post :title ~A ~%~12T :perm '~A ~%~12T :val ~A ~%~12T :fields ~A)"
           (bprint (a-title param))
           (bprint (a-perm param))
           (format nil "(named-lambda ~A () ~A)"
@@ -208,8 +208,8 @@
 
 ;; dispatcher -->
 (defmethod gen ((param list) &key entity-param)
-  (format t "~%-- :~A" param)
-  (format t "~%== :~A" entity-param)
+  ;; (format t "~%-- :~A" param)
+  ;; (format t "~%== :~A" entity-param)
   (gen (ent-to-mi param) :entity-param entity-param))
 
 
@@ -237,7 +237,7 @@
              (etypecase (cadr rest)
                (cons    (setf fld-perm (cadr rest)))
                (integer (setf width (cadr rest)))))))
-      (format nil "~%~25T (mi 'fld :name \"~A\" :typedata '~A :title ~A :width ~A :xref ~A ~%~31T :perm ~A)"
+      (format nil "~%~6T (mi 'fld :name \"~A\" :typedata '~A :title ~A :width ~A :xref ~A ~%~15T :perm ~A)"
               (bprint fld)
               (bprint typedata)
               (bprint name)
@@ -260,7 +260,7 @@
           (append *controllers*
                   (list (list genid (a-act param)))))
     ;; output
-    (format nil "~%~25T (mi 'btn :name \"~A\" :width ~A :perm ~A :value \"~A\")"
+    (format nil "~%~6T (mi 'btn :name \"~A\" :width ~A :perm ~A :value \"~A\")"
             genid
             (aif (a-width param) it "200")
             (bprint (a-perm param))
@@ -271,7 +271,7 @@
   (declare (ignore entity-param))
   (let* ((genid (string-downcase (symbol-name (gensym "P")))))
     ;; output
-    (format nil "~%~25T (mi 'popbtn :name \"~A\" :width ~A :perm ~A :value \"~A\" ~%~31T :action ~A)"
+    (format nil "~%~6T (mi 'popbtn :name \"~A\" :width ~A :perm ~A :value \"~A\" ~%~19T :action ~A)"
             genid
             (aif (a-width param) it "200")
             (bprint (a-perm param))
@@ -318,7 +318,7 @@
      (format out "~%~%(restas:define-route ~A-page (\"~A\")"
              (string-downcase (getf place :place))
              (getf place :url))
-     (format out "~A~%  (let ((session (hunchentoot:start-session))~%~7T (acts (list ~{~A~})))~%~4T(declare (ignore session))~%~4T(show-acts acts)))"
+     (format out "~A~%  (list ~{~A~}))"
              (if *param-id-flag* (format nil "~% (declare (ignore id))") "")
              (loop :for action :in (eval (getf place :actions)) :collect
                 (gen action) ;; <-- dispatcher: (defmethod gen ((param list) &key entity-param)

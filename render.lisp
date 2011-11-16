@@ -5,7 +5,11 @@
 ;; show-acts
 
 (defclass wizard-render () ()) ;; default
-(defclass action-render () ()) ;; actions: none, tpl, grid, linear, announce, yamap, file.
+(defclass action-render () ()) ;; actions : none, tpl, grid, linear, announce, yamap, file.
+(defclass grid-render   () ()) ;; grids   : fld, btn, popbtn.
+(defclass linear-render () ()) ;; linears : fld, btn, popbtn, grid
+;; TODO - проверка прав - в around-методах
+
 
 (setf *default-render-method* (mi 'wizard-render))
 
@@ -21,20 +25,20 @@
     (declare (special *popups*))
     (tpl:root
      (list
-      :mapkey    *mapkey*
-      :popups    *popups*
-      :personal  personal
-      :right (if (eql 1 (length (request-list))) ;; main page
-                 (tpl:right)
-                 "")
-      :navpoints (menu)
+      :mapkey         *mapkey*
+      :popups         *popups*
+      :personal       personal
+      :right          (if (eql 1 (length (request-list))) ;; main page
+                          (tpl:right)
+                          "")
+      :navpoints      (menu)
       :searchcategory (aif (hunchentoot:post-parameter "searchcategory") it "")
       :searchstring   (aif (hunchentoot:post-parameter "searchstring") it "")
-      :content  (format nil "~{~A~}"
-                        (loop :for act :in acts :collect
-                           (if (check-perm (a-perm act) (cur-user) (a-val act))
-                               (restas:render-object (mi 'action-render) act)
-                               "")))))))
+      :content        (format nil "~{~A~}"
+                              (loop :for act :in acts :collect
+                                 (if (check-perm (a-perm act) (cur-user) (a-val act))
+                                     (restas:render-object (mi 'action-render) act)
+                                     "")))))))
 
 ;; before start-session
 (defmethod restas:render-object :before ((designer wizard-render) (acts list))
@@ -60,7 +64,7 @@
          :content (format nil "~A" (funcall (a-val obj))))))
 
 
-;; ACT: grid
+;; ACT: grid --> grid-render (fld, btn, popbtn)
 (defmethod restas:render-object ((designer action-render) (obj grid))
   (let ((grid-id  (gensym "J"))
         (pager-id (gensym "P"))
@@ -70,7 +74,7 @@
     (declare (special *popups*))
     (loop :for infld :in (a-fields obj) :collect
        (multiple-value-bind (col-title col-model)
-           (show-grid infld) ;; <-- dispatcher
+           (restas:render-object (mi 'grid-render) infld) ;; <-dispatcher
          (unless (null col-title)
            (push col-title col-titles)
            (push col-model col-models))))
@@ -112,10 +116,12 @@ function(){
 
 ;; ACT: linear
 (defmethod restas:render-object ((designer action-render) (obj linear))
-  (let* ((val  (a-val obj))
-         (flds (loop :for infld :in (a-fields obj) :collect
-                  (show-linear infld val)))) ;; <-- dispatcher
-    (tpl:frmobj (list :content (format nil "~{~A~}" flds)))))
+  (let ((*val*  (a-val obj)))
+    (declare (special *val*))
+    (tpl:frmobj
+     (list :content (format nil "~{~A~}"
+                            (loop :for infld :in (a-fields obj) :collect
+                               (restas:render-object (mi 'linear-render) infld))))))) ;; <-- dispatcher
 
 
 ;; ACT: announce
@@ -163,3 +169,164 @@ function(){
 ;;   (funcall func))
 
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; GRID-RENDER ;;;;;;;;;;;;;;;;
+
+
+
+;; GRID: default (error)
+(defmethod restas:render-object ((designer grid-render) (obj t))
+  (error "no applicable render method for grid: ~A" (type-of obj)))
+
+
+(defmethod restas:render-object ((designer grid-render) (obj fld))
+  (unless (check-perm (a-show (a-perm obj)) (cur-user))
+    (return-from restas:render-object nil))
+  (values
+   (a-title obj)
+   `(("name"     . ,(a-name obj))
+     ("index"    . ,(a-name obj))
+     ("width"    . ,(a-width obj))
+     ("align"    . ,(if (equal '(:num) (a-typedata obj)) "center" "left"))
+     ("sortable" . t)
+     ("editable" . nil))))
+
+
+(defmethod restas:render-object ((designer grid-render) (obj btn))
+  (unless (check-perm (a-perm obj) (cur-user))
+    (return-from restas:render-object nil))
+  (values
+   ""
+   `(("name"     . "")
+     ("index"    . "")
+     ("width"    . ,(a-width obj))
+     ("align"    . "center")
+     ("sortable" . nil)
+     ("editable" . nil))))
+
+
+(defmethod restas:render-object ((designer grid-render) (obj popbtn))
+  (unless (check-perm (a-perm obj) (cur-user))
+    (return-from restas:render-object nil))
+  (let ((in-action (a-action obj)))
+    (push
+     (list :id (a-name obj)
+           :title (a-title in-action)
+           :content (restas:render-object (mi 'action-render) in-action)
+           :left 200
+           :width 500)
+     *popups*))
+  (values
+   ""
+   `(("name"     . "")
+     ("index"    . "")
+     ("width"    . ,(a-width obj))
+     ("align"    . "center")
+     ("sortable" . nil)
+     ("editable" . nil))))
+
+
+;; (cond
+;; ((equal :calc (car infld))
+;;  (when (check-perm (getf infld :perm) (cur-user))
+;;    (let* ((in-name (getf infld :calc))
+;;           (width   (getf infld :width))
+;;           (model `(("name" . ,in-name)
+;;                    ("index" . ,in-name)
+;;                    ("width" . ,width)
+;;                    ("align" . "left")
+;;                    ("sortable" . t)
+;;                    ("editable" . nil))))
+;;      (push in-name col-names)
+;;      (push model col-model))))
+;; (t (error "show-grid unk fld" )))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LINEAR-RENDER ;;;;;;;;;;;;;;
+
+
+;; LINEAR: default (error)
+(defmethod restas:render-object ((designer linear-render) (obj t))
+  (error "no applicable render method for linear: ~A" (type-of obj)))
+
+
+(defmethod restas:render-object ((designer linear-render) (obj fld))
+  (let ((val       (funcall      *val*))
+        (namefld   (a-name       obj))
+        (captfld   (a-title      obj))
+        (permfld   (a-perm       obj))
+        (typedata  (a-typedata   obj)))
+    (declare (ignore permfld))
+    (show-linear-elt typedata val namefld captfld permfld)))
+
+
+(defmethod restas:render-object ((designer linear-render) (obj btn))
+  (if (check-perm (a-perm obj) (cur-user))
+      (tpl:btnlin (list :name (a-name obj) :value (a-value obj)))
+      ""))
+
+
+(defmethod restas:render-object ((designer linear-render) (obj popbtn))
+  (if (check-perm (a-perm obj) (cur-user))
+      (progn
+        (let ((in-action (a-action obj)))
+          (push
+           (list :id (a-name obj)
+                 :title (a-title in-action)
+                 :content (restas:render-object (mi 'action-render) in-action)
+                 :left 200
+                 :width 800)
+           *popups*))
+        (tpl:popbtnlin (list :popid (a-name obj)
+                             :value (a-value obj))))
+      ""))
+
+
+(defmethod restas:render-object ((designer linear-render) (obj grid))
+  (restas:render-object (mi 'action-render) obj))
+
+
+(restas:define-route test ("/test")
+  (list
+   (mi 'linear :title "Поставщик"
+       :perm ':ALL
+       :val (named-lambda ACTNL-1216 () (GETHASH 2 *USER*))
+       :fields (list
+                (mi 'fld :name "NAME" :typedata '(:STR) :title "Название организации" :width 300 :xref NIL
+                    :perm (MI 'PERM :UPDATE (OR :ADMIN :SELF) :SHOW :ALL :VIEW :ALL :DELETE :ADMIN
+                              :CREATE (OR :ADMIN :NOT-LOGGED)))
+                (mi 'fld :name "CONTACT-EMAIL" :typedata '(:STR) :title "Контактный email" :width 200 :xref NIL
+                    :perm (MI 'PERM :UPDATE (OR :ADMIN :SELF) :SHOW :ALL :VIEW :ALL :DELETE :ADMIN
+                              :CREATE (OR :ADMIN :NOT-LOGGED)))
+                (mi 'btn :name "b1217" :width 200 :perm '(OR :ADMIN :SELF) :value "Сохранить")
+                (mi 'popbtn :name "p1237" :width 200 :perm :all :value "Добавить распродажу"
+                    :action
+                    (mi 'linear :title "Добавление расподажи"
+                        :perm ':all
+                        :val (named-lambda ACTNL-1238 () NIL)
+                        :fields (list
+                                 (mi 'btn :name "b1239" :width 200 :perm :ALL :value "Добавить распродажу"))))
+                (mi 'grid :title "Адреса филиалов и магазинов"
+                    :perm ':ALL
+                    :grid "jg1218"
+                    :param-id T
+                    :height "180"
+                    :val (named-lambda ACTNL-1220 () (CONS-INNER-OBJS *SUPPLIER-AFFILIATE* (A-AFFILIATES (GETHASH 5 *USER*))))
+                    :fields (list
+                             (mi 'fld :name "ADDRESS" :typedata '(:STR) :title "Адрес" :width 850 :xref NIL
+                                 :perm (MI 'PERM :UPDATE (OR :ADMIN :SELF) :SHOW :ALL :VIEW :ALL :DELETE :ADMIN
+                                           :CREATE :ADMIN))))
+                (mi 'grid :title "Список заявок на тендеры"
+                    :perm ':ALL
+                    :grid "jg1242"
+                    :param-id T
+                    :height "180"
+                    :val (named-lambda ACTNL-1244 () (CONS-INNER-OBJS *OFFER* (A-OFFERS (GETHASH (CUR-ID) *USER*))))
+                    :fields (list
+                             (mi 'fld :name "TENDER" :typedata '(:LINK TENDER) :title "Тендер" :width 640 :xref NIL
+                                 :perm (MI 'PERM :UPDATE (AND :ACTIVE :OWNER) :SHOW :ALL :VIEW :ALL :DELETE
+                                           (AND :OWNER :ACTIVE) :CREATE (AND :ACTIVE :SUPPLIER)))
+                             (mi 'btn :name "b1240" :width 110 :perm :ALL :value "Страница заявки")
+                             (mi 'btn :name "b1241" :width 105 :perm :ALL :value "Удалить заявку")))
+                ))))

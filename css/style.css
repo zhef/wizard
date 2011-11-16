@@ -1,26 +1,26 @@
 /* ------------- Body elements -------------------*/
 /*body { background: url(../img/fon2.png) repeat scroll; }*/
-.wraper {
+.wraper {	
 	width: 97%;
 	max-width: 1400px;
-	min-width: 990px;
+	min-width: 990px;	
 	margin: 0 auto;
 	min-height: 100%;
 	height: auto !important;
-	height: 100%;
-	position: relative;
+	height: 100%;	
+	position: relative;	
 	background-color: #fff;}
 #header {
 	height: 110px;
-	position: relative;}
+	position: relative;}	
 #container {
 	width: 100%;
 	padding-top: 10px;
 	float: left;}
 #content {
-	padding: 0 20px 0 260px;
+	padding: 0 20px 0 260px; 
 	min-width: 440px;	}
-#left {
+#left {	
 	float: left;
 	width: 220px;
 	padding: 10px 20px;
@@ -33,7 +33,7 @@
 #footer {
 	width: 100%;
 	max-width: 1400px;
-	min-width: 960px;
+	min-width: 960px;	
 	margin: 0 auto;
 	height: 100px;
 	margin-top: -100px;
@@ -48,13 +48,13 @@
 .green { background-color: #e1ffb6; }
 em.tl, em.tr, em.bl, em.br { position: absolute; font-size: 1px; }
 .corners em.tl, .corners em.tr, .corners em.bl, .corners em.br { width: 16px; height: 16px; background: url(../img/corners/corners-8.png); }
-.corners em.tl { left: -8px; top: -8px; }
-.corners em.tr { right: -8px; top: -8px; }
-.corners em.bl { left: -8px; bottom: -8px; }
+.corners em.tl { left: -8px; top: -8px; } 
+.corners em.tr { right: -8px; top: -8px; } 
+.corners em.bl { left: -8px; bottom: -8px; } 
 .corners em.br { right: -8px; bottom: -8px; }
 .corners h1 {
 	font-size: 14px;
-	padding: 5px 0;}
+	padding: 5px 0;}	
 
 /* ------------- Header elements -------------------*/
 .banner_top {
@@ -66,13 +66,13 @@ em.tl, em.tr, em.bl, em.br { position: absolute; font-size: 1px; }
 	background: url(../img/banners/top.png) no-repeat scroll center;}
 .logo {
 	width: 30%;
-	min-width: 260px;
+	min-width: 260px;	
 	max-width: 260px;
 	height: 59px;
 	position: relative;
 	float: left;
 	top: 40px;
-	background: url(../img/logo5.png) no-repeat scroll;}
+	background: url(../img/logo5.png) no-repeat scroll;}	
 span.service_link {
 	display: inline-block;
 	position: relative;
@@ -86,7 +86,7 @@ span.service_link {
 	display: inline-block;
 	float: left;
 	height: 80px;
-	min-width: 560px;
+	min-width: 560px;	
 	max-width: 750px;
 	padding: 0 15px;
 	text-align: center;}
@@ -105,14 +105,16 @@ a.store_map {	background: url(../img/store_map.png) no-repeat scroll left top;}
 	display: inline-block;
 	position: relative;
 	float: right;
-	width: 220px;
-	min-width: 60px;
-	max-width: 350px;
+	width: 200px;
+	min-width: 100px;
+	max-width: 300px;
 	height: 80px;
 	overflow: hidden;
 	clear: right;}
-.enter {padding-top: 32px; text-align: center;}
-.enter a {
+.enter {
+	padding-top: 32px; 
+	text-align: center;}
+.enter a {	
 	display: inline-block;
 	height: 16px;
 	color: #626262;
@@ -122,15 +124,42 @@ a.store_map {	background: url(../img/store_map.png) no-repeat scroll left top;}
 	text-decoration: none;
 	border-bottom: 1px solid #626262;
 	padding-bottom: 1px;}
-a.key {
-	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -166px;
+a.key { 
+	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -166px;	
 	display: inline-block;
-	padding: 0 0 0 19px;
+	padding: 0 0 0 19px; 
 	margin: 0 5px;
 	border-bottom: 0px solid #626262;}
 a.dot span {
 	border-bottom: 1px dashed #626262;
 	padding-bottom: 1px;}
+.enter_up {
+	width: 200px;
+	min-width: 100px;
+	max-width: 300px;
+	background-color: #ededed;
+	border: 2px solid #284288;
+	padding: 10px 5px;
+	position: absolute;
+	top: 51px;
+	right: 0;
+	z-index: 1000;}
+.enter_up input, .enter_up button, .enter_up a{
+	display: block;
+	clear: both;
+	width: 90%;
+	margin: 6px auto;}
+.enter_up span {
+	display: block;
+	text-align: center;
+	margin: 0 0 9px 0;}
+.enter_up span a{clear: none; display: inline; color: #D00707;}
+strong.key { 
+	background: url(../img/icons/lock.png) no-repeat scroll left -1px;	
+	display: inline-block;
+	padding: 0 0 0 19px;
+	height: 16px;}
+
 .cabinet {padding: 5px 0;}
 .cabinet a {display: block;}
 .cabinet a.right {
@@ -144,17 +173,17 @@ a.dot span {
 	height: 17px;
 	font-weight: bold;
 	text-decoration: none;}
-/* ------------- Tools Menu elements -------------------*/
+/* ------------- Tools Menu elements -------------------*/	
 .tools_menu {
 	padding: 3px 5px 35px 5px;
 	text-align: right;
-	background: url(../img/line2.gif) repeat-x scroll top;
-	padding-left: 248px;}
+	background: url(../img/line2.gif) repeat-x scroll top;	
+	padding-left: 248px;}	
 .tools_menu a, .service_link a {
 	display: inline-block;
 	height: 16px;
 	float: right;
-	padding: 0 0 0 19px;
+	padding: 0 0 0 19px; 
 	margin: 6px 0 1px 8px;
 	color: #4a4a4a;
 	text-decoration: none;
@@ -181,7 +210,7 @@ a.rating {	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -6
 	line-height: 15px;
 	font-weight: 900;
 	border-bottom: 1px dotted #e4e4e4;}
-#menu a {
+#menu a {	
 	color: #646464;
 	text-decoration: none;
 	font-size: 13px;
@@ -191,7 +220,7 @@ a.rating {	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -6
 .banner_left {
 	width: 220px;
 	height: 90px;
-	margin-bottom: 15px;
+	margin-bottom: 15px;	
 	background: #ddd url(../img/banners/center.png) no-repeat scroll center;}
 .yellow h1, .tender_day h1 {color: #d31616; margin-bottom: 0px; font-weight: bold;}
 .tender_day a {
@@ -219,7 +248,7 @@ a.rating {	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -6
 	margin: 0;}
 .tender_day span {
 	text-align: center;
-	display: block;
+	display: block;	
 	padding: 10px 0 4px 0;}
 .tender_day a.all_tender {
 	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -184px;
@@ -227,21 +256,21 @@ a.rating {	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -6
 	height: 16px;
 	padding: 0 0 0 19px;
 	font-weight: normal;
-	font-size: 12px;}
+	font-size: 12px;}	
 /* ------------- Center elements -------------------*/
 .banner_center {
-	display: block;
-	width: 470px;
+	display: block;	
+	width: 470px; 
 	height: 90px;
 	margin: 0 auto 15px auto;
 	background: #ddd url(../img/banners/center.png) no-repeat scroll center;}
-.search {
-	background: url(../img/search_block1.png) repeat-x scroll left top;
+.search { 
+	background: url(../img/search_block1.png) repeat-x scroll left top; 
 	width: 97%;
 	color: #fff;
 	float: left;
 	padding: 10px 10px 10px 10px;
-	margin-bottom: 20px;}
+	margin-bottom: 10px auto 20px auto;}
 .search input[type='text']{
 	height: 18px;
 	width: 55%;
@@ -269,7 +298,7 @@ a.rating {	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -6
 /* ------------- Right elements -------------------*/
 .banner_right {
 	width: 220px;
-	height: 285px;
+	height: 285px;	
 	background: #ddd url(../img/banners/right.png) no-repeat scroll center;
 	margin-bottom: 15px;}
 

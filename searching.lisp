@@ -30,10 +30,12 @@
         (points))
     (loop :for (id . supplier) :in (remove-if-not #'(lambda (x) (equal 'supplier (type-of (cdr x)))) (cons-hash-list *user*)) :collect
        (loop :for supplier-resource :in (a-resources supplier) :collect
-          (if (not (null (search text (string-downcase (string-trim '(#\Space #\Tab #\Newline) (a-name (a-resource supplier-resource)))))))
-              (progn
-                (push supplier results)
-                (return)))))
+          (let ((resource (a-resource supplier-resource)))
+            (unless (null resource)
+              (if (not (null (search text (string-downcase (string-trim '(#\Space #\Tab #\Newline) (a-name resource))))))
+                  (progn
+                    (push supplier results)
+                    (return)))))))
     (setf points
           (mapcar #'(lambda (x)
                       (mi 'yapoint
@@ -56,7 +58,12 @@
           :val (lambda ()
                  (let* ((text      (string-downcase (string-trim '(#\Space #\Tab #\Newline) (cdr (car (form-data))))))
                         (category  (cdr (cadr (form-data)))))
-                   (cond ((= 0 (length text)) "Задан пустой поисковый запрос")
+                   (cond ((= 0 (length text))
+                          (if (string= "map" category)
+                              (show-block
+                               (mi 'yamap
+                                   :center-coord "30.313622, 59.937720"))
+                              "Задан пустой поисковый запрос"))
                          ((> 3 (length text)) "Слишком короткий поисковый запрос")
                          (t  (let ((results   (cond  ((string= "supplier" category) (searching :supplier text))
                                                      ((string= "map"      category) (searching :map text))
@@ -66,3 +73,33 @@
                                (if (null results)
                                    "Ничего не найдено"
                                    results)))))))))))
+
+
+(restas:define-route newtender/post ("/newtender" :method :post)
+  (if (equal 'builder (type-of (cur-user)))
+      (let* ((id     (hash-table-count *TENDER*))
+             (owner  (cur-user))
+             (tender (setf (gethash id *TENDER*)
+                           (mi 'TENDER
+                               :name      (cdr (ASSOC "NAME" (FORM-DATA) :test #'equal))
+                               :status    :unactive
+                               :owner     owner
+                               :all       (cdr (ASSOC "ALL" (FORM-DATA) :test #'equal))
+                               :claim     (cdr (ASSOC "CLAIM" (FORM-DATA) :test #'equal))
+                               :analize   (cdr (ASSOC "ANALIZE" (FORM-DATA) :test #'equal))
+                               :interview (cdr (ASSOC "INTERVIEW" (FORM-DATA) :test #'equal))
+                               :result    (cdr (ASSOC "RESULT" (FORM-DATA) :test #'equal))
+                               ))))
+        ;; Связываем с владельцем
+        (setf (a-tenders owner)
+              (append (a-tenders owner)
+                      (list tender)))
+        ;; Редирект
+        (hunchentoot:redirect
+         (format nil "/tender/~A" id)))
+      ;; else
+      (show-acts
+       (list
+        (mi 'tpl :title "Недостаточно прав" :perm :all
+            :val (lambda ()
+                   "Только залогиненные застройщики могут объявлять тендер!"))))))
