@@ -31,6 +31,20 @@
   (restas.directory-publisher:*baseurl* '("img/jqgrid"))
   (restas.directory-publisher:*directory* "img/jqgrid/"))
 
+(restas:mount-submodule -img-techno- (#:restas.directory-publisher)
+  (restas.directory-publisher:*baseurl* '("pic_tech"))
+  (restas.directory-publisher:*directory* "techno/pic_tech/"))
+
+(restas:mount-submodule -img-news- (#:restas.directory-publisher)
+  (restas.directory-publisher:*baseurl* '("pic_news"))
+  (restas.directory-publisher:*directory* "news/pic_news/"))
+
+(restas:mount-submodule -img-ivent- (#:restas.directory-publisher)
+  (restas.directory-publisher:*baseurl* '("pic_ivent"))
+  (restas.directory-publisher:*directory* "ivent/pic_ivent/"))
+
+
+
 
 (defclass entity () ())
 
