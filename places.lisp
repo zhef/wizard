@@ -938,7 +938,6 @@
     ;; О портале
     (:place                about
      :url                  "/about"
-     :navpoint             "О портале"
      :actions
      '((:tpl               "О портале"
         :perm              :all
