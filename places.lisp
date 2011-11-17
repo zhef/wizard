@@ -58,11 +58,11 @@
      :actions
      '((:announce          "Анонсы"
         :perm              :all
-        :entity            post
-        :val               (cons-hash-list *POST*)
+        :entity            post-item
+        :val               (cons-hash-list *POST-ITEM*)
         :fields            '((:fld   title)
                              (:fld   date)
-                             (:fld   photo-announce)
+                             (:fld   announce-photo)
                              (:fld   announce)))))
 
     ;; Новость
@@ -71,11 +71,11 @@
      :actions
      '((:post              "%|title|%"
         :perm              :all
-        :entity            post
-        :val               (gethash (cur-id) *POST*)
+        :entity            post-item
+        :val               (gethash (cur-id) *POST-ITEM*)
         :fields            '((:fld title)
                              (:fld date)
-                             (:fld photo-text)
+                             (:fld text-photo)
                              (:fld text)))))
 
 

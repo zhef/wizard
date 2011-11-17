@@ -131,7 +131,7 @@ function(){
              (list
               (tpl:postannounce (list :title (a-title announce)
                                       :date (a-date announce)
-                                      :photoannounce (or (a-photo-announce announce) "")
+                                      :photoannounce (or (a-announce-photo announce) "")
                                       :announce (a-announce announce)
                                       :id id))))))
 
@@ -141,7 +141,7 @@ function(){
     (tpl:posttext (list :title (a-title val)
                         :text (a-text val)
                         :date (a-date val)
-                        :phototext (or (a-photo-text val) "")))))
+                        :phototext (or (a-text-photo val) "")))))
 
 
 ;; ACT: yamap
@@ -161,6 +161,8 @@ function(){
   (tpl:fld
    (list :fldname (a-value obj)
          :fldcontent (tpl:fileupd (list :name (a-name obj))))))
+
+
 
 
 ;; ACT: #'function

@@ -9,7 +9,7 @@
   (load "defmodule.lisp"))
 
 (restas:define-module #:WIZARD
-    (:use #:CL #:ITER #:cl-mysql #:alexandria #:anaphora))
+    (:use #:CL #:ITER #:cl-mysql #:alexandria #:anaphora #:ppcre))
 
 (in-package #:WIZARD)
 
@@ -517,6 +517,18 @@ If objs are of different classes the result is NIL."
     (close stream)))
 
 
+;; extract
+
+
+(defun extract (regex in-string)
+  (multiple-value-bind (start end)
+      (scan (create-scanner regex) in-string)
+    (if (or (null start)
+            (null end))
+        nil
+        (subseq in-string start end))))
+
+
 ;; geo-coder
 
 ;; gdestroytorg.ru
@@ -586,14 +598,13 @@ If objs are of different classes the result is NIL."
 
 (with-defclass (tpl (action)))
 
-
 (with-defclass (announce (action)))
 
 (with-defclass (post (action))
   (date "")
-  (photo-announce nil)
+  (announce-photo nil)
   (announce "")
-  (photo-text nil)
+  (text-photo nil)
   (text ""))
 
 (with-defclass (file (action))

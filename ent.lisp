@@ -130,15 +130,16 @@
       :update              (or :admin :self)))
 
   ;; Новости
-    (:entity               post
-     :container            post
+    (:entity               post-item
+     :container            post-item
      :fields
      ((title               "Название новости"           (:str))
       (date                "Дата и время"               (:date))
-      (photo-announce      "Фото в анонсе"              (:img))
+      (announce-photo      "Фото в анонсе"              (:img))
       (announce            "Анонс"                      (:str))
-      (photo-text          "Фото в тексте"              (:img))
-      (text                "Текст"                      (:str)))
+      (text-photo          "Фото в тексте"              (:img))
+      (text                "Текст"                      (:str))
+      (section             "Раздел"                     (:str)))
      :perm
      (:create              :admin
       :delete              :admin

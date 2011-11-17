@@ -290,17 +290,17 @@
   <table border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px; font-size: 12px;">
     <tr>
       <td>
-        <a href="/post/{$id}">{$title}</a>
+        <a href="/post/{$id}">{$title |noAutoescape}</a>
       </td>
       <td width="1">
         {$date}
       </td>
     </tr>
     <tr>
-      <td colspan="2">{$photoannounce}</td>
+      <td colspan="2">{$photoannounce  |noAutoescape}</td>
     </tr>
     <tr>
-      <td colstan="2">{$announce}</td>
+      <td colstan="2">{$announce  |noAutoescape}</td>
     </tr>
   </table>
 {/template}
@@ -310,7 +310,7 @@
   <table width="80%" border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px; font-size: 12px;">
     <tr>
       <td>
-        <h1 style="font-size:32px">{$title}</h1>
+        <h1 style="font-size:32px">{$title  |noAutoescape}</h1>
       </td>
       <td width="1" align="right">
         {$date}
@@ -322,10 +322,10 @@
       </td>
     </tr>
     <tr>
-      <td colspan="2">{$phototext}</td>
+      <td colspan="2">{$phototext  |noAutoescape}</td>
     </tr>
     <tr>
-      <td colstan="2">{$text}</td>
+      <td colstan="2">{$text  |noAutoescape}</td>
     </tr>
   </table>
 {/template}

@@ -280,23 +280,53 @@
                       ))))))))))
 
 
-(push-hash *POST* 'POST
+(push-hash *POST-ITEM* 'POST-ITEM
   :title "Первая новость"
   :date  "07.11.2011"
-  :photo-announce nil
+  :announce-photo nil
   :announce "Это текст анонса первой новости"
   :text "Это текст первой новости")
 
 
-(push-hash *POST* 'POST
+(push-hash *POST-ITEM* 'POST-ITEM
   :title "Вторая новость"
   :date  "07.11.2011"
-  :photo-announce nil
+  :announce-photo nil
   :announce "Это текст анонса второй новости"
   :text "Это текст второй новости")
 
-;; (clrhash *POST*)
 
+(defun get-post-items-from-dir (section)
+  (loop :for html-file :in (directory (path (format nil "~A/*.htm" section))) :collect
+     (let ((content  (read-file-into-string html-file))
+           (fmt-tpl  "(?s)<~A>(.*)</~A>")
+           (tags     '(title date announce-photo announce text-photo text))
+           (result   (mi 'post-item :section section)))
+       (loop :for tag :in tags :do
+          (let ((extract (extract (string-downcase (format nil fmt-tpl tag tag)) content)))
+            (setf extract (replace-all extract (string-downcase (format nil "<~A>" (symbol-name tag))) ""))
+            (setf extract (replace-all extract (string-downcase (format nil "</~A>" (symbol-name tag))) ""))
+            (setf (slot-value result tag)
+                  (string-trim '(#\Space #\Tab #\Newline) extract))))
+       result)))
+
+(defun posts ()
+  (clrhash *POST-ITEM*)
+  (let ((last-id (block post-fnd-block
+                  (loop :for id :from 0 :do
+                     (multiple-value-bind (result present)
+                         (gethash id *POST-ITEM*)
+                       (unless present
+                         (return-from post-fnd-block id)))))))
+    (mapcar #'(lambda (x)
+                (setf (gethash last-id *POST-ITEM*) x)
+                (setf last-id (+ 1 last-id)))
+            (append (get-post-items-from-dir "ivent")
+                    (get-post-items-from-dir "techno")
+                    (get-post-items-from-dir "news")))))
+
+;; (gethash 1 *POST-ITEM*)
+(posts)
 
 
 (categoryes-and-resources)
