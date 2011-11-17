@@ -23,22 +23,23 @@
                                                 :usertype (string-downcase (type-of (gethash userid *USER*)))
                                                 :userid userid))))))
     (declare (special *popups*))
-    (tpl:root
-     (list
-      :mapkey         *mapkey*
-      :popups         *popups*
-      :personal       personal
-      :right          (if (eql 1 (length (request-list))) ;; main page
-                          (tpl:right)
-                          "")
-      :navpoints      (menu)
-      :searchcategory (aif (hunchentoot:post-parameter "searchcategory") it "")
-      :searchstring   (aif (hunchentoot:post-parameter "searchstring") it "")
-      :content        (format nil "~{~A~}"
-                              (loop :for act :in acts :collect
-                                 (if (check-perm (a-perm act) (cur-user) (a-val act))
-                                     (restas:render-object (mi 'action-render) act)
-                                     "")))))))
+    ;; Рендерить вложенные объекты надо именно здесь - чтобы работало *popups*!
+    (let ((in-render (loop :for act :in acts :collect
+                        (if (check-perm (a-perm act) (cur-user) (a-val act))
+                            (restas:render-object (mi 'action-render) act)
+                            ""))))
+      (tpl:root
+       (list
+        :mapkey         *mapkey*
+        :popups         *popups*
+        :personal       personal
+        :right          (if (eql 1 (length (request-list))) ;; main page
+                            (tpl:right)
+                            "")
+        :navpoints      (menu)
+        :searchcategory (aif (hunchentoot:post-parameter "searchcategory") it "")
+        :searchstring   (aif (hunchentoot:post-parameter "searchstring") it "")
+        :content        (format nil "~{~A~}" in-render))))))
 
 ;; before start-session
 (defmethod restas:render-object :before ((designer wizard-render) (acts list))
