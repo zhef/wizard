@@ -280,6 +280,16 @@
               (gen (ent-to-mi action))))))
 
 
+(defmethod gen ((param file) &key entity-param)
+  (declare (ignore entity-param))
+  (format nil "~%~6T (mi 'file :name \"~A\" :perm ~A :value \"~A\")"
+          (a-title param)
+          (bprint (a-perm param))
+          (a-name param)))
+
+
+
+
 (with-open-file (out (path "defmodule.lisp") :direction :output :if-exists :supersede)
   ;; Required
   (format out "(in-package #:~A)"  (package-name *package*))

@@ -335,9 +335,9 @@
                                         :entity             supplier-resource-price-elt
                                         :val                :clear
                                         :fields             '(
-                                                              ;; (:file file
-                                                              ;;  :perm :all
-                                                              ;;  :name "Прайс")
+                                                              (:file file
+                                                               :perm :all
+                                                               :name "Прайс")
                                                               (:btn "Загрузить"
                                                                :perm :all
                                                                :act

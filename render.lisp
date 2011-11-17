@@ -152,18 +152,10 @@ function(){
                                      (mapcar #'(lambda (point)
                                                  (tpl:placemark
                                                   (list :title (a-title point)
+                                                        :link  (a-link  point)
                                                         :coord (a-coord point)
                                                         :descr (a-descr point))))
                                              (a-mark-points obj))))))
-
-
-;; ACT: file
-(defmethod restas:render-object ((designer action-render) (obj file))
-  (tpl:fld
-   (list :fldname (a-value obj)
-         :fldcontent (tpl:fileupd (list :name (a-name obj))))))
-
-
 
 
 ;; ACT: #'function
@@ -288,6 +280,14 @@ function(){
 
 (defmethod restas:render-object ((designer linear-render) (obj grid))
   (restas:render-object (mi 'action-render) obj))
+
+
+
+(defmethod restas:render-object ((designer linear-render) (obj file))
+  (tpl:fld
+   (list :fldname (a-value obj)
+         :fldcontent (tpl:fileupd (list :name (a-name obj))))))
+
 
 
 (restas:define-route test ("/test")

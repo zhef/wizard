@@ -34,19 +34,27 @@
             (unless (null resource)
               (if (not (null (search text (string-downcase (string-trim '(#\Space #\Tab #\Newline) (a-name resource))))))
                   (progn
-                    (push supplier results)
+                    (push (cons id supplier) results)
                     (return)))))))
     (setf points
           (mapcar #'(lambda (x)
                       (mi 'yapoint
-                          :title (a-name x)
-                          :descr (a-actual-address x)
-                          :coord (geo-coder (a-actual-address x))))
+                          :title (a-name (cdr x))
+                          :link  (format nil "/supplier/~A" (car x))
+                          :descr (format nil "~A" (a-actual-address (cdr x)))
+                          :coord (geo-coder (a-actual-address (cdr x)))))
                   results))
-    (show-block
-     (mi 'yamap
-         :center-coord "30.313622, 59.937720"
-         :mark-points points))))
+    (format nil "~A<br></br>~{~A~}"
+            (restas:render-object (mi 'action-render) (mi 'yamap
+                                                          :center-coord "30.313622, 59.937720"
+                                                          :mark-points points))
+            (mapcar #'(lambda (x)
+                        (format nil "<a href=\"/supplier/~A\">~A</a><br>~A<br/><br/>"
+                                (car x)
+                                (a-name (cdr x))
+                                (a-actual-address (cdr x))))
+                    results)
+            )))
 
 
 (restas:define-route search-page/post ("/search" :method :post)
@@ -59,9 +67,9 @@
                        (category  (cdr (cadr (form-data)))))
                   (cond ((= 0 (length text))
                          (if (string= "map" category)
-                             (show-block
-                              (mi 'yamap
-                                  :center-coord "30.313622, 59.937720"))
+                             (restas:render-object (mi 'action-render)
+                                                   (mi 'yamap
+                                                       :center-coord "30.313622, 59.937720"))
                              "Задан пустой поисковый запрос"))
                         ((> 3 (length text)) "Слишком короткий поисковый запрос")
                         (t  (let ((results   (cond  ((string= "supplier" category) (searching :supplier text))

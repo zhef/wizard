@@ -257,7 +257,7 @@
 {template placemark}
   // Создает метку и добавляет ее на карту{\n}
   var placemark = new YMaps.Placemark(new YMaps.GeoPoint({$coord}));{\n}
-  placemark.name = "{$title}";{\n}
+  placemark.name = "<a href=\"{$link}\">{$title}</a>";{\n}
   placemark.description = "{$descr}";{\n}
   map.addOverlay(placemark);{\n}
   // Открывает балун{\n}

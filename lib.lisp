@@ -6,7 +6,8 @@
   (load "gen.lisp")
   (load "grid.lisp")
   (load "perm.lisp")
-  (load "defmodule.lisp"))
+  (load "defmodule.lisp")
+  (load "render.lisp"))
 
 (restas:define-module #:WIZARD
     (:use #:CL #:ITER #:cl-mysql #:alexandria #:anaphora #:ppcre))
@@ -615,6 +616,7 @@ If objs are of different classes the result is NIL."
 ;; CLASS YAPOINT
 (with-defclass (yapoint ())
   (title "")
+  (link  "")
   (descr "")
   (coord ""))
 
