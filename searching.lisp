@@ -57,6 +57,35 @@
             )))
 
 
+(defmethod searching ((category (eql :resource)) text)
+  (let ((results)
+        (points))
+    (loop :for (id . supplier) :in (remove-if-not #'(lambda (x) (equal 'supplier (type-of (cdr x)))) (cons-hash-list *user*)) :collect
+       (loop :for supplier-resource :in (a-resources supplier) :collect
+          (let ((resource (a-resource supplier-resource)))
+            (unless (null resource)
+              (if (not (null (search text (string-downcase (string-trim '(#\Space #\Tab #\Newline) (a-name resource))))))
+                  (progn
+                    (push (cons id supplier) results)
+                    (return)))))))
+    (setf points
+          (mapcar #'(lambda (x)
+                      (mi 'yapoint
+                          :title (a-name (cdr x))
+                          :link  (format nil "/supplier/~A" (car x))
+                          :descr (format nil "~A" (a-actual-address (cdr x)))
+                          :coord (geo-coder (a-actual-address (cdr x)))))
+                  results))
+    (format nil "<br/><br/>~{~A~}"
+            (mapcar #'(lambda (x)
+                        (format nil "<a href=\"/supplier/~A\">~A</a><br>~A<br/><br/>"
+                                (car x)
+                                (a-name (cdr x))
+                                (a-actual-address (cdr x))))
+                    results)
+            )))
+
+
 (restas:define-route search-page/post ("/search" :method :post)
   (let ((session (hunchentoot:start-session)))
     (declare (ignore session))
@@ -74,6 +103,7 @@
                         ((> 3 (length text)) "Слишком короткий поисковый запрос")
                         (t  (let ((results   (cond  ((string= "supplier" category) (searching :supplier text))
                                                     ((string= "map"      category) (searching :map text))
+                                                    ((string= "resource" category) (searching :resource text))
                                                     ((string= "all" category)      (concatenate 'list
                                                                                                 (searching :supplier text)))
                                                     (t (format nil "~A" (bprint category))))))
