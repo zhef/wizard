@@ -6,9 +6,9 @@
 (restas:define-route search-page ("/search")
   (let ((session (hunchentoot:start-session)))
     (declare (ignore session))
-    (show-acts (list
-                (mi 'tpl :title "Результаты поиска:" :perm :ALL
-                    :val (lambda () "Задан пустой поисковый запрос!"))))))
+    (list
+     (mi 'tpl :title "Результаты поиска:" :perm :ALL
+         :val (lambda () "Задан пустой поисковый запрос!")))))
 
 
 (defmethod searching ((category (eql :supplier)) text)
@@ -52,27 +52,26 @@
 (restas:define-route search-page/post ("/search" :method :post)
   (let ((session (hunchentoot:start-session)))
     (declare (ignore session))
-    (show-acts
-     (list
-      (mi 'tpl :title "Результаты поиска" :perm :ALL
-          :val (lambda ()
-                 (let* ((text      (string-downcase (string-trim '(#\Space #\Tab #\Newline) (cdr (car (form-data))))))
-                        (category  (cdr (cadr (form-data)))))
-                   (cond ((= 0 (length text))
-                          (if (string= "map" category)
-                              (show-block
-                               (mi 'yamap
-                                   :center-coord "30.313622, 59.937720"))
-                              "Задан пустой поисковый запрос"))
-                         ((> 3 (length text)) "Слишком короткий поисковый запрос")
-                         (t  (let ((results   (cond  ((string= "supplier" category) (searching :supplier text))
-                                                     ((string= "map"      category) (searching :map text))
-                                                     ((string= "all" category)      (concatenate 'list
-                                                                                                 (searching :supplier text)))
-                                                     (t (format nil "~A" (bprint category))))))
-                               (if (null results)
-                                   "Ничего не найдено"
-                                   results)))))))))))
+    (list
+     (mi 'tpl :title "Результаты поиска" :perm :ALL
+         :val (lambda ()
+                (let* ((text      (string-downcase (string-trim '(#\Space #\Tab #\Newline) (cdr (car (form-data))))))
+                       (category  (cdr (cadr (form-data)))))
+                  (cond ((= 0 (length text))
+                         (if (string= "map" category)
+                             (show-block
+                              (mi 'yamap
+                                  :center-coord "30.313622, 59.937720"))
+                             "Задан пустой поисковый запрос"))
+                        ((> 3 (length text)) "Слишком короткий поисковый запрос")
+                        (t  (let ((results   (cond  ((string= "supplier" category) (searching :supplier text))
+                                                    ((string= "map"      category) (searching :map text))
+                                                    ((string= "all" category)      (concatenate 'list
+                                                                                                (searching :supplier text)))
+                                                    (t (format nil "~A" (bprint category))))))
+                              (if (null results)
+                                  "Ничего не найдено"
+                                  results))))))))))
 
 
 (restas:define-route newtender/post ("/newtender" :method :post)
@@ -98,8 +97,7 @@
         (hunchentoot:redirect
          (format nil "/tender/~A" id)))
       ;; else
-      (show-acts
-       (list
-        (mi 'tpl :title "Недостаточно прав" :perm :all
-            :val (lambda ()
-                   "Только залогиненные застройщики могут объявлять тендер!"))))))
+      (list
+       (mi 'tpl :title "Недостаточно прав" :perm :all
+           :val (lambda ()
+                  "Только залогиненные застройщики могут объявлять тендер!")))))
