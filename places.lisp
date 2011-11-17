@@ -329,7 +329,7 @@
                                                     :act    (delete-supplier-resource-price-elt))))
                              ;; upload pricelist
                              (:popbtn             "Загрузить прайс-лист"
-                              :perm               :all
+                              :perm               :self
                               :action '(:linear             "Добавление прайс-листа"
                                         :perm               '(or :admin :self)
                                         :entity             supplier-resource-price-elt
@@ -367,7 +367,7 @@
                                                           (a-resources (gethash (cur-id) *USER*))))))
 
                              (:popbtn            "Добавить ресурс"
-                              :perm              :all;; '(or :admin :self)
+                              :perm              '(or :admin :self)
                               :action '(:grid               "Добавление ресурса"
                                        :perm               :all
                                        :entity             resource
@@ -412,10 +412,10 @@
 
                              ;; offers
                              (:grid              "Список заявок на тендеры"
-                              :perm              :all ;; admin
+                              :perm              :logged
                               :entity            offer
                               :val               (cons-inner-objs *OFFER* (a-offers (gethash (cur-id) *USER*)))
-                              :fields            '((:fld tender)
+                              :fields            '((:fld tender :xref "offer")
                                                    (:btn "Страница заявки"
                                                     :perm :all
                                                     :width 110
@@ -548,7 +548,7 @@
                               :perm :all
                               :act ;;(format nil "~A" (form-data))
                               (let* ((id     (hash-table-count *TENDER*))
-                                     (owner  (curr-user))
+                                     (owner  (cur-user))
                                      (tender (setf (gethash id *TENDER*)
                                                    (mi 'TENDER
                                                        :name      (cdr (ASSOC "NAME" (FORM-DATA) :test #'equal))
