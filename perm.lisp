@@ -68,10 +68,11 @@
 
 ;; (defun check-perm (perm subj &optional (obj (make-instance 'DYMMY)))
 (defun check-perm (perm subj obj)
+  t)
   (let ((rs (eval (perm-check perm subj obj))))
     (safe-write (path "perm-log.txt") (format nil "perm: ~A; result: ~A; subj: ~A; obj: ~A~%" perm rs subj obj))
     (eval rs)
-  t
+
   ))
 
 

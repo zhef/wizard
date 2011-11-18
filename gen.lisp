@@ -157,9 +157,12 @@
   (declare (ignore entity-param))
   (let* ((genid (string-downcase (symbol-name (gensym "P")))))
     ;; output
-    (format nil "~%~6T (mi 'popbtn :name \"~A\" :width ~A :perm ~A :value \"~A\" ~%~19T :action ~A)"
+    (format nil "~%~6T (mi 'popbtn :name \"~A\" :top ~A :left ~A :width ~A :height ~A :perm ~A :value \"~A\" ~%~19T :action ~A)"
             genid
+            (aif (a-top param) it "200")
+            (aif (a-left param) it "400")
             (aif (a-width param) it "200")
+            (aif (a-height param) it "400")
             (bprint (a-perm param))
             (a-title param)
             (let ((action (eval (a-action param))))

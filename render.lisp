@@ -194,9 +194,10 @@ function(){
   (error "no applicable render method for grid: ~A" (type-of obj)))
 
 
+;; FLD in GRID
+
+
 (defmethod restas:render-object ((designer grid-render) (obj fld))
-  ;; (unless (check-perm (a-show (a-perm obj)) (cur-user))
-  ;;   (return-from restas:render-object nil))
   (values
    (a-title obj)
    `(("name"     . ,(a-name obj))
@@ -206,10 +207,25 @@ function(){
      ("sortable" . t)
      ("editable" . nil))))
 
+(defmethod restas:render-object :around ((designer grid-render) (obj fld))
+  "check-perm :fld in :grid"
+  (if (check-perm (a-show (a-perm obj)) (cur-user) obj)
+      (call-next-method)
+      (if (and (boundp '*dbg*) *dbg*)
+          (values
+           (format nil "[~A]:[~A]" (bprint (a-show (a-perm obj))) (a-title obj))
+           `(("name"     . "")
+             ("index"    . "")
+             ("width"    . ,(a-width obj))
+             ("align"    . ,(if (equal '(:num) (a-typedata obj)) "center" "left"))
+             ("sortable" . t)
+             ("editable" . nil))))))
+
+
+;; BTN in GRID
+
 
 (defmethod restas:render-object ((designer grid-render) (obj btn))
-  ;; (unless (check-perm (a-perm obj) (cur-user))
-  ;;   (return-from restas:render-object nil))
   (values
    ""
    `(("name"     . "")
@@ -220,9 +236,23 @@ function(){
      ("editable" . nil))))
 
 
+(defmethod restas:render-object :around ((designer grid-render) (obj btn))
+  "check-perm :btn in :grid"
+  (if (check-perm (a-perm obj) (cur-user) obj)
+      (call-next-method)
+      (if (and (boundp '*dbg*) *dbg*)
+          (values
+           (format nil "[~A]" (bprint (a-perm obj)))
+           `(("name"     . "")
+             ("index"    . "")
+             ("width"    . ,(a-width obj))
+             ("align"    . "center")
+             ("sortable" . nil)
+             ("editable" . nil))))))
+
+;; POPBTN in GRID
+
 (defmethod restas:render-object ((designer grid-render) (obj popbtn))
-  ;; (unless (check-perm (a-perm obj) (cur-user))
-  ;;   (return-from restas:render-object nil))
   (let ((in-action (a-action obj)))
     (push
      (list :id (a-name obj)
@@ -240,23 +270,19 @@ function(){
      ("sortable" . nil)
      ("editable" . nil))))
 
-
-;; (cond
-;; ((equal :calc (car infld))
-;;  (when (check-perm (getf infld :perm) (cur-user))
-;;    (let* ((in-name (getf infld :calc))
-;;           (width   (getf infld :width))
-;;           (model `(("name" . ,in-name)
-;;                    ("index" . ,in-name)
-;;                    ("width" . ,width)
-;;                    ("align" . "left")
-;;                    ("sortable" . t)
-;;                    ("editable" . nil))))
-;;      (push in-name col-names)
-;;      (push model col-model))))
-;; (t (error "show-grid unk fld" )))
-
-
+(defmethod restas:render-object :around ((designer grid-render) (obj popbtn))
+  "check-perm :popbtn in :grid"
+  (if (check-perm (a-perm obj) (cur-user) obj)
+      (call-next-method)
+      (if (and (boundp '*dbg*) *dbg*)
+          (values
+           (format nil "[~A]" (bprint (a-perm obj)))
+           `(("name"     . "")
+             ("index"    . "")
+             ("width"    . ,(a-width obj))
+             ("align"    . "center")
+             ("sortable" . nil)
+             ("editable" . nil))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LINEAR-RENDER ;;;;;;;;;;;;;;
 
@@ -291,8 +317,10 @@ function(){
            (list :id (a-name obj)
                  :title (a-title in-action)
                  :content (restas:render-object (mi 'action-render) in-action)
-                 :left 200
-                 :width 800)
+                 :top (a-top obj)
+                 :left (a-left obj)
+                 :width (a-width obj)
+                 :height (a-height obj))
            *popups*))
         (tpl:popbtnlin (list :popid (a-name obj)
                              :value (a-value obj))))

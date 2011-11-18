@@ -201,8 +201,8 @@
 {template popup}
   <div id="{$id}"{\n}
        class="popupBox"{\n}
-       style="position: absolute; top: 0px; left: {$left}px; width: {$width}px;  display: none;{\n}
-              background-color: yellow; border: 1px dotted red; z-index: 999999999; padding: 20px;">{\n}
+       style="position: absolute; top: {$top}px; left: {$left}px; width: {$width}px; height: {$height}px;  display: none;{\n}
+              background-color: yellow; border: 1px dotted red; z-index: 1; padding: 20px;">{\n}
     <div class="popupCancel">{\n}
       <a href="#popupCancel" onclick="ShowHide('{$id}')">{\n}
         <img alt="" src="/img/popups/popupCancel.gif" />{\n}
@@ -210,7 +210,7 @@
     </div>{\n}
 
     <div class="popupEnterLink">{\n}
-      <a class="dashedLink italic" href="/registration/">{$title}</a>{\n}
+      <h3>{$title}</h3>{\n}
     </div>{\n}
 
     <div class="popupCenter">{\n}

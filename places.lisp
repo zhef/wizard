@@ -324,6 +324,10 @@
                                                     :act    (delete-supplier-resource-price-elt))))
                              ;; upload pricelist
                              (:popbtn             "Загрузить прайс-лист"
+                              :top                1750
+                              :left               280
+                              :height             200
+                              :width              700
                               :perm               :self
                               :action '(:linear             "Добавление прайс-листа"
                                         :perm               '(or :admin :self)
@@ -362,23 +366,29 @@
                                                           (a-resources (gethash (cur-id) *USER*))))))
 
                              (:popbtn            "Добавить ресурс"
+                              :top                2000
+                              :left               280
+                              :height             400
+                              :width              900
                               :perm              '(or :admin :self)
                               :action '(:grid               "Добавление ресурса"
-                                       :perm               :all
-                                       :entity             resource
-                                       :val                (cons-hash-list *RESOURCE*)
-                                       :fields             '((:fld name)
-                                                             (:btn "Добавить ресурс"
-                                                              :perm :all
-                                                              :act
-                                                              (progn
-                                                                (push-hash *SUPPLIER-RESOURCE* 'SUPPLIER-RESOURCE
-                                                                  :owner (gethash (cur-user) *USER*)
-                                                                  :resource (gethash
-                                                                             (cdr (assoc "res" (form-data) :test #'equal))
-                                                                             *RESOURCE*)
-                                                                  :price (cdr (assoc "PRICE" (form-data) :test #'equal)))
-                                                                (hunchentoot:redirect (hunchentoot:request-uri*)))))))
+                                        :perm               :all
+                                        :entity             resource
+                                        :val                (cons-hash-list *RESOURCE*)
+                                        :height             250
+                                        :fields             '((:fld name :width 700)
+                                                              (:btn "Добавить ресурс"
+                                                               :width 120
+                                                               :perm :all
+                                                               :act
+                                                               (progn
+                                                                 (push-hash *SUPPLIER-RESOURCE* 'SUPPLIER-RESOURCE
+                                                                   :owner (gethash (cur-user) *USER*)
+                                                                   :resource (gethash
+                                                                              (cdr (assoc "res" (form-data) :test #'equal))
+                                                                              *RESOURCE*)
+                                                                   :price (cdr (assoc "PRICE" (form-data) :test #'equal)))
+                                                                 (hunchentoot:redirect (hunchentoot:request-uri*)))))))
 
                              ;; sales
                              (:grid              "Акции"
