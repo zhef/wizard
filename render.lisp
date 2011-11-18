@@ -120,7 +120,7 @@ function(){
   "check-perm :grid"
   (if (check-perm (a-perm obj) (cur-user) obj)
       (call-next-method)
-      (if (boundp '*dbg*)
+      (if (and (boundp '*dbg*) *dbg*)
           (format nil "<br/>~%Permisson [~A] denied for :grid [~A] <br/>~%" (bprint (a-perm obj)) (a-title obj))
           "")))
 
@@ -138,7 +138,7 @@ function(){
   "check-perm :linear"
   (if (check-perm (a-perm obj) (cur-user) obj)
       (call-next-method)
-      (if (boundp '*dbg*)
+      (if (and (boundp '*dbg*) *dbg*)
           (format nil "<br/>~%Permisson [~A] denied for :linear [~A] <br/>~%" (bprint (a-perm obj)) (a-title obj))
           "")))
 

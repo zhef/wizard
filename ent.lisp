@@ -56,7 +56,7 @@
      :fields
      ((login               "Логин"                      (:str))
       (password            "Пароль"                     (:pswd))
-      (name                "Название организации"       (:str) 300)
+      (name                "Название организации"       (:str))
       (referal             "Реферал"                    (:link user)
                            '(:create :system             ;; Если застройщик привел этого поставщика
                              :view   (or :admin :expert) ;; то здесь ссылка на застройщика
@@ -66,7 +66,7 @@
                              :update :admin))
       (juridical-address   "Юридический адрес"          (:str)
                            '(:view   :logged))          ;; Гость не видит
-      (actual-address      "Фактический адрес"          (:str) 600)
+      (actual-address      "Фактический адрес"          (:str))
       (contacts            "Контактные телефоны"        (:list-of-str)     ;; cписок телефонов с возможностью ввода
                            '(:view   (or :logged :fair)))                  ;; незалогиненные могут видеть только тел. добросовестных
       (email               "Email"                      (:str)             ;; отображение как ссылка mailto://....
@@ -117,7 +117,7 @@
      :container            supplier-affiliate
      :fields
      ((owner               "Поставщик"                  (:link supplier))
-      (address             "Адрес"                      (:str) 850))
+      (address             "Адрес"                      (:str)))
      :perm
      (:create             :admin
       :delete             :admin
@@ -134,7 +134,7 @@
                            '(:update :owner))
       (owner               "Поставщик"                  (:link supplier)
                            '(:update :admin))
-      (resource            "Ресурс"                     (:link supplier-resource) 600)
+      (resource            "Ресурс"                     (:link supplier-resource))
       (procent             "Процент скидки"             (:num))
       (price               "Цена со скидкой"            (:num))
       (notes               "Дополнительные условия"     (:list-of-str)))
@@ -152,8 +152,8 @@
      :fields
      ((owner               "Поставщик"                  (:link supplier)
                            '(:update :nobody))
-      (resource            "Ресурс"                     (:link resource) 800)
-      (price               "Цена поставщика"            (:num) 55))
+      (resource            "Ресурс"                     (:link resource))
+      (price               "Цена поставщика"            (:num)))
      :perm
      (:create :owner
       :delete :owner
@@ -167,7 +167,7 @@
      :container            supplier-resource-price-elt
      :fields
      ((owner               "Поставщик"                  (:link supplier))
-      (name                "Наименование"               (:str) 460)
+      (name                "Наименование"               (:str))
       (unit                "Единица измерения"          (:str))
       (price               "Цена"                       (:str)))
      :perm
@@ -222,7 +222,7 @@
     (:entity               category
      :container            category
      :fields
-     ((name                "Имя"                        (:str) 900)
+     ((name                "Имя"                        (:str))
       (parent              "Родительская группа"        (:link category))
       (child-categoryes    "Дочерние группы"            (:list-of-links category))
       (resources           "Ресурсы"                    (:list-of-links resource)))
@@ -238,7 +238,7 @@
     (:entity               resource
      :container            resource
      :fields
-     ((name                "Наименование"               (:str) 900)
+     ((name                "Наименование"               (:str))
       (category            "Группа"                     (:link category))
       (resource-type       "Тип ресурса"                (:list-of-keys resource-types))
       (unit                "Единица измерения"          (:str))
@@ -289,14 +289,14 @@
     (:entity               tender
      :container            tender
      :fields
-     ((name                "Название"                   (:str) 550
+     ((name                "Название"                   (:str)
                            '(:view   :all))
-      (status              "Статус"                     (:list-of-keys tender-status) 120
+      (status              "Статус"                     (:list-of-keys tender-status)
                            '(:view   :all))
       (owner               "Заказчик"                   (:link builder)
                            '(:update :admin))
       ;; Дата, когда тендер стал активным (первые сутки новые тендеры видят только добростовестные поставщики)
-      (all                 "Срок проведения"            (:interval) 150
+      (all                 "Срок проведения"            (:interval)
                            '(:view   :all
                              :update (or :admin  (and :owner :unactive))))
       (claim               "Срок подачи заявок"         (:interval)
@@ -333,13 +333,13 @@
      :container            tender-resource
      :fields
      ((tender             "Тендер"                      (:link tender))
-      (resource           "Название ресурса"            (:link resource) 400)
-      (quantity           "Кол-во"                      (:num) 50)
-      (price              "Цена"                        (:num) 50) ;; Первоначально цена заполняется из справочника
+      (resource           "Название ресурса"            (:link resource))
+      (quantity           "Кол-во"                      (:num))
+      (price              "Цена"                        (:num)) ;; Первоначально цена заполняется из справочника
       (price-date         "Дата справочника цен"        (:str))
       (comment            "Комментарий"                 (:text))
-      (delivery           "Доставка"                    (:bool) 55)
-      (basic              "Основной"                    (:bool) 50))
+      (delivery           "Доставка"                    (:bool))
+      (basic              "Основной"                    (:bool)))
      :perm
      (:create :builder
       :delete :admin
@@ -358,8 +358,8 @@
      :container            offer
      :fields
      ((owner               "Название организации"       (:link supplier))
-      (tender              "Тендер"                     (:link tender) 640)
-      (status              "Состояние"                  (:list-of-keys  offer-status) 300)
+      (tender              "Тендер"                     (:link tender))
+      (status              "Состояние"                  (:list-of-keys  offer-status))
       (resources           "Ресурсы"                    (:list-of-links offer-resource))
       (allow-modify        "Разрешено изменять"         (:bool)))
       :perm
@@ -376,10 +376,10 @@
      :container            offer-resource
      :fields
      ((offer              "Заявка"                      (:link offer))
-      (tender-resource    "Ресурс тендера"              (:link tender-resource) 345)
-      (quantity           "Кол-во"                      (:num) 55)
-      (price              "Цена до собеседования"       (:num) 150) ;; Первоначально цена заполняется из справочника
-      (price-result       "Цена после собеседования"    (:num) 155)
+      (tender-resource    "Ресурс тендера"              (:link tender-resource))
+      (quantity           "Кол-во"                      (:num))
+      (price              "Цена до собеседования"       (:num)) ;; Первоначально цена заполняется из справочника
+      (price-result       "Цена после собеседования"    (:num))
       (comment            "Комментарий"                 (:str))
       (delivery           "Доставка"                    (:bool))
       (delivery-price     "Стоимость доставки"          (:num))

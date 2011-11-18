@@ -58,10 +58,10 @@
      '((:announce          "Анонсы"
         :entity            post-item
         :val               (cons-hash-list *POST-ITEM*)
-        :fields            '((:fld   title)
-                             (:fld   date)
-                             (:fld   announce-photo)
-                             (:fld   announce)))))
+        :fields            '((:fld title)
+                             (:fld date)
+                             (:fld announce-photo)
+                             (:fld announce)))))
 
     ;; Новость
     (:place                post
@@ -98,7 +98,7 @@
                                                           (null (a-parent (cdr x))))
                                                       (cons-hash-list *CATEGORY*))))))
         :height            400
-        :fields            '((:fld name :xref "category")))))
+        :fields            '((:fld name :xref "category" :width 900)))))
 
 
     ;; ;; Каталог материалов
@@ -115,7 +115,7 @@
                                                            (null (a-parent (cdr x))))
                                                        (cons-hash-list *CATEGORY*))))))
         :height            400
-        :fields            '((:fld name :xref "category")))))
+        :fields            '((:fld name :xref "category" :width 900)))))
 
 
     ;; Каталог ресурсов - содержимое категории
@@ -130,7 +130,7 @@
                                :perm              :all
                                :entity            category
                                :val               (cons-inner-objs *CATEGORY* (a-child-categoryes (gethash (cur-id) *CATEGORY*)))
-                               :fields            '((:fld name :xref "category")))
+                               :fields            '((:fld name :xref "category" :width 900)))
                               (:grid              "Ресурсы группы"
                                :perm              :all
                                :entity            resource
@@ -138,7 +138,7 @@
                                                                      (equal (a-category (cdr x))
                                                                             (gethash (cur-id) *CATEGORY*)))
                                                    (cons-hash-list *RESOURCE*))
-                               :fields            '((:fld name :xref "resource")))))))
+                               :fields            '((:fld name :xref "resource" :width 900)))))))
 
     ;; Страница ресурса (ресурсы редактированию не подвергаются)
     (:place                resource
@@ -265,9 +265,8 @@
         :perm              :all
         :entity            supplier
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'SUPPLIER))  (cons-hash-list *USER*))
-        :fields            '((:fld      name
-                              :xref     "supplier")
-                             (:fld      actual-address)))))
+        :fields            '((:fld name :xref "supplier" :width 300)
+                             (:fld actual-address :width 600)))))
 
     ;; Страница поставщика
     (:place                supplier
@@ -308,7 +307,7 @@
                               :perm              :all
                               :entity            supplier-affiliate
                               :val               (cons-inner-objs *supplier-affiliate* (a-affiliates (gethash 5 *user*)))
-                              :fields            '((:fld address)))
+                              :fields            '((:fld address :width 900)))
                              ;; pricelist
                              (:grid              "Прайс-лист"
                               :perm              :all
@@ -316,9 +315,9 @@
                               :val               (remove-if-not #'(lambda (x)
                                                                     (equal (a-owner (cdr x)) (gethash (cur-id) *user*)))
                                                   (cons-hash-list *supplier-resource-price-elt*))
-                              :fields            '((:fld name)
-                                                   (:fld unit)
-                                                   (:fld price)
+                              :fields            '((:fld name  :width 500)
+                                                   (:fld unit  :width 150)
+                                                   (:fld price :width 150)
                                                    (:btn    "Удалить"
                                                     :perm   '(or :admin :owner)
                                                     :width  100
@@ -353,10 +352,10 @@
                               :perm              :all
                               :entity            supplier-resource
                               :val               (cons-inner-objs *SUPPLIER-RESOURCE* (a-resources (gethash (cur-id) *USER*)))
-                              :fields            '((:fld resource)
+                              :fields            '((:fld resource :width 800)
                                                    (:btn   "Удалить"
                                                     :perm  :self
-                                                    :width 65
+                                                    :width 100
                                                     :act (del-inner-obj
                                                           (caar (form-data))
                                                           *SUPPLIER-RESOURCE*
@@ -381,21 +380,23 @@
                                                                   :price (cdr (assoc "PRICE" (form-data) :test #'equal)))
                                                                 (hunchentoot:redirect (hunchentoot:request-uri*)))))))
 
-                             ;; ;; sales
-                             ;; (:grid              "Акции"
-                             ;;  :perm              :all
-                             ;;  :entity            sale
-                             ;;  :val               (cons-inner-objs *SALE* (a-sales (gethash (cur-id) *USER*)))
-                             ;;  :fields            '((:fld name)
-                             ;;                       (:btn "Страница распродажи"
-                             ;;                        :perm :all
-                             ;;                        :act (to "/sale/~A"  (caar (form-data))))
-                             ;;                       (:btn "Удалить распродажу"
-                             ;;                        :perm :owner
-                             ;;                        :act (del-inner-obj
-                             ;;                              (caar (form-data))
-                             ;;                              *SALE*
-                             ;;                              (a-sales (gethash (cur-id) *USER*))))))
+                             ;; sales
+                             (:grid              "Акции"
+                              :perm              :all
+                              :entity            sale
+                              :val               (cons-inner-objs *SALE* (a-sales (gethash (cur-id) *USER*)))
+                              :fields            '((:fld name :width  700)
+                                                   (:btn "Страница распродажи"
+                                                    :perm :all
+                                                    :width 100
+                                                    :act (to "/sale/~A"  (caar (form-data))))
+                                                   (:btn "Удалить распродажу"
+                                                    :perm :owner
+                                                    :width 100
+                                                    :act (del-inner-obj
+                                                          (caar (form-data))
+                                                          *SALE*
+                                                          (a-sales (gethash (cur-id) *USER*))))))
 
                              (:popbtn "Добавить распродажу"
                               :perm :nobody
@@ -411,10 +412,10 @@
                               :perm              :logged
                               :entity            offer
                               :val               (cons-inner-objs *OFFER* (a-offers (gethash (cur-id) *USER*)))
-                              :fields            '((:fld tender :xref "offer")
+                              :fields            '((:fld tender :xref "offer" :width 680)
                                                    (:btn "Страница заявки"
                                                     :perm :all
-                                                    :width 110
+                                                    :width 115
                                                     :act (to "/offer/~A" (caar (form-data))))
                                                    (:btn "Удалить заявку"
                                                     :perm :all
@@ -455,7 +456,7 @@
      :url                  "/technologies"
      :navpoint             "Технологии"
      :actions
-     '((:none            "Технологии")))
+     '((:none              "Технологии")))
 
 
     ;; Распродажи
@@ -467,7 +468,7 @@
         :perm              :all
         :entity            sale
         :val               (cons-hash-list *SALE*)
-        :fields            '((:fld name :xref "sale")))))
+        :fields            '((:fld name :xref "sale" :width 900)))))
 
     ;; Страница распродажи
     (:place                sale
@@ -492,14 +493,13 @@
     ;; Список застройщиков
     (:place                builders
      :url                  "/builder"
-     ;; :navpoint             "Застройщики"
      :actions
      '((:grid            "Организации-застройщики"
         :perm              :all
         :entity            builder
         :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'BUILDER)) (cons-hash-list *USER*))
-        :fields            '((:fld name :xref "builder")
-                             (:fld login)))))
+        :fields            '((:fld name :xref "builder" :width 750)
+                             (:fld login :width 150)))))
 
     ;; Страница застройщика
     (:place                builder
@@ -529,9 +529,9 @@
                               :perm             :all
                               :entity           tender
                               :val              (cons-inner-objs *TENDER* (a-tenders (gethash (cur-id) *USER*)))
-                              :fields           '((:fld name :xref "tender")
-                                                  (:fld status)
-                                                  (:fld all)))))
+                              :fields           '((:fld name :xref "tender" :width 550)
+                                                  (:fld status :width 150)
+                                                  (:fld all :width 200)))))
 
        (:linear            "Объявить новый тендер"
         :perm              :self

@@ -1,24 +1,3 @@
-
-(defun reload ()
-  (load "lib.lisp")
-  (load "ent.lisp")
-  (load "places.lisp")
-  (load "gen.lisp")
-  (load "grid.lisp")
-  (load "perm.lisp")
-  (load "defmodule.lisp")
-  (load "render.lisp"))
-
-(defun retempl ()
-  (closure-template:compile-template :common-lisp-backend #P"tpl/root.htm")
-  (closure-template:compile-template :common-lisp-backend #P"tpl/right.htm")
-  (closure-template:compile-template :common-lisp-backend #P"tpl/templates.htm")
-  (closure-template:compile-template :common-lisp-backend #P"tpl/main.htm")
-  (closure-template:compile-template :common-lisp-backend #P"tpl/about.htm")
-  (closure-template:compile-template :common-lisp-backend #P"tpl/contacts.htm")
-  (closure-template:compile-template :common-lisp-backend #P"tpl/services.htm"))
-
-
 (restas:define-module #:WIZARD
     (:use #:CL #:ITER #:cl-mysql #:alexandria #:anaphora #:ppcre))
 
@@ -729,6 +708,59 @@ If objs are of different classes the result is NIL."
 (defparameter *types* (loop :for ftype :in *fld-types* :by #'cddr :collect ftype))
 
 
+
+(defun re-tpl ()
+  (closure-template:compile-template :common-lisp-backend #P"tpl/root.htm")
+  (closure-template:compile-template :common-lisp-backend #P"tpl/right.htm")
+  (closure-template:compile-template :common-lisp-backend #P"tpl/templates.htm")
+  (closure-template:compile-template :common-lisp-backend #P"tpl/main.htm")
+  (closure-template:compile-template :common-lisp-backend #P"tpl/about.htm")
+  (closure-template:compile-template :common-lisp-backend #P"tpl/contacts.htm")
+  (closure-template:compile-template :common-lisp-backend #P"tpl/services.htm"))
+
+(defun re-path ()
+  (restas:mount-submodule -css- (#:restas.directory-publisher)
+    (restas.directory-publisher:*baseurl* '("css"))
+    (restas.directory-publisher:*directory* (path "css/")))
+  (restas:mount-submodule -js- (#:restas.directory-publisher)
+    (restas.directory-publisher:*baseurl* '("js"))
+    (restas.directory-publisher:*directory* (path "js/")))
+  (restas:mount-submodule -img- (#:restas.directory-publisher)
+    (restas.directory-publisher:*baseurl* '("img"))
+    (restas.directory-publisher:*directory* (path "img/")))
+  (restas:mount-submodule -img-popups- (#:restas.directory-publisher)
+    (restas.directory-publisher:*baseurl* '("img/popups"))
+    (restas.directory-publisher:*directory* (path "img/popups/")))
+  (restas:mount-submodule -img-jqgrid- (#:restas.directory-publisher)
+    (restas.directory-publisher:*baseurl* '("img/jqgrid"))
+    (restas.directory-publisher:*directory* (path "img/jqgrid/")))
+  (restas:mount-submodule -img-techno- (#:restas.directory-publisher)
+    (restas.directory-publisher:*baseurl* '("pic_tech"))
+    (restas.directory-publisher:*directory* (path "techno/pic_tech/")))
+  (restas:mount-submodule -img-news- (#:restas.directory-publisher)
+    (restas.directory-publisher:*baseurl* '("pic_news"))
+    (restas.directory-publisher:*directory* (path "news/pic_news/")))
+  (restas:mount-submodule -img-ivent- (#:restas.directory-publisher)
+    (restas.directory-publisher:*baseurl* '("pic_ivent"))
+    (restas.directory-publisher:*directory* (path "ivent/pic_ivent/"))))
+
+
+(re-tpl)
+(re-path)
+
+
+(defun re-load ()
+  (load "lib.lisp")
+  (load "ent.lisp")
+  (load "places.lisp")
+  (load "gen.lisp")
+  (load "grid.lisp")
+  (load "perm.lisp")
+  (load "defmodule.lisp")
+  (load "render.lisp")
+  (re-path))
+
+
 (defun passwd ()
   (with-open-file (file-stream "passwd.txt" :direction :output :if-exists :supersede)
     (maphash #'(lambda (k v)
@@ -742,3 +774,5 @@ If objs are of different classes the result is NIL."
              *USER*)))
 
 ;; (passwd)
+(defparameter *dbg* t)
+
