@@ -57,16 +57,15 @@
            (:cancelled (error "perm-todo :cancelled")) ;; Объект является отмененным тендером
            ;; Mixed
            (:self      (equal subj obj))               ;; Объект выполняет операцию надо собой
-           (:owner     t) ;;(equal (a-owner subj) obj))     ;; Объект, над которым совершается действие имеет поле owner текущего пользователя
+           (:owner     (if (and (not (null obj))
+                                (not (null subj))
+                                (slot-exists-p obj 'owner)
+                                (equal (a-owner obj) obj))
+                           t ;; Объект, над которым совершается действие имеет поле owner текущего пользователя
+                           nil))
            ))
         (t perm)))
 
-
-(defclass DYMMY (entity)
-  ((DYMMY :initarg :DYMMY :initform nil :accessor A-DYMMY)))
-
-
-;; (defun check-perm (perm subj &optional (obj (make-instance 'DYMMY)))
 (defun check-perm (perm subj obj)
   ;; t)
   (let ((rs (eval (perm-check perm subj obj))))
@@ -74,8 +73,6 @@
     (eval rs)
   ))
 
-
-;; (check-perm '(or :admin :self) (gethash 2 *USER*))
 
 ;; TEST
 ;; (check-perm '(or :ADMIN :SELF) (gethash 0 *USER*) (gethash 1 *USER*))
