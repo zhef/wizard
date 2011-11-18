@@ -8,7 +8,6 @@
      :navpoint             "Главная"
      :actions
      '((:tpl               "Главная"
-        :perm              :all
         :val               (funcall (find-symbol "MAIN" 'tpl)))))
 
     ;; Страница регистрации
@@ -57,7 +56,6 @@
      :navpoint             "Новости"
      :actions
      '((:announce          "Анонсы"
-        :perm              :all
         :entity            post-item
         :val               (cons-hash-list *POST-ITEM*)
         :fields            '((:fld   title)
@@ -70,7 +68,6 @@
      :url                  "/post/:id"
      :actions
      '((:post              "%|title|%"
-        :perm              :all
         :entity            post-item
         :val               (gethash (cur-id) *POST-ITEM*)
         :fields            '((:fld title)
@@ -84,8 +81,7 @@
      :url                  "/analytics"
      :navpoint             "Аналитика"
      :actions
-     '((:none              "Аналитика"
-        :perm              :all)))
+     '((:none              "Аналитика")))
 
 
     ;; Каталог материалов
@@ -440,7 +436,6 @@
                                      (hunchentoot:redirect (hunchentoot:request-uri*))))))
 
        (:yamap            "Адрес поставщика"
-        :perm              :all
         :val               (let* ((supp (gethash (cur-id) *USER*))
                                   (name (a-name supp))
                                   (addr (a-actual-address supp))
@@ -454,15 +449,13 @@
                                                affi)
                                        (list addr))))))
        ))
-    ;; (setf (a-affiliates (gethash 5 *USER*)) (mi 'supplier-affiliate :owner (gethash 5 *USER*)
-                                             ;; :address "Проспект просвещения д 24"))
-    ;; ;; Технологии
-    ;; (:place                technologies
-    ;;  :url                  "/technologies"
-    ;;  :navpoint             "Технологии"
-    ;;  :actions
-    ;;  '((:none            "Технологии"
-    ;;     :perm              :all)))
+
+    ;; Технологии
+    (:place                technologies
+     :url                  "/technologies"
+     :navpoint             "Технологии"
+     :actions
+     '((:none            "Технологии")))
 
 
     ;; Распродажи
@@ -753,7 +746,7 @@
                                                                      (hunchentoot:redirect (format nil "/offer/~A" id)))))))
 
                              (:popbtn "Отменить тендер"
-                              :perm   :owner
+                              :perm   :all ;;:owner
                               :action '(:linear            "Действительно отменить?"
                                        :perm               :all ;;:owner
                                        :entity             tender
@@ -932,15 +925,13 @@
      :url                  "/calender"
      :navpoint             "Календарь событий"
      :actions
-     '((:none              "Календарь событий"
-        :perm              :all)))
+     '((:none              "Календарь событий")))
 
     ;; О портале
     (:place                about
      :url                  "/about"
      :actions
      '((:tpl               "О портале"
-        :perm              :all
         :val               (funcall (find-symbol "ABOUT" 'tpl)))))
 
     ;; Услуги портала
@@ -949,7 +940,6 @@
      :navpoint             "Услуги портала"
      :actions
      '((:tpl               "Услуги портала"
-        :perm              :all
         :val               (funcall (find-symbol "SERVICES" 'tpl)))))
 
     ;; Контакты
@@ -958,7 +948,5 @@
      :navpoint             "Контакты"
      :actions
      '((:tpl               "Контакты"
-        :perm              :all
         :val               (funcall (find-symbol "CONTACTS" 'tpl)))))
-
     ))

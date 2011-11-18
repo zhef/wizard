@@ -9,6 +9,16 @@
   (load "defmodule.lisp")
   (load "render.lisp"))
 
+(defun retempl ()
+  (closure-template:compile-template :common-lisp-backend #P"tpl/root.htm")
+  (closure-template:compile-template :common-lisp-backend #P"tpl/right.htm")
+  (closure-template:compile-template :common-lisp-backend #P"tpl/templates.htm")
+  (closure-template:compile-template :common-lisp-backend #P"tpl/main.htm")
+  (closure-template:compile-template :common-lisp-backend #P"tpl/about.htm")
+  (closure-template:compile-template :common-lisp-backend #P"tpl/contacts.htm")
+  (closure-template:compile-template :common-lisp-backend #P"tpl/services.htm"))
+
+
 (restas:define-module #:WIZARD
     (:use #:CL #:ITER #:cl-mysql #:alexandria #:anaphora #:ppcre))
 
@@ -574,7 +584,6 @@ If objs are of different classes the result is NIL."
      ;;                              (bprint (funcall (intern (format nil "A-~A" (symbol-name (closer-mop:slot-definition-name slot)))) obj)))))))
      ))
 
-
 ;; CLASS ACTION - superclass for all actions (:none :linear :grid :tpl :map etc)
 (with-defclass (action ())
   (title "")
@@ -655,8 +664,73 @@ If objs are of different classes the result is NIL."
 
 
 
+(defclass entity () ())
+
+
+;; Структура для хранения интервалов времени
+(defstruct interval
+  (begin 0 :type integer)
+  (end 0 :type integer))
+
+
+;; Определение типов и их расшифровок
+(defmacro define-user-type ((typename varname) &body typelist)
+  `(progn
+     (deftype ,typename ()
+       (cons 'member ,(cons 'list (loop :for key :in typelist :by #'cddr :collect key))))
+     (defparameter ,varname ',typelist)))
+
+;; Возможные типы ресурсов: машины, материалы etc
+(define-user-type (resource-type *resource-types*)
+  :machine "машина"
+  :material "материал")
+;; (typep :machine2 'resource-type)
+
+;; Возможные статусы тендеров
+(define-user-type (tender-status *tender-status*)
+  :active "активный"
+  :unactive "неактивный"
+  :finished "завершенный"
+  :cancelled "отмененный")
+
+;; Возможные статусы поставщиков
+(define-user-type (supplier-status *supplier-status*) ;; Пока нет схемы перехода поставщика в добросовестного будем переводить через заявку
+  :fair "добросовестный"
+  :unfair "недобросовестный"
+  :request "подана заявка")
+
+;; Возможные статусы заявки
+(define-user-type (offer-status *offer-status*)
+  :open      "заявка открыта, но не заполнена"
+  :sended    "заявка открыта и отправлена поставщику"
+  :readed    "заявка прочтена поставщиком"
+  :replyed   "поставщик принял решение участвовать в тендере"
+  :cancelled "поставщик отменил участие в тендере"
+  :invited   "застройщик пригласил поставщика на собеседование"
+  :closed    "тендер завершен, заявка закрыта")
+
+
+;; Типы полей, составляющих сущности - в дальнейшем будут использоваться при диспетчеризации
+(define-user-type (fld-type *fld-types*)
+  :bool                 "T или NIL (checkbox)"
+  :num                  "число"
+  :str                  "строка"
+  :pswd                 "пароль"
+  :list-of-str          "список строк (модификатор: возможность ввода строк пользователем)"
+  :link                 "связанная сущность (модификатор: тип сущности)"
+  :list-of-links        "список связанных сущностей"
+  :list-of-keys         "выпадающий список ключей, с выбором одного из них"
+  :text                 "текстовое поле"
+  :date                 "дата и время"
+  :interval             "диапазоны дат, относящиеся к тендеру"
+  :img                  "изображения, картинки")
+
+;; TODO: при создании экземпляра entity проверять тип поля
+(defparameter *types* (loop :for ftype :in *fld-types* :by #'cddr :collect ftype))
+
+
 (defun passwd ()
-  (with-open-file (file-stream "passwd.txt" :direction :output)
+  (with-open-file (file-stream "passwd.txt" :direction :output :if-exists :supersede)
     (maphash #'(lambda (k v)
                  (declare (ignore k))
                  (unless (equal 'admin(type-of v))

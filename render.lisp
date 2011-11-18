@@ -23,11 +23,12 @@
                                                 :usertype (string-downcase (type-of (gethash userid *USER*)))
                                                 :userid userid))))))
     (declare (special *popups*))
-    ;; Рендерить вложенные объекты надо именно здесь - чтобы работало *popups*!
+    ;; Рендерить вложенные объекты надо до передачи в шаблон - чтобы работало *popups*!
     (let ((in-render (loop :for act :in acts :collect
-                        (if (check-perm (a-perm act) (cur-user) (a-val act))
+                        ;; (if (check-perm (a-perm act) (cur-user) (a-val act))
                             (restas:render-object (mi 'action-render) act)
-                            ""))))
+                            ;; "")
+                            )))
       (tpl:root
        (list
         :mapkey         *mapkey*
@@ -56,6 +57,7 @@
   (tpl:content-block
    (list :title (a-title obj)
          :content "Раздел находится в разработке")))
+
 
 
 ;; ACT: tpl
@@ -114,6 +116,14 @@ function(){
              (format nil "jQuery(\"#~A\").jqGrid('setRowData',ids[i],{~A: ~A});"
                      grid-id in-name btn-str))))))))))
 
+(defmethod restas:render-object :around ((designer action-render) (obj grid))
+  "check-perm :grid"
+  (if (check-perm (a-perm obj) (cur-user) obj)
+      (call-next-method)
+      (if (boundp '*dbg*)
+          (format nil "<br/>~%Permisson [~A] denied for :grid [~A] <br/>~%" (bprint (a-perm obj)) (a-title obj))
+          "")))
+
 
 ;; ACT: linear
 (defmethod restas:render-object ((designer action-render) (obj linear))
@@ -123,6 +133,15 @@ function(){
      (list :content (format nil "~{~A~}"
                             (loop :for infld :in (a-fields obj) :collect
                                (restas:render-object (mi 'linear-render) infld))))))) ;; <-- dispatcher
+
+(defmethod restas:render-object :around ((designer action-render) (obj linear))
+  "check-perm :linear"
+  (if (check-perm (a-perm obj) (cur-user) obj)
+      (call-next-method)
+      (if (boundp '*dbg*)
+          (format nil "<br/>~%Permisson [~A] denied for :linear [~A] <br/>~%" (bprint (a-perm obj)) (a-title obj))
+          "")))
+
 
 
 ;; ACT: announce
@@ -135,6 +154,7 @@ function(){
                                       :photoannounce (or (a-announce-photo announce) "")
                                       :announce (a-announce announce)
                                       :id id))))))
+
 
 ;; ACT: post
 (defmethod restas:render-object ((designer action-render) (obj post))
@@ -175,8 +195,8 @@ function(){
 
 
 (defmethod restas:render-object ((designer grid-render) (obj fld))
-  (unless (check-perm (a-show (a-perm obj)) (cur-user))
-    (return-from restas:render-object nil))
+  ;; (unless (check-perm (a-show (a-perm obj)) (cur-user))
+  ;;   (return-from restas:render-object nil))
   (values
    (a-title obj)
    `(("name"     . ,(a-name obj))
@@ -188,8 +208,8 @@ function(){
 
 
 (defmethod restas:render-object ((designer grid-render) (obj btn))
-  (unless (check-perm (a-perm obj) (cur-user))
-    (return-from restas:render-object nil))
+  ;; (unless (check-perm (a-perm obj) (cur-user))
+  ;;   (return-from restas:render-object nil))
   (values
    ""
    `(("name"     . "")
@@ -201,8 +221,8 @@ function(){
 
 
 (defmethod restas:render-object ((designer grid-render) (obj popbtn))
-  (unless (check-perm (a-perm obj) (cur-user))
-    (return-from restas:render-object nil))
+  ;; (unless (check-perm (a-perm obj) (cur-user))
+  ;;   (return-from restas:render-object nil))
   (let ((in-action (a-action obj)))
     (push
      (list :id (a-name obj)
@@ -257,13 +277,14 @@ function(){
 
 
 (defmethod restas:render-object ((designer linear-render) (obj btn))
-  (if (check-perm (a-perm obj) (cur-user))
+  ;; (if (check-perm (a-perm obj) (cur-user))
       (tpl:btnlin (list :name (a-name obj) :value (a-value obj)))
-      ""))
+      ;; "")
+  )
 
 
 (defmethod restas:render-object ((designer linear-render) (obj popbtn))
-  (if (check-perm (a-perm obj) (cur-user))
+  ;; (if (check-perm (a-perm obj) (cur-user))
       (progn
         (let ((in-action (a-action obj)))
           (push
@@ -275,7 +296,8 @@ function(){
            *popups*))
         (tpl:popbtnlin (list :popid (a-name obj)
                              :value (a-value obj))))
-      ""))
+      ;; "")
+  )
 
 
 (defmethod restas:render-object ((designer linear-render) (obj grid))
