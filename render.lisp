@@ -1,5 +1,18 @@
 (in-package :wizard)
 
+
+(defmacro permacheck ((perm) if-dbg if-not-dbg)
+  "macro for :around permissions check"
+  `(if (check-perm ,perm (cur-user) obj)
+       (call-next-method)
+       (if (and (boundp '*dbg*) *dbg*)
+           ,if-dbg
+           ,if-not-dbg)))
+
+;; (macroexpand-1 '(permacheck ((a-perm obj))
+;;   (print (list 'a 'b))
+;;   (print (list 'c 'd))))
+
 ;; activate
 ;; example-json
 ;; show-acts
@@ -116,13 +129,11 @@ function(){
              (format nil "jQuery(\"#~A\").jqGrid('setRowData',ids[i],{~A: ~A});"
                      grid-id in-name btn-str))))))))))
 
+
 (defmethod restas:render-object :around ((designer action-render) (obj grid))
-  "check-perm :grid"
-  (if (check-perm (a-perm obj) (cur-user) obj)
-      (call-next-method)
-      (if (and (boundp '*dbg*) *dbg*)
-          (format nil "<br/>~%Permisson [~A] denied for :grid [~A] <br/>~%" (bprint (a-perm obj)) (a-title obj))
-          "")))
+  (permacheck ((a-perm obj))
+    (format nil "<br/>~%Permisson [~A] denied for :grid [~A] <br/>~%" (bprint (a-perm obj)) (a-title obj))
+    ""))
 
 
 ;; ACT: linear
@@ -135,12 +146,9 @@ function(){
                                (restas:render-object (mi 'linear-render) infld))))))) ;; <-- dispatcher
 
 (defmethod restas:render-object :around ((designer action-render) (obj linear))
-  "check-perm :linear"
-  (if (check-perm (a-perm obj) (cur-user) obj)
-      (call-next-method)
-      (if (and (boundp '*dbg*) *dbg*)
-          (format nil "<br/>~%Permisson [~A] denied for :linear [~A] <br/>~%" (bprint (a-perm obj)) (a-title obj))
-          "")))
+  (permacheck ((a-perm obj))
+    (format nil "<br/>~%Permisson [~A] denied for :linear [~A] <br/>~%" (bprint (a-perm obj)) (a-title obj))
+    ""))
 
 
 
@@ -178,12 +186,6 @@ function(){
                                              (a-mark-points obj))))))
 
 
-;; ACT: #'function
-
-;; (defmethod restas:render-object ((designer wizard-render) (func function))
-;;   (funcall func))
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; GRID-RENDER ;;;;;;;;;;;;;;;;
 
@@ -208,18 +210,16 @@ function(){
      ("editable" . nil))))
 
 (defmethod restas:render-object :around ((designer grid-render) (obj fld))
-  "check-perm :fld in :grid"
-  (if (check-perm (a-show (a-perm obj)) (cur-user) obj)
-      (call-next-method)
-      (if (and (boundp '*dbg*) *dbg*)
-          (values
-           (format nil "[~A]:[~A]" (bprint (a-show (a-perm obj))) (a-title obj))
-           `(("name"     . "")
-             ("index"    . "")
-             ("width"    . ,(a-width obj))
-             ("align"    . ,(if (equal '(:num) (a-typedata obj)) "center" "left"))
-             ("sortable" . t)
-             ("editable" . nil))))))
+  (permacheck ((a-show (a-perm obj)))
+    (values
+     (format nil "[~A]:[~A]" (bprint (a-show (a-perm obj))) (a-title obj))
+     `(("name"     . "")
+       ("index"    . "")
+       ("width"    . ,(a-width obj))
+       ("align"    . ,(if (equal '(:num) (a-typedata obj)) "center" "left"))
+       ("sortable" . t)
+       ("editable" . nil)))
+    nil))
 
 
 ;; BTN in GRID
@@ -237,18 +237,16 @@ function(){
 
 
 (defmethod restas:render-object :around ((designer grid-render) (obj btn))
-  "check-perm :btn in :grid"
-  (if (check-perm (a-perm obj) (cur-user) obj)
-      (call-next-method)
-      (if (and (boundp '*dbg*) *dbg*)
-          (values
-           (format nil "[~A]" (bprint (a-perm obj)))
-           `(("name"     . "")
-             ("index"    . "")
-             ("width"    . ,(a-width obj))
-             ("align"    . "center")
-             ("sortable" . nil)
-             ("editable" . nil))))))
+  (permacheck ((a-perm obj))
+    (values
+     (format nil "[~A]" (bprint (a-perm obj)))
+     `(("name"     . "")
+       ("index"    . "")
+       ("width"    . ,(a-width obj))
+       ("align"    . "center")
+       ("sortable" . nil)
+       ("editable" . nil)))
+    nil))
 
 ;; POPBTN in GRID
 
@@ -271,18 +269,16 @@ function(){
      ("editable" . nil))))
 
 (defmethod restas:render-object :around ((designer grid-render) (obj popbtn))
-  "check-perm :popbtn in :grid"
-  (if (check-perm (a-perm obj) (cur-user) obj)
-      (call-next-method)
-      (if (and (boundp '*dbg*) *dbg*)
-          (values
-           (format nil "[~A]" (bprint (a-perm obj)))
-           `(("name"     . "")
-             ("index"    . "")
-             ("width"    . ,(a-width obj))
-             ("align"    . "center")
-             ("sortable" . nil)
-             ("editable" . nil))))))
+  (permacheck ((a-perm obj))
+    (values
+     (format nil "[~A]" (bprint (a-perm obj)))
+     `(("name"     . "")
+       ("index"    . "")
+       ("width"    . ,(a-width obj))
+       ("align"    . "center")
+       ("sortable" . nil)
+       ("editable" . nil)))
+    nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LINEAR-RENDER ;;;;;;;;;;;;;;
 
@@ -303,34 +299,37 @@ function(){
 
 
 (defmethod restas:render-object ((designer linear-render) (obj btn))
-  ;; (if (check-perm (a-perm obj) (cur-user))
-      (tpl:btnlin (list :name (a-name obj) :value (a-value obj)))
-      ;; "")
-  )
+      (tpl:btnlin (list :name (a-name obj) :value (a-value obj))))
+
+(defmethod restas:render-object :around ((designer linear-render) (obj btn))
+  (permacheck ((a-perm obj))
+    (format nil "<br/>~%Permisson [~A] denied for :btn [~A] <br/>~%" (bprint (a-perm obj)) (a-value obj))
+    ""))
 
 
 (defmethod restas:render-object ((designer linear-render) (obj popbtn))
-  ;; (if (check-perm (a-perm obj) (cur-user))
-      (progn
-        (let ((in-action (a-action obj)))
-          (push
-           (list :id (a-name obj)
-                 :title (a-title in-action)
-                 :content (restas:render-object (mi 'action-render) in-action)
-                 :top (a-top obj)
-                 :left (a-left obj)
-                 :width (a-width obj)
-                 :height (a-height obj))
-           *popups*))
-        (tpl:popbtnlin (list :popid (a-name obj)
-                             :value (a-value obj))))
-      ;; "")
-  )
+  (let ((in-action (a-action obj)))
+    (push
+     (list :id (a-name obj)
+           :title (a-title in-action)
+           :content (restas:render-object (mi 'action-render) in-action)
+           :top (a-top obj)
+           :left (a-left obj)
+           :width (a-width obj)
+           :height (a-height obj))
+     *popups*))
+  (tpl:popbtnlin (list :popid (a-name obj)
+                       :value (a-value obj))))
+
+(defmethod restas:render-object :around ((designer linear-render) (obj popbtn))
+  (permacheck ((a-perm obj))
+    (format nil "<br/>~%Permisson [~A] denied for :popbtn [~A] <br/>~%" (bprint (a-perm obj)) (a-value obj))
+    ""))
+
 
 
 (defmethod restas:render-object ((designer linear-render) (obj grid))
   (restas:render-object (mi 'action-render) obj))
-
 
 
 (defmethod restas:render-object ((designer linear-render) (obj file))
@@ -340,46 +339,46 @@ function(){
 
 
 
-(restas:define-route test ("/test")
-  (list
-   (mi 'linear :title "Поставщик"
-       :perm ':ALL
-       :val (named-lambda ACTNL-1216 () (GETHASH 2 *USER*))
-       :fields (list
-                (mi 'fld :name "NAME" :typedata '(:STR) :title "Название организации" :width 300 :xref NIL
-                    :perm (MI 'PERM :UPDATE (OR :ADMIN :SELF) :SHOW :ALL :VIEW :ALL :DELETE :ADMIN
-                              :CREATE (OR :ADMIN :NOT-LOGGED)))
-                (mi 'fld :name "CONTACT-EMAIL" :typedata '(:STR) :title "Контактный email" :width 200 :xref NIL
-                    :perm (MI 'PERM :UPDATE (OR :ADMIN :SELF) :SHOW :ALL :VIEW :ALL :DELETE :ADMIN
-                              :CREATE (OR :ADMIN :NOT-LOGGED)))
-                (mi 'btn :name "b1217" :width 200 :perm '(OR :ADMIN :SELF) :value "Сохранить")
-                (mi 'popbtn :name "p1237" :width 200 :perm :all :value "Добавить распродажу"
-                    :action
-                    (mi 'linear :title "Добавление расподажи"
-                        :perm ':all
-                        :val (named-lambda ACTNL-1238 () NIL)
-                        :fields (list
-                                 (mi 'btn :name "b1239" :width 200 :perm :ALL :value "Добавить распродажу"))))
-                (mi 'grid :title "Адреса филиалов и магазинов"
-                    :perm ':ALL
-                    :grid "jg1218"
-                    :param-id T
-                    :height "180"
-                    :val (named-lambda ACTNL-1220 () (CONS-INNER-OBJS *SUPPLIER-AFFILIATE* (A-AFFILIATES (GETHASH 5 *USER*))))
-                    :fields (list
-                             (mi 'fld :name "ADDRESS" :typedata '(:STR) :title "Адрес" :width 850 :xref NIL
-                                 :perm (MI 'PERM :UPDATE (OR :ADMIN :SELF) :SHOW :ALL :VIEW :ALL :DELETE :ADMIN
-                                           :CREATE :ADMIN))))
-                (mi 'grid :title "Список заявок на тендеры"
-                    :perm ':ALL
-                    :grid "jg1242"
-                    :param-id T
-                    :height "180"
-                    :val (named-lambda ACTNL-1244 () (CONS-INNER-OBJS *OFFER* (A-OFFERS (GETHASH (CUR-ID) *USER*))))
-                    :fields (list
-                             (mi 'fld :name "TENDER" :typedata '(:LINK TENDER) :title "Тендер" :width 640 :xref NIL
-                                 :perm (MI 'PERM :UPDATE (AND :ACTIVE :OWNER) :SHOW :ALL :VIEW :ALL :DELETE
-                                           (AND :OWNER :ACTIVE) :CREATE (AND :ACTIVE :SUPPLIER)))
-                             (mi 'btn :name "b1240" :width 110 :perm :ALL :value "Страница заявки")
-                             (mi 'btn :name "b1241" :width 105 :perm :ALL :value "Удалить заявку")))
-                ))))
+;; (restas:define-route test ("/test")
+;;   (list
+;;    (mi 'linear :title "Поставщик"
+;;        :perm ':ALL
+;;        :val (named-lambda ACTNL-1216 () (GETHASH 2 *USER*))
+;;        :fields (list
+;;                 (mi 'fld :name "NAME" :typedata '(:STR) :title "Название организации" :width 300 :xref NIL
+;;                     :perm (MI 'PERM :UPDATE (OR :ADMIN :SELF) :SHOW :ALL :VIEW :ALL :DELETE :ADMIN
+;;                               :CREATE (OR :ADMIN :NOT-LOGGED)))
+;;                 (mi 'fld :name "CONTACT-EMAIL" :typedata '(:STR) :title "Контактный email" :width 200 :xref NIL
+;;                     :perm (MI 'PERM :UPDATE (OR :ADMIN :SELF) :SHOW :ALL :VIEW :ALL :DELETE :ADMIN
+;;                               :CREATE (OR :ADMIN :NOT-LOGGED)))
+;;                 (mi 'btn :name "b1217" :width 200 :perm '(OR :ADMIN :SELF) :value "Сохранить")
+;;                 (mi 'popbtn :name "p1237" :width 200 :perm :all :value "Добавить распродажу"
+;;                     :action
+;;                     (mi 'linear :title "Добавление расподажи"
+;;                         :perm ':all
+;;                         :val (named-lambda ACTNL-1238 () NIL)
+;;                         :fields (list
+;;                                  (mi 'btn :name "b1239" :width 200 :perm :ALL :value "Добавить распродажу"))))
+;;                 (mi 'grid :title "Адреса филиалов и магазинов"
+;;                     :perm ':ALL
+;;                     :grid "jg1218"
+;;                     :param-id T
+;;                     :height "180"
+;;                     :val (named-lambda ACTNL-1220 () (CONS-INNER-OBJS *SUPPLIER-AFFILIATE* (A-AFFILIATES (GETHASH 5 *USER*))))
+;;                     :fields (list
+;;                              (mi 'fld :name "ADDRESS" :typedata '(:STR) :title "Адрес" :width 850 :xref NIL
+;;                                  :perm (MI 'PERM :UPDATE (OR :ADMIN :SELF) :SHOW :ALL :VIEW :ALL :DELETE :ADMIN
+;;                                            :CREATE :ADMIN))))
+;;                 (mi 'grid :title "Список заявок на тендеры"
+;;                     :perm ':ALL
+;;                     :grid "jg1242"
+;;                     :param-id T
+;;                     :height "180"
+;;                     :val (named-lambda ACTNL-1244 () (CONS-INNER-OBJS *OFFER* (A-OFFERS (GETHASH (CUR-ID) *USER*))))
+;;                     :fields (list
+;;                              (mi 'fld :name "TENDER" :typedata '(:LINK TENDER) :title "Тендер" :width 640 :xref NIL
+;;                                  :perm (MI 'PERM :UPDATE (AND :ACTIVE :OWNER) :SHOW :ALL :VIEW :ALL :DELETE
+;;                                            (AND :OWNER :ACTIVE) :CREATE (AND :ACTIVE :SUPPLIER)))
+;;                              (mi 'btn :name "b1240" :width 110 :perm :ALL :value "Страница заявки")
+;;                              (mi 'btn :name "b1241" :width 105 :perm :ALL :value "Удалить заявку")))
+;;                 ))))

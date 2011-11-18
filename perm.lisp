@@ -57,7 +57,7 @@
            (:cancelled (error "perm-todo :cancelled")) ;; Объект является отмененным тендером
            ;; Mixed
            (:self      (equal subj obj))               ;; Объект выполняет операцию надо собой
-           (:owner     (equal (a-owner subj) obj))     ;; Объект, над которым совершается действие имеет поле owner текущего пользователя
+           (:owner     t) ;;(equal (a-owner subj) obj))     ;; Объект, над которым совершается действие имеет поле owner текущего пользователя
            ))
         (t perm)))
 
@@ -68,11 +68,10 @@
 
 ;; (defun check-perm (perm subj &optional (obj (make-instance 'DYMMY)))
 (defun check-perm (perm subj obj)
-  t)
+  ;; t)
   (let ((rs (eval (perm-check perm subj obj))))
     (safe-write (path "perm-log.txt") (format nil "perm: ~A; result: ~A; subj: ~A; obj: ~A~%" perm rs subj obj))
     (eval rs)
-
   ))
 
 
