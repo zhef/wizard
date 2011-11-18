@@ -9,10 +9,6 @@
            ,if-dbg
            ,if-not-dbg)))
 
-;; (macroexpand-1 '(permacheck ((a-perm obj))
-;;   (print (list 'a 'b))
-;;   (print (list 'c 'd))))
-
 ;; activate
 ;; example-json
 ;; show-acts

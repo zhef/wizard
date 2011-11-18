@@ -137,7 +137,7 @@
                             (replace-all (funcall accessor obj)
                                          "%|id|%"
                                          (format nil "~A" id))
-                            (if (boundp '*dbg*) "permission denied in grid pager" "")))))))
+                            (if (and (boundp '*dbg*) *dbg*) "permission denied in grid pager" "")))))))
       (values result cnt-rows))))
 
 
