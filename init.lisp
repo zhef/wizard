@@ -280,22 +280,6 @@
                       ))))))))))
 
 
-(push-hash *POST-ITEM* 'POST-ITEM
-  :title "Первая новость"
-  :date  "07.11.2011"
-  :announce-photo nil
-  :announce "Это текст анонса первой новости"
-  :text "Это текст первой новости")
-
-
-(push-hash *POST-ITEM* 'POST-ITEM
-  :title "Вторая новость"
-  :date  "07.11.2011"
-  :announce-photo nil
-  :announce "Это текст анонса второй новости"
-  :text "Это текст второй новости")
-
-
 (defun get-post-items-from-dir (section)
   (loop :for html-file :in (directory (path (format nil "~A/*.htm" section))) :collect
      (let ((content  (read-file-into-string html-file))
