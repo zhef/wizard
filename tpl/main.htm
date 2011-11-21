@@ -25,6 +25,12 @@
   </div>
 {/template}
 
+{template postpage}
+  {foreach $elt in $postblocks}
+    {call postblock data="$elt" /}
+  {/foreach}
+{/template}
+
 {template main}
   <div class="news_list">
     <a href="news_list.html" class="right">Все новости</a>

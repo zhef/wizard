@@ -69,15 +69,21 @@
      :url                  "/posts"
      :navpoint             "Новости"
      :actions
-     '((:announce          "Анонсы"
-        :entity            post-item
-        :val               (remove-if-not #'(lambda (x)
-                                              (equal "news" (a-section (cdr x))))
-                            (cons-hash-list *POST-ITEM*))
-        :fields            '((:fld title)
-                             (:fld date)
-                             (:fld announce-photo)
-                             (:fld announce)))))
+     '((:tpl               "Новости"
+        :val               (funcall (find-symbol "POSTPAGE" 'tpl)
+                            (list :postblocks (list (list* :xrefall "/event"
+                                                           :titleall "все новости"
+                                                           :title "Календарь событий"
+                                                           :posts (posts-by-section "ivent" 3))
+                                                    (list* :xrefall "/technologies"
+                                                           :titleall "все новости"
+                                                           :title "Новые технологии"
+                                                           :posts (posts-by-section "techno" 3))
+                                                    (list* :xrefall "/posts"
+                                                           :titleall "все новости"
+                                                           :title "Новости строительной сферы"
+                                                           :posts (posts-by-section "news" 3)))))
+        )))
 
     ;; Новость
     (:place                post
