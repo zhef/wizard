@@ -36,18 +36,23 @@
            (:all       t)                                            ;; Все пользователи
            (:nobody    nil)                                          ;; Никто
            (:system    nil) ;; Система (загрузка данных на старте и изменение статуса поставщиков, когда время добросовестности истеклл)
-           (:notlogged (if (cur-user) nil t))                        ;; Незалогиненный пользователь (может зарегистрироваться как поставщик)
-           (:logged    (if (cur-user) t nil))                        ;; Залогиненный пользователь
+           ;; Subjects
+           (:notlogged (if subj nil t))                              ;; Незалогиненный пользователь (может зарегистрироваться как поставщик)
+           (:logged    (if subj t nil))                              ;; Залогиненный пользователь
            (:admin     (if (equal (type-of subj) 'ADMIN) t nil))     ;; Администратор
            (:expert    (if (equal (type-of subj) 'EXPERT) t nil))    ;; Пользователь-Эксперт
            (:builder   (if (equal (type-of subj) 'BUILDER) t nil))   ;; Пользователь-Застройщик
            (:supplier  (if (equal (type-of subj) 'SUPPLIER) t nil))  ;; Пользователь-Поставщик
            ;; Objects
-           (:fair      (if (equal (type-of subj) 'SUPPLIER)          ;; Объект является добросовестным поставщиком
-                           (if (equal (a-status (cur-user)) :fair) t nil)
+           (:fair      (if (equal (type-of obj) 'SUPPLIER)           ;; Объект является добросовестным поставщиком
+                           (if (equal (a-status obj) :fair)
+                               t
+                               nil)
                            nil))
-           (:unfair    (if (equal (type-of subj) 'SUPPLIER)          ;; Объект является недобросовестным поставщиком
-                           (if (equal (a-status (cur-user)) :unfair) t nil)
+           (:unfair    (if (equal (type-of obj) 'SUPPLIER)          ;; Объект является недобросовестным поставщиком
+                           (if (equal (a-status obj) :unfair)
+                               t
+                               nil)
                            nil))
            (:active    (error "perm-todo :active"))    ;; Объект является активным тендером, т.е. время подачи заявок не истекло
            (:unacitve  (error "perm-todo :unacitve"))  ;; Объект является неакивным тендером, т.е. время подачи заявок не наступило
@@ -56,7 +61,14 @@
            (:finished  (error "perm-todo :finished"))  ;; Объект является завершенным тендером
            (:cancelled (error "perm-todo :cancelled")) ;; Объект является отмененным тендером
            ;; Mixed
-           (:self      (equal subj obj))               ;; Объект выполняет операцию надо собой
+           (:selfpage  (destructuring-bind (root obj-type id) ;; Объект выполняет операцию на своей странице
+                           (request-list)
+                         (if (and (not (null obj-type))
+                                  (not (null id))
+                                  (equal id (format nil "~A" (parse-integer id :junk-allowed t)))
+                                  (string= (string-upcase obj-type) (type-of (gethash (parse-integer id :junk-allowed t) *USER*))))
+                             t
+                             nil)))
            (:owner     (if (and (not (null obj))
                                 (not (null subj))
                                 (slot-exists-p obj 'owner)

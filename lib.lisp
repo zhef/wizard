@@ -48,9 +48,11 @@
   `(let ((inner-lst ,inner-lst)
          (cons-hash (cons-hash-list ,hash)))
      (loop :for obj :in inner-lst :collect
-        (loop :for cons :in cons-hash :collect
-           (when (equal (cdr cons) obj)
-             (return cons))))))
+        (block in-ret
+          (loop :for cons :in cons-hash :collect
+             (when (equal (cdr cons) obj)
+               (return-from in-ret cons)))
+          nil))))
 
 (defmacro del-inner-obj (form-element hash inner-lst)
   `(let* ((key  (get-btn-key ,form-element))

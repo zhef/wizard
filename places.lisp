@@ -312,7 +312,7 @@
                              (:fld contact-phone)
                              (:fld contact-email)
                              (:btn               "Сохранить"
-                              :perm              '(or :admin :self)
+                              :perm              '(or :admin :selfpage)
                               :act (let ((obj (gethash (cur-id) *USER*)))
                                      (with-obj-save obj
                                        NAME JURIDICAL-ADDRESS ACTUAL-ADDRESS CONTACTS EMAIL SITE HEADS INN KPP OGRN BANK-NAME
@@ -344,9 +344,9 @@
                               :left               280
                               :height             200
                               :width              700
-                              :perm               :self
+                              :perm               :selfpage
                               :action '(:linear             "Добавление прайс-листа"
-                                        :perm               '(or :admin :self)
+                                        :perm               '(or :admin :selfpage)
                                         :entity             supplier-resource-price-elt
                                         :val                :clear
                                         :fields             '(
@@ -374,7 +374,7 @@
                               :val               (cons-inner-objs *SUPPLIER-RESOURCE* (a-resources (gethash (cur-id) *USER*)))
                               :fields            '((:fld resource :width 800)
                                                    (:btn   "Удалить"
-                                                    :perm  :self
+                                                    :perm  :selfpage
                                                     :width 100
                                                     :act (del-inner-obj
                                                           (caar (form-data))
@@ -386,7 +386,7 @@
                               :left               280
                               :height             400
                               :width              900
-                              :perm              '(or :admin :self)
+                              :perm              '(or :admin :selfpage)
                               :action '(:grid               "Добавление ресурса"
                                         :perm               :all
                                         :entity             resource
@@ -427,7 +427,7 @@
                              (:popbtn "Добавить распродажу"
                               :perm :nobody
                               :action '(:linear             "Добавление расподажи"
-                                       :perm               :self
+                                       :perm               :selfpage
                                        :entity             sale
                                        :fields             '((:btn "Добавить распродажу"
                                                               :perm :all
@@ -453,7 +453,7 @@
                              ))
 
        (:linear            "Отправить заявку на добросовестность" ;; заявка на статус добросовестного поставщика (изменяет статус поставщика)
-        :perm              '(and :self :unfair)
+        :perm              '(and :selfpage :unfair)
         :entity            supplier
         :val               (gethash (cur-id) *USER*)
         :fields            '((:btn "Отправить заявку на добросовестность"
@@ -503,7 +503,7 @@
                              (:fld notes)
                              (:fld resource)
                              (:btn "Сохранить"
-                              :perm :self
+                              :perm :selfpage
                               :act (let ((obj (gethash (cur-id) *SALE*)))
                                      (with-obj-save obj
                                        name price procent notes)))))))
@@ -552,7 +552,7 @@
                                                   (:fld all :width 200)))))
 
        (:linear            "Объявить новый тендер"
-        :perm              :self
+        :perm              :selfpage
         :entity            tender
         :val               :clear
         :fields            '((:btn "Объявить тендер"
@@ -615,7 +615,7 @@
                               :perm :all
                               :act (let ((obj (gethash (cur-id) *TENDER*)))
                                      (with-obj-save obj
-                                       name active-date all claim analize interview result)))
+                                       name all claim analize interview result)))
                              ;; resources
                              (:grid             "Ресурсы тендера"
                               :perm             :all
@@ -644,27 +644,30 @@
                                          :width 130
                                          :act   (to "/tender-resource/~A" (caar (last (form-data)))))))
 
-
-                             (:popbtn "Добавить ресурс"
-                              :perm   :all
-                              :action '(:grid              "Выберите ресурсы"
-                                       :perm              :all ;;'(and :active :fair)
-                                       :entity            resource
-                                       :val               (cons-hash-list *RESOURCE*)
-                                       :fields            '((:fld name)
-                                                            (:btn      "Добавить к тендеру"
-                                                             :perm     :all
-                                                             :width    140
-                                                             :act      (let* ((key      (get-btn-key (caar (last (form-data)))))
-                                                                              (resource (gethash key *RESOURCE*))
-                                                                              (tender (gethash (cur-id) *TENDER*)))
-                                                                         #| TODO: Надо находить пересечение с ресурсами поставщика, который видит это |#
-                                                                         (multiple-value-bind (elt id)
-                                                                             (push-hash *TENDER-RESOURCE* 'TENDER-RESOURCE
-                                                                               :tender   tender
-                                                                               :resource resource)
-                                                                           (append-link (a-resources tender) elt)
-                                                                           (hunchentoot:redirect (format nil "/tender-resource/~A" id))))))))
+                             (:popbtn  "Добавить ресурс"
+                              :top     400
+                              :left    280
+                              :height  600
+                              :width   800
+                              :perm    :all
+                              :action  '(:grid              "Выберите ресурсы"
+                                         :perm              :all ;;'(and :active :fair)
+                                         :entity            resource
+                                         :val               (cons-hash-list *RESOURCE*)
+                                         :fields            '((:fld name :xref "resource" :width 650)
+                                                              (:btn      "Добавить к тендеру"
+                                                               :perm     :all
+                                                               :width    140
+                                                               :act      (let* ((key      (get-btn-key (caar (last (form-data)))))
+                                                                                (resource (gethash key *RESOURCE*))
+                                                                                (tender (gethash (cur-id) *TENDER*)))
+                                                                           #| TODO: Надо находить пересечение с ресурсами поставщика, который видит это |#
+                                                                           (multiple-value-bind (elt id)
+                                                                               (push-hash *TENDER-RESOURCE* 'TENDER-RESOURCE
+                                                                                 :tender   tender
+                                                                                 :resource resource)
+                                                                             (append-link (a-resources tender) elt)
+                                                                             (hunchentoot:redirect (format nil "/tender-resource/~A" id))))))))
 
                              ;; documents
                              (:grid             "Документы тендера"
