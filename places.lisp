@@ -612,7 +612,7 @@
                              (:fld result)
                              ;; winner price
                              (:btn "Сохранить"
-                              :perm :all
+                              :perm :owner
                               :act (let ((obj (gethash (cur-id) *TENDER*)))
                                      (with-obj-save obj
                                        name all claim analize interview result)))
@@ -621,37 +621,34 @@
                               :perm             :all
                               :entity           tender-resource
                               :val              (cons-inner-objs *TENDER-RESOURCE* (a-resources (gethash (cur-id) *TENDER*)))
-                              :fields '((:fld resource)
+                              :fields '((:fld resource :xref "tender-resource" :width 400)
                                         ;; (:calc  "Ед.изм."
                                         ;;  :perm :all
                                         ;;  :width 40
                                         ;;  :func (lambda (x) (a-unit (a-resource x))))
-                                        (:fld quantity)
-                                        (:fld price)
-                                        (:fld delivery)
-                                        (:fld basic)
+                                        (:fld quantity :width 80)
+                                        (:fld price :width 80)
+                                        (:fld delivery :width 100)
+                                        (:fld basic :width 100)
                                         (:btn   "Удалить из тендера"
-                                         :perm  :all
-                                         :width 130
+                                         :perm  :owner
+                                         :width 125
                                          :act   (let ((etalon (gethash (get-btn-key (caar (last (form-data)))) *TENDER-RESOURCE*)))
                                                   (setf (a-resources (gethash (cur-id) *TENDER*))
                                                         (remove-if #'(lambda (x)
                                                                        (equal x etalon))
                                                                    (a-resources (gethash (cur-id) *TENDER*))))
-                                                  (hunchentoot:redirect (hunchentoot:request-uri*))))
-                                        (:btn   "Страница ресурса"
-                                         :perm :all
-                                         :width 130
-                                         :act   (to "/tender-resource/~A" (caar (last (form-data)))))))
+                                                  (hunchentoot:redirect (hunchentoot:request-uri*))))))
 
                              (:popbtn  "Добавить ресурс"
                               :top     400
                               :left    280
-                              :height  600
+                              :height  480
                               :width   800
-                              :perm    :all
+                              :perm    :owner
                               :action  '(:grid              "Выберите ресурсы"
                                          :perm              :all ;;'(and :active :fair)
+                                         :height            240
                                          :entity            resource
                                          :val               (cons-hash-list *RESOURCE*)
                                          :fields            '((:fld name :xref "resource" :width 650)
@@ -694,12 +691,12 @@
                              (:popbtn "Добавить документ"
                               :perm   :all
                               :action '(:linear            "Загрузка документа"
-                                       :perm              :all ;; '(and :active :fair)
-                                       :entity            document
-                                       :val               :clear
-                                       :fields            '((:btn   "Загрузит документ (пока не активно)"
-                                                             :perm  :all
-                                                             :act   (upload-document)))))
+                                        :perm              :all ;; '(and :active :fair)
+                                        :entity            document
+                                        :val               :clear
+                                        :fields            '((:btn   "Загрузить документ (пока не активно)"
+                                                              :perm  :all
+                                                              :act   (upload-document)))))
 
                              ;; suppliers
                              (:grid             "Поставщики ресурсов"

@@ -69,14 +69,25 @@
                                   (string= (string-upcase obj-type) (type-of (gethash (parse-integer id :junk-allowed t) *USER*))))
                              t
                              nil)))
-           (:owner     (if (and (not (null obj))
-                                (not (null subj))
-                                (slot-exists-p obj 'owner)
-                                (equal (a-owner obj) obj))
-                           t ;; Объект, над которым совершается действие имеет поле owner текущего пользователя
-                           nil))
+           (:owner     (destructuring-bind (root obj-type id) ;; Объект, над которым совершается действие имеет поле owner текущего пользователя
+                           (request-list)
+                         (if (and (not (null obj-type))
+                                  (not (null id))
+                                  (equal id (format nil "~A" (parse-integer id :junk-allowed t))))
+                             (let* ((hash   (intern  (string-upcase (format nil "*~A*"  "tender")) :wizard))
+                                    (target (gethash (parse-integer "12" :junk-allowed t) (symbol-value hash))))
+                               (if (and (slot-exists-p target 'owner)
+                                        (equal (a-owner target) subj))
+                                   t
+                                   nil)))))
            ))
         (t perm)))
+
+
+(let* ((hash   (intern  (string-upcase (format nil "*~A*"  "tender"))))
+       (target (gethash (parse-integer "12" :junk-allowed t) (symbol-value hash))))
+  target)
+
 
 (defun check-perm (perm subj obj)
   ;; t)
