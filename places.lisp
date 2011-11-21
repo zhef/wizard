@@ -1,5 +1,6 @@
 (in-package #:wizard)
 
+
 (defparameter *places*
   '(
     ;; Главная страница
@@ -8,7 +9,20 @@
      :navpoint             "Главная"
      :actions
      '((:tpl               "Главная"
-        :val               (funcall (find-symbol "MAIN" 'tpl)))))
+        :val               (funcall (find-symbol "MAIN" 'tpl)
+                            (list :postblocks (list (list* :xrefall "/event"
+                                                           :titleall "все новости"
+                                                           :title "Календарь событий"
+                                                           :posts (posts-by-section "ivent" 3))
+                                                    (list* :xrefall "/technologies"
+                                                           :titleall "все новости"
+                                                           :title "Новые технологии"
+                                                           :posts (posts-by-section "techno" 3))
+                                                    (list* :xrefall "/posts"
+                                                           :titleall "все новости"
+                                                           :title "Новости строительной сферы"
+                                                           :posts (posts-by-section "news" 3)))))
+        )))
 
     ;; Страница регистрации
     (:place                register
@@ -57,7 +71,9 @@
      :actions
      '((:announce          "Анонсы"
         :entity            post-item
-        :val               (cons-hash-list *POST-ITEM*)
+        :val               (remove-if-not #'(lambda (x)
+                                              (equal "news" (a-section (cdr x))))
+                            (cons-hash-list *POST-ITEM*))
         :fields            '((:fld title)
                              (:fld date)
                              (:fld announce-photo)
@@ -460,14 +476,6 @@
                                                affi)
                                        (list addr))))))
        ))
-
-    ;; Технологии
-    (:place                technologies
-     :url                  "/technologies"
-     :navpoint             "Технологии"
-     :actions
-     '((:none              "Технологии")))
-
 
     ;; Распродажи
     (:place                sales
@@ -929,13 +937,51 @@
                                      (hunchentoot:redirect (format nil "/offer/~A" offer-id))))))))
 
 
-
     ;; Календарь событий
-    (:place                calendar
-     :url                  "/calender"
+    (:place                event
+     :url                  "/event"
      :navpoint             "Календарь событий"
      :actions
-     '((:none              "Календарь событий")))
+     '((:announce          "Анонсы"
+        :entity            post-item
+        :val               (remove-if-not #'(lambda (x)
+                                              (equal "ivent" (a-section (cdr x))))
+                            (cons-hash-list *POST-ITEM*))
+        :fields            '((:fld title)
+                             (:fld date)
+                             (:fld announce-photo)
+                             (:fld announce)))))
+
+    ;; Новые технологии
+    (:place                technologies
+     :url                  "/technologies"
+     :navpoint             "Технологии"
+     :actions
+     '((:announce          "Новые технологии"
+        :entity            post-item
+        :val               (remove-if-not #'(lambda (x)
+                                              (equal "techno" (a-section (cdr x))))
+                            (cons-hash-list *POST-ITEM*))
+        :fields            '((:fld title)
+                             (:fld date)
+                             (:fld announce-photo)
+                             (:fld announce)))))
+
+
+    ;; Новости законодальства
+    (:place                laws
+     :url                  "/laws"
+     ;; :navpoint             "Новости законодательства"
+     :actions
+     '((:announce          "Новости законодательства"
+        :entity            post-item
+        :val               (remove-if-not #'(lambda (x)
+                                              (equal "laws" (a-section (cdr x))))
+                            (cons-hash-list *POST-ITEM*))
+        :fields            '((:fld title)
+                             (:fld date)
+                             (:fld announce-photo)
+                             (:fld announce)))))
 
     ;; О портале
     (:place                about

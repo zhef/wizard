@@ -712,6 +712,17 @@ If objs are of different classes the result is NIL."
 
 
 
+(defun posts-by-section (section count)
+  (list (mapcar #'(lambda (x)
+                    (let ((elt (cdr x)))
+                      (list :date (a-date elt)
+                            :title (a-title elt)
+                            :xref (format nil "/post/~A" (car x)))))
+                (last (remove-if-not #'(lambda (x)
+                                         (equal section (a-section (cdr x))))
+                                     (cons-hash-list *POST-ITEM*)) count))))
+
+
 (defun re-tpl ()
   (closure-template:compile-template :common-lisp-backend #P"tpl/root.htm")
   (closure-template:compile-template :common-lisp-backend #P"tpl/right.htm")

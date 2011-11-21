@@ -2,6 +2,29 @@
 
 {namespace tpl}
 
+{template postelt}
+  <tr>
+    <td>{$date}</td>
+    <td>
+      <a href="{$xref}">
+        {$title |noAutoescape}
+      </a>
+    </td>
+  </tr>
+{/template}
+
+{template postblock}
+  <div class="news_law">
+    <a href="{$xrefall}" class="right">{$titleall |noAutoescape}</a>
+    <h2><img src="img/icons/rss_add.png" alt="" />&nbsp;{$title |noAutoescape}</h2>
+    <table>
+      {foreach $elt in $posts}
+        {call postelt data="$elt" /}
+      {/foreach}
+    </table>
+  </div>
+{/template}
+
 {template main}
   <div class="news_list">
     <a href="news_list.html" class="right">Все новости</a>
@@ -42,36 +65,11 @@
     </table>
   </div>
   <div class="banner_center"></div>
-  <div class="news_law">
-    <a href="news_law.html" class="right">Все новости</a>
-    <h2><img src="img/icons/rss_add.png" alt="" /> Новости законодательства</h2>
-    <table>
-      <tr>
-        <td>08.11.2011</td>
-        <td>
-          <a href="news.html">
-            Поправки к закону №345-23 87 от 23 марта 1987 года "О возведении усадьб в черте города"
-          </a>
-        </td>
-      </tr>
-      <tr>
-        <td>07.11.2011</td>
-        <td>
-          <a href="news.html">
-            Новый пакет нормативных документов по закупке стройматериалов на черном рынке
-          </a>
-        </td>
-      </tr>
-      <tr>
-        <td>29.10.2011</td>
-        <td>
-          <a href="news.html">
-            С ноября вступает в силу закон "О вольном наеме граждан из Северной Кореи" №32453-2010 от 13 октября 2011 года
-          </a>
-        </td>
-      </tr>
-    </table>
-  </div>
+
+  {foreach $elt in $postblocks}
+    {call postblock data="$elt" /}
+  {/foreach}
+
   <div class="action">
     <a href="news_list.html" class="right">Все акции</a><h2><img src="img/icons/rss_add.png" alt="" /> Акции, скидки и предложения</h2>
     <table>
