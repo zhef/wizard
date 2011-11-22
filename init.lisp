@@ -343,7 +343,7 @@
          :val (lambda ()
                 (format nil "<pre>~A</pre>"
                         (read-file-into-string (path "passwd.txt")))))))
-  (restas:define-route passwords ("/passwords" :method :post)
+  (restas:define-route passwords/post ("/passwords" :method :post)
     (passwd)
     (list
      (mi 'tpl :title "Пароли" :perm :ALL
