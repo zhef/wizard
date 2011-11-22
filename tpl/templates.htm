@@ -1,0 +1,336 @@
+// -*- mode: closure-template-html; fill-column: 130 -*-
+
+{namespace tpl}
+
+
+{template old}
+  <link rel="stylesheet" href="/default.css" type="text/css" />{\n}
+  <link rel="stylesheet" href="/unique.css" type="text/css" />{\n}
+  <link rel="stylesheet" href="/content.css" type="text/css" />{\n}
+  <link rel="stylesheet" href="/general.css" type="text/css" />{\n}
+  <link rel="stylesheet" href="/templateBanner.css" type="text/css" />{\n}
+  <script type="text/javascript" src="/general.js"></script>{\n}
+{/template}
+
+
+{template loginform}
+  <div class="enter">
+    <a class="key dot" href="#" onclick="ShowHide('popupLogin'); return false;">
+      <span>Вход</span>
+    </a>|
+    <a href="/register">Регистрация</a>
+  </div>
+{/template}
+
+
+{template logoutform}
+  <div class="cabinet">
+    <form method="post" style="display:inline">{\n}
+      <input type="hidden" name="LOGOUT" value="Выход" />{\n}
+      <a href="#" class="right" onclick="jQuery(this).parent('form').submit()">{\n}
+        Выйти
+      </a>
+    </form>{\n}
+    <strong>Вы вошли как:</strong>
+    <a href="/{$usertype}/{$userid}">{$user}</a>
+  </div>
+{/template}
+
+
+{template contentBlock}
+  <h2>{$title}</h2>
+  {$content |noAutoescape}{\n}
+{/template}
+
+
+{template navelt}
+  <li><a href="{$link}">{$title}</a></li>
+{/template}
+
+
+{template fld}
+  <table cellpadding="0" cellspacing="0">{\n}
+    <tbody>{\n}
+      <tr style="vertical-align: middle;">{\n}
+        <td width="250" style="padding: 0 4px 0 0; vertical-align: top; text-align: right; font-weight: bold;">{\n}
+          <div>{\n}
+            {$fldname}{\n}
+          </div>{\n}
+        </td>{\n}
+        <td width="550" style="padding: 0px; vertical-align: middle;">{\n}
+          <div>{\n}
+            {$fldcontent |noAutoescape}{\n}
+          </div>{\n}
+        </td>{\n}
+      </tr>{\n}
+    </tbody>{\n}
+  </table>{\n}
+{/template}
+
+
+{template gridview}
+  <div style="margin: 10px 0 10px 0">
+    <table id="{$idgrid}"></table>
+    <div id="{$idpager}"></div>
+    <script type="text/javascript">
+      jQuery("#{$idgrid}").jqGrid({$json |noAutoescape}).navGrid('#{$idpager}',{lb}edit:false,add:false,del:false{rb},
+        {lb}{rb}, // use default settings for edit
+        {lb}{rb}, // use default settings for add
+        {lb}{rb},  // delete instead that del:false we need this
+        {lb}
+          closeOnEscape : true,
+          sopt          : ['eq','ne','bw','bn','ew','en','cn','nc']
+        {rb}, // enable the advanced searching
+        {lb}{rb} // use default settings for view
+        );
+    </script>
+  </div>
+{/template}
+
+
+{template strview}
+  {$value |noAutoescape} <br />{\n}
+{/template}
+
+
+{template strupd}
+  <input type="text" name="{$name}" value="{$value}" style="width: 600px;" /> <br />{\n}
+{/template}
+
+
+{template strupd}
+  <input type="text" name="{$name}" value="{$value}" style="width: 600px;" /> <br />{\n}
+{/template}
+
+{template strview}
+  {$value}{\n}
+{/template}
+
+
+
+{template dateupd}
+  <input type="text" name="{$name}" value="{$value}" style="width: 65px;" />{\n}
+  <br />
+{/template}
+
+
+{template intervalupd}
+  <input type="text" name="{$name}:begin" value="{$valuebegin}" style="width: 65px;" />{\n}
+  -
+  <input type="text" id="id-{$name}" name="{$name}:end" value="{$valueend}" style="width: 65px;" />{\n}
+  <br />
+{/template}
+
+
+{template flagupd}
+  <input type="checkbox" name="{$name}" value="T" {if $value} checked {/if} /> <br />{\n}
+{/template}
+
+
+{template fileupd}
+  <input type="file" name="{$name}" />{\n}
+{/template}
+
+
+{template selopt}
+  <OPTION value="{$id}">{$name}</OPTION>{\n}
+{/template}
+
+
+{template selres}
+  <SELECT name="{$name}" size="10">
+    {foreach $option in $options}
+      {call selopt data="$option" /}
+    {/foreach}
+  </SELECT>
+{/template}
+
+
+{template textupd}
+  <textarea name="{$name}" rows="6" col="120" style="width: 600px;" />{$value}</textarea> <br />{\n}
+{/template}
+
+
+{template pswdupd}
+  <input type="password" name="{$name}" value="{$value}" style="width: 600px;" /> <br />{\n}
+{/template}
+
+
+{template btn}
+  <input type="button" name="{$name}" value="{$value}" onclick="jQuery(this).parent('form').submit()"/>
+{/template}
+
+
+{template btnlin}
+  <input type="hidden" name="{$name}" value="{$value}" />
+  <input type="button" onclick="jQuery(this).parent('form').submit()" style="margin: 10px 0 10px 0;" value="{$value}">
+{/template}
+
+
+{template btncol}
+  <form method="post">
+    <input type="button" name="{$name}" value="{$value}" onclick="jQuery(this).parent('form').submit()" value="{$value}">
+  </form>
+{/template}
+
+
+{template popbtnlin}
+  <input type="button" onclick="ShowHide('{$popid}');" style="margin: 10px 0 10px 0;" value="{$value}" />
+{/template}
+
+
+{template frmobj}
+  <form method="post" enctype="multipart/form-data">
+    {$content |noAutoescape}
+  </form>
+{/template}
+
+
+{template frmtbl}
+  <table border="0" bgcolor="#DCDCDC" width="100%">
+    {foreach $obj in $objs}
+      <tr>
+        {foreach $fld in $obj}
+          <td bgcolor="#F1F1F1">
+            <div style="padding: 0px 3px 0px 3px;">
+              {$fld |noAutoescape}
+            </div>
+          </td>
+        {/foreach}
+      </tr>
+    {/foreach}
+  </table>
+{/template}
+
+
+{template popup}
+  <div id="{$id}"{\n}
+       class="popupBox"{\n}
+       style="position: absolute; top: {$top}px; left: {$left}px; width: {$width}px; height: {$height}px;  display: none;{\n}
+              background-color: yellow; border: 1px dotted red; z-index: 1; padding: 20px;">{\n}
+    <div class="popupCancel">{\n}
+      <a href="#popupCancel" onclick="ShowHide('{$id}')">{\n}
+        <img alt="" src="/img/popups/popupCancel.gif" />{\n}
+      </a>{\n}
+    </div>{\n}
+
+    <div class="popupEnterLink">{\n}
+      <h3>{$title}</h3>{\n}
+    </div>{\n}
+
+    <div class="popupCenter">{\n}
+      {$content |noAutoescape}
+    </div>{\n}
+  </div>{\n}
+{/template}
+
+
+{template popuplogin}
+  <div class="enter_up">
+    <span><strong class="key">Авторизация</strong> (<a href="#" onclick="ShowHide('popupLogin'); return false;">Отменить</a>)</span>
+    <form method="post" class="enter_form">
+      <input type="text" name="LOGIN" value="LOGIN" maxlength="64" />
+      <a href="#">Зарегистрироваться</a>
+      <input type="text" name="PASSWORD" value="PASSWORD" maxlength="64" />
+      <a href="#">Забыли пароль?</a>
+      <input type="submit" name="AUTH" value="Войти" style="background-color: #E0E0E0; width: 160px;" />
+    </form>
+  </div>
+{/template}
+
+
+{template col}
+<div style="border: 1px solid #7F9DB9; padding: 3px 5px 3px 5px;
+            background-color: #F1F1F1; margin: 3px 0px 3px 0px;">
+  <div style="padding: 3px 5px 3px 5px;"> {$title}</div>
+  <div style="border: 1px solid #7F9DB9; padding: 3px 5px 3px 5px;
+              background-color: #F1F1F1; background-color: #DCDCDC">
+    {$content |noAutoescape}
+  </div>
+</div>
+{/template}
+
+
+{template test}
+  <form method="POST" enctype="multipart/form-data">{\n}
+	<input type="file" name="file" value="" />{\n}
+    <input type="submit" />{\n}
+  </form>
+{/template}
+
+
+{template placemark}
+  // Создает метку и добавляет ее на карту{\n}
+  var placemark = new YMaps.Placemark(new YMaps.GeoPoint({$coord}));{\n}
+  placemark.name = "<a href=\"{$link}\">{$title}</a>";{\n}
+  placemark.description = "{$descr}";{\n}
+  map.addOverlay(placemark);{\n}
+  // Открывает балун{\n}
+  placemark.openBalloon();{\n}
+  {\n}
+{/template}
+
+
+{template map}
+<script type="text/javascript">{\n}
+    YMaps.jQuery(function () {lb}{\n}
+        // Создает экземпляр карты и привязывает его к созданному контейнеру{\n}
+        var map = new YMaps.Map(YMaps.jQuery("#YMapsID")[0]);{\n}
+        // Устанавливает начальные параметры отображения карты: центр карты и коэффициент масштабирования{\n}
+        map.setCenter(new YMaps.GeoPoint({$center}), 10);{\n}
+        map.addControl(new YMaps.TypeControl());{\n}
+        map.addControl(new YMaps.ToolBar());{\n}
+        map.addControl(new YMaps.Zoom());{\n}
+        map.addControl(new YMaps.MiniMap());{\n}
+        map.addControl(new YMaps.ScaleLine());{\n}
+        // Устанавливаем метки{\n}
+        {$placemarks |noAutoescape}{\n}
+    {rb}){\n}
+</script>{\n}
+<div id="YMapsID" style="width:600px;height:400px"></div>{\n}
+{/template}
+
+
+{template postannounce}
+  <table border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px; font-size: 12px;">
+    <tr>
+      <td>
+        <a href="/post/{$id}">{$title |noAutoescape}</a>
+      </td>
+      <td width="1">
+        {$date}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">{$photoannounce  |noAutoescape}</td>
+    </tr>
+    <tr>
+      <td colstan="2">{$announce  |noAutoescape}</td>
+    </tr>
+  </table>
+{/template}
+
+
+{template posttext}
+  <table width="80%" border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px; font-size: 12px;">
+    <tr>
+      <td>
+        <h1 style="font-size:32px">{$title  |noAutoescape}</h1>
+      </td>
+      <td width="1" align="right">
+        {$date}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        &nbsp;
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">{$phototext  |noAutoescape}</td>
+    </tr>
+    <tr>
+      <td colstan="2">{$text  |noAutoescape}</td>
+    </tr>
+  </table>
+{/template}

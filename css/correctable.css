@@ -1,0 +1,6 @@
+/* correctable ui styles */
+#content table {margin: 0 0 15px 0;}
+#content .ui-jqgrid-htable {margin: 0 0 0 0;}
+#content .ui-pg-table {margin: 0 0 0 0;}
+.ui-th-column {vertical-align: middle}
+/* end correctable ui styles */

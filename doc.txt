@@ -36,7 +36,6 @@ slot-value-using-class и (setf slot-value-using-class)
 (имя - это keyword), а symbol - его тип
 [21:11] rigidus> а тип возвращаемого значения этой функции указать
 можно?
-[21:11] LinkFly> тогда норм:)
 [21:11] dmitry_vk> Да, можно, после списка аргументов:
 (ftype (function (arg-1-type .. arg-n-type) result-type))
 [21:12] LinkFly> можно даже нескольких через (values result-type ...)
@@ -100,3 +99,163 @@ SB-POSIX> (defun get-username (&aux (pid (getpid))) ;(getenv "USERNAME"))
 asdf:*central-registry*)
 [17:39] jsv> а чего через окружение, а не в
 ~/.config/common-lisp/source-registry.conf?
+
+
+Хочется странного: отметить блок в буфере, нажать на какую-нибудь
+кнопку так, чтобы блок подался некоему скрипту на stdin, затем то что
+скрипт выдаст в stdout, emacs вставил в буфер вместо выделенного
+блока.
+Запускать скрипты awk, и прочие.
+Есть уже подобная фича?
+
+C-u M-|
+http://www.emacswiki.org/emacs/ExecuteExternalCommand
+
+
+[19:47] edgbla> а как сделать чтобы диред не открывал стопицот буферов
+когда шастаешь по каталогам? мене вроде одного достаточно...
+[20:01] Ioda> edgbla: dired-single.el
+
+
+[2011-10-11 02:49] LinkFly> rigidus: с работающими тредами это больно
+круто:) но можно попробовать их притормозить, сохранить образ и потом
+запустить. Код подготавливающий сохранение образа можно добавить как
+хук, в список sb-ext:*save-hooks* (определенные там ф-ии срабатывают
+при вызове save-lisp-and-die. Ф-ию с кодом, восстанавливающим
+состояние, можно поместить в значение ключа :top-level ф-ии
+save-lisp-and-die.
+
+
+
+;; Поиск и выполнение произвольных методов объекта
+
+(defclass test-obj ()
+  ((test-method :initarg :test-method :initform nil :accessor a-test-method)))
+
+(defparameter *test-example*
+  (make-instance 'test-obj :test-method 'a))
+
+(funcall (closer-mop:method-function
+          (find-method #'a-test-method '() (mapcar #'find-class '(test-obj))))
+         (list *test-example*) '())
+
+
+
+[17:02] dmitry_vk> "Open Implementations and Metaobject Protocols", by
+Gregor Kiczales and Andreas Paepcke - ИМХО, более хорошее введение в
+суть MOP'а, чем AMOP
+
+
+[01:02] LinkFly> ещё есть slime-list-threads, hot key - C-c C-x t -
+там можно манипулировать потоками
+[01:15] LinkFly> rigidus: разобрался с буфером? Тм очень просто: ? -
+описание команд. Можно выделить несколько потоков, как обычно
+выделяешь текст, нажать k - и они убьются, достаточно удобно.
+
+[22:40] zeldan@jabber.ru> https://github.com/Zeldan,
+sbushnjak@gmail.com для почты и чата...
+
+
+http://www.slideshare.net/chaitanyagupta/slime-1180051
+  10. Evaluation
+          * C-x C-e M-x slime-eval-last-expression
+          * C-M-x M-x slime-eval-last-defun
+          * C-c C-r M-x slime-eval-region
+  11. Compilation
+          * C-c C-c M-x slime-compile-defun
+          * C-c C-k M-x slime-compile-and-load-file
+          * M-n M-x slime-next-note
+          * M-p M-x slime-previous-note
+  12. Completion
+          * TAB M-x slime-complete-symbol
+          * M-TAB M-x slime-fuzzy-complete-symbol
+  13. Documentation
+          * SPC M-x slime-space
+          * C-c C-d d M-x slime-describe-symbol
+          * C-c C-d a M-x slime-apropos
+          * C-c C-d h M-x slime-hyperspec-lookup
+  14. Finding Definitions
+          * M-. M-x slime-edit-definition
+          * M-, M-* M-x slime-pop-find-definition-stack
+          * (the “Meta-point” commands)
+  15. Inspector
+          * C-c I M-x slime-inspect
+          * Some Inspector commands
+                o RET M-x slime-inspector-operate-on-point
+                o l M-x slime-inspector-pop
+                o n M-x slime-inspector-next
+                o M-RET M-x slime-inspector-copy-down
+  16. Cross-reference
+          * C-c C-w c M-x slime-who-calls
+          * C-c C-w w M-x slime-calls-who
+          * C-c C-w r M-x slime-who-references
+          * C-c C-w b M-x slime-who-binds
+          * C-c C-w s M-x slime-who-sets
+  17. Disassembly
+          * C-c M-d M-x slime-disassemble-symbol
+          * C-c C-t M-x slime-toggle-trace-definition
+          * M-x slime-untrace-all
+  18. SLDB: the SLIME debugger
+          * Examining Frames
+                o t M-x sldb-toggle-details
+                o v M-x sldb-show-source
+                o e M-x sldb-eval-in-frame
+                o i M-x sldb-inspect-in-frame
+  19. SLDB: the SLIME debugger
+          * Frame Navigation
+                o n M-x sldb-down
+                o p M-x sldb-up
+                o M-n M-x sldb-details-down
+                o M-p M-x sldb-details-up
+  20. SLDB: the SLIME debugger
+          * Miscellaneous commands
+                o r M-x sldb-restart-frame
+                o R M-x sldb-return-from-frame
+                o C M-x sldb-inspect-condition
+                o q M-x sldb-quit
+  21. How CL helps
+          * eval
+          * compile, compile-file, load
+          * describe, documentation
+          * apropos
+          * sb-introspect:who-calls, sb-introspect:who-references,
+   etc.
+          * disassemble
+          * trace, step
+          * inspect
+# CL Resources
+    * Paredit -- http://mumble.net/~campbell/emacs/paredit.el
+# CL Resources
+    * Books
+
+          o Practical Common Lisp (by Peter Seibel)
+          http://www.gigamonkeys.com/book/
+
+          o Common Lisp: A Gentle Introduction to Symbolic Computation
+          http://www-cgi.cs.cmu.edu/afs/cs.cmu.edu/user/dst/www/LispBook/index.html
+
+          o On Lisp (by Paul Graham)
+          http://www.paulgraham.com/onlisp.html
+
+          o Paradigms of AI Programming: Case Studies in Common Lisp
+          (by Peter Norvig) http://norvig.com/paip.html
+
+          o Structure and Interpretation of Computer Programs (by
+          Harold Abelson and Gerald Jay Sussman with Julie Sussman)
+          http://mitpress.mit.edu/sicp/
+
+# CL Resources
+
+    * CL Tutorials
+
+          o Casting SPELs in Lisp
+          http://www.lisperati.com/casting.html
+
+          o A Tutorial on Conditions and Restarts
+          http://chaitanyagupta.com/lisp/restarts.html
+
+          o Lisp for the Web
+          http://www.adampetersen.se/articles/lispweb.htm
+
+
+http://habrahabr.ru/blogs/algorithm/132128/ - Shift-OR

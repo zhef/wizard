@@ -1,0 +1,156 @@
+// -*- mode: closure-template-html; fill-column: 130 -*-
+
+{namespace tpl}
+
+{template root}
+  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">{\n}
+  <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru-ru" xmlns:vml="urn:schemas-microsoft-com:vml">{\n}
+    <head>{\n}
+	  <meta http-equiv="content-type" content="text/html; charset=utf-8" />{\n}
+      <meta name="viewport" content="initial-scale=1.0, user-scalable=no" /><!-- YandexMaps recommended fix -->{\n}
+	  <title>{$headtitle}</title>{\n}
+	  <meta name="keywords" content="" />{\n}
+	  <meta name="description" content="" />{\n}
+      <meta name="robots" content="index, follow" />{\n}
+	  <link rel="stylesheet" href="/css/reset.css" type="text/css" media="screen, projection" />{\n}
+   	  <link rel="stylesheet" href="/css/print.css" type="text/css" media="print" />{\n}
+   	  <link rel="stylesheet" href="/css/typograf.css" type="text/css" media="screen, projection" />{\n}
+   	  <link rel="stylesheet" href="/css/style.css" type="text/css" media="screen, projection" />{\n}
+   	  <link rel="stylesheet" href="/css/correctable.css" type="text/css" media="screen, projection" />{\n}
+
+      <!--[if IE 6]>{\n}
+	  <link rel="stylesheet" href="/css/ie6.css" type="text/css" media="screen, projection" />{\n}
+	  <![endif]-->{\n}
+      <!-- YandexMaps -->{\n}
+      <script src="http://api-maps.yandex.ru/1.1/index.xml?key={$mapkey}" type="text/javascript"></script>{\n}
+      <!-- RSS -->{\n}
+      <link href="/index.php?format=feed&amp;type=rss" rel="alternate" type="application/rss+xml" title="RSS 2.0" />{\n}
+      <link href="/index.php?format=feed&amp;type=atom" rel="alternate" type="application/atom+xml" title="Atom 1.0" />{\n}
+      <!-- Favicon -->{\n}
+      <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />{\n}
+      <!-- JQuery -->
+      <script type="text/javascript" src="/js/jquery-1.6.2.min.js"></script>{\n}
+      <script type="text/javascript" src="/js/jquery-ui-1.8.16.custom.min.js"></script>{\n}
+      <link rel="stylesheet" type="text/css" media="screen" href="/css/jquery-ui-1.8.16.custom.css" />{\n}
+      <!-- fix images -->
+      <link rel="stylesheet" type="text/css" media="screen" href="/css/jquery-ui-1.8.1.custom.css" />{\n}
+      <!-- jqgrid -->
+      <link rel="stylesheet" type="text/css" media="screen" href="/css/ui.jqgrid.css" />{\n}
+      <script type="text/javascript" src="/js/grid.locale-ru.js"></script>{\n}
+      <script type="text/javascript" src="/js/jquery.jqGrid.min.js"></script>{\n}
+      <!-- my -->
+      <script src="/js/my.js" type="text/javascript"></script>{\n}
+    </head>
+    <body>
+
+      {foreach $popup in $popups}
+        {call popup data="$popup" /}
+      {/foreach}
+
+      <div class="banner_top"></div>
+      <div class="wraper">
+        <div id="header">
+          <span class="service_link">
+            <a class="start_page" href="#">Сделать стартовой</a>
+            <a class="favorite" href="#">В избранное</a>
+          </span>
+          <a href="index.html"><div class="logo"></div></a>
+          <div class="speed_buttons">
+            <form action="/newtender" method="post" style="display:inline">{\n}
+              <a class="new_tender" href="#" onclick="jQuery(this).parent('form').submit(); return false;"><span>Объявить тендер</span></a>
+            </form>
+            <a class="express" href="#"><span>Экспресс-котировка</span></a>
+            <form action="/search" method="post" style="display:inline">{\n}
+              <input type="hidden" name="searchstring" value="" />{\n}
+              <input type="hidden" name="searchcategory" value="map" />{\n}
+              <a class="store_map" href="#" onclick="jQuery(this).parent('form').submit(); return false;"><span>Карта поставщиков</span></a>{\n}
+            </form>
+          </div>
+          <div class="autorisation">
+            {$personal |noAutoescape}
+          </div>
+        </div>
+        <div class="tools_menu">
+          <a class="help" href="#">Помощь</a>
+          <a class="board" href="#">Доска объявлений</a>
+          <a class="services" href="/about">О портале</a>
+          <a class="action" href="/sale">Акции</a>
+          <!-- <a class="rating" href="#">Рейтинги</a> -->
+        </div>
+        <div id="container">{\n}
+          <div id="content">{\n}
+            <div class="search corners">{\n}
+              <form action="/search" method="post" class="searh">{\n}
+                <input type="text" name="searchstring" value="{$searchstring}" maxlength="128" />{\n}
+                <select size="1" name="searchcategory">{\n}
+                  <!--{\n}
+                     <option value="all">везде</option>{\n}
+                  <option value="tender">по тендерам</option>{\n}
+                  <option value="builder">по застройщикам</option>{\n}
+                  -->{\n}
+                  <option value="supplier" {if $searchcategory == 'supplier'} selected="selected"{/if}>по поставщикам</option>{\n}
+                  <option value="map"      {if $searchcategory == 'map'}      selected="selected"{/if}>по карте</option>{\n}
+                  <option value="resource" {if $searchcategory == 'resource'} selected="selected"{/if}>по материалам</option>{\n}
+                  <!--{\n}
+                  <option value="tech">по технологиям</option>{\n}
+                  -->{\n}
+                </select>{\n}
+                <button type="submit">Искать</button>{\n}
+              </form>{\n}
+              <!--{\n}
+                 <span class="left">например <a href="#">пескосоляная смесь</a></span>{\n}
+                 <span class="right">или воспользуйтесь <a href="#">расширенным поиском</a></span>{\n}
+                 -->{\n}
+              <em class="tl"></em><em class="tr"></em><em class="bl"></em><em class="br"></em>{\n}
+            </div>{\n}
+            <br />
+
+            {$content |noAutoescape}
+
+	      </div>{\n}
+        </div>
+        <div class="sidebar" id="left">
+	      <ul id="menu">
+            {foreach $elt in $navpoints}
+              {call navelt data="$elt" /}
+            {/foreach}
+          </ul>
+          <div class="banner_left"></div>
+          <div class="tender_day corners">
+            <h1>Тендер дня</h1>
+            <strong><a href="#">Ремонт кровли ГДОУ Детский сад №56 Выборгского района Санкт-Петербург</a></strong>
+            <i>Открытый аукцион в электронной форме</i>
+            <table cellpadding="0" cellspacing="0">
+              <tr>
+                <td><p>Начало:</p></td>
+                <td>20.10.2011 <img src="img/icons/today.png" width="45" height="12" alt="Сегодня" /></td>
+              </tr>
+              <tr>
+                <td><p>Окончание:</p></td>
+                <td>27.10.2011</td>
+              </tr>
+            </table>
+            <span><a class="all_tender" href="#">Все тендеры</a></span>
+            <em class="tl"></em><em class="tr"></em><em class="bl"></em><em class="br"></em>
+          </div>
+        </div>
+
+        {$right |noAutoescape}
+
+        <span class="footer_reserve"></span>
+      </div>
+      <div id="footer">
+        <ul>
+          <li><a href="#">Главная</a></li>
+          <li><a href="#">Техническая поддержка</a></li>
+          <li><a href="#">Подписка</a></li>
+          <li><a href="#">Реклама</a></li>
+          <li><a href="#">О портале</a></li>
+          <li><a href="#">Помощь</a></li>
+        </ul>
+        <span class="copyright left">2010 &mdash; 2011 (c) <strong>ГдеСтройТорг.ру</strong> <br />&mdash; <a href="#">Единая система поиска поставщиков</a></span>
+        <span class="copyright right"><strong>При поддержке:</strong><br/><a href="www.ktostroit.ru"><img src="img/ktostroit.png" width="133" height="31" alt="" /></a></span> </div>
+
+    </body>
+  </html>
+{/template}
