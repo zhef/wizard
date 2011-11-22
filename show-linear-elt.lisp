@@ -36,7 +36,7 @@
 
 
 (defmethod show-linear-elt-ext ((typedata (eql :str)) val namefld captfld permfld)
-  (if (check-perm (a-update permfld) (cur-user) :error-object)
+  (if (check-perm (a-update permfld) (cur-user) (intern (format nil "LINEAR-FLD-~A-~A" typedata namefld) :keyword))
       ;; update
       (tpl:fld
        (list :fldname captfld
@@ -44,10 +44,9 @@
                           (list :name namefld
                                 :value (IF (EQUAL VAL :CLEAR)
                                            ""
-                                           (slot-value val (intern namefld :wizard))
-                                           )))))
+                                           (slot-value val (intern namefld :wizard)))))))
       ;; else
-      (if (check-perm (a-view permfld) (cur-user) :error-object)
+      (if (check-perm (a-view permfld) (cur-user) (intern (format nil "LINEAR-FLD-~A-~A" typedata namefld) :keyword))
           ;; view
           (tpl:fld
            (list :fldname captfld
@@ -55,8 +54,7 @@
                               (list :name namefld
                                     :value (IF (EQUAL VAL :CLEAR)
                                                ""
-                                               (slot-value val (intern namefld :wizard))
-                                               )))))
+                                               (slot-value val (intern namefld :wizard)))))))
           ;; else - none
           (if (and (boundp '*dbg*) *dbg*)
               (format nil "<br/>~%Permisson denied for fld [~A] <br/>~%"

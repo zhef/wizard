@@ -647,7 +647,6 @@ If objs are of different classes the result is NIL."
   (action ""))
 
 
-
 (defclass entity () ())
 
 

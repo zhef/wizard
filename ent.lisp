@@ -105,11 +105,9 @@
                              :update :self))  ;; offer - связующий объект
       (sales               "Распродажи"                (:list-of-links sale)))    ;; sale - связующий объект
      :perm
-     (:create             '(or :admin :not-logged)
-      :delete             :admin
-      :view               :all
+     (:view               :all
       :show               :all
-      :update             '(or :admin :selfpage)))
+      :update             :self))
 
 
     ;; Филиалы поставщика

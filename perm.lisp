@@ -61,48 +61,56 @@
            (:finished  (error "perm-todo :finished"))  ;; Объект является завершенным тендером
            (:cancelled (error "perm-todo :cancelled")) ;; Объект является отмененным тендером
            ;; Mixed
-           (:selfpage  (destructuring-bind (root obj-type id) ;; Залогиненный пользователь (subj) и просматриваемая страница (request-list)
+           (:self      (destructuring-bind (root obj-type id) ;; Залогиненный пользователь (subj) и просматриваемая страница (request-list)
                            (request-list)                     ;; указывают на один объект.
-                         (if (and (not (null obj-type))
-                                  (not (null id))
+                         (if (and (not (null obj-type))       ;; Этот вид прав не должен использоваться с ajax-объектамми, например grid,
+                                  (not (null id))             ;; так как requuest-list для них не указывает на объект!
                                   (equal id (format nil "~A" (parse-integer id :junk-allowed t)))
                                   (string= (string-upcase obj-type) (type-of (gethash (parse-integer id :junk-allowed t) *USER*)))
-                                  (equal subj (gethash (parse-integer id :junk-allowed t) *USER*))
-                                  )
+                                  (equal subj (gethash (parse-integer id :junk-allowed t) *USER*)))
                              t
                              nil)))
-           (:owner     (destructuring-bind (root obj-type id) ;; Объект, над которым совершается действие имеет поле owner текущего пользователя
-                           (request-list)
-                         (if (and (not (null obj-type))
-                                  (not (null id))
-                                  (equal id (format nil "~A" (parse-integer id :junk-allowed t))))
-                             (let ((hash (string-upcase (format nil "*~A*"  obj-type)))
-                                   (target))
-                               (if (or (string= hash "*SUPPLIER*")
-                                       (string= hash "*BUILDER*")
-                                       (string= hash "*ADMIN*")
-                                       (string= hash "*EXPERT*"))
-                                   (setf hash "*USER*"))
-                               (setf hash (intern hash :wizard))
-                               (setf target (gethash (parse-integer id :junk-allowed t) (symbol-value hash)))
-                               (if (and (slot-exists-p target 'owner)
-                                        (equal (a-owner target) subj))
-                                   t
-                                   nil)))))
+           (:owner     (if (and (slot-exists-p obj 'owner)    ;; Объект, над которым совершается действие имеет поле owner текущего пользователя
+                                (equal subj (a-owner obj)))
+                           t
+                           nil))
+                       ;; (destructuring-bind (root obj-type id)
+                       ;;     (request-list)
+                       ;;   (if (and (not (null obj-type))
+                       ;;            (not (null id))
+                       ;;            (equal id (format nil "~A" (parse-integer id :junk-allowed t))))
+                       ;;       (let ((hash (string-upcase (format nil "*~A*"  obj-type)))
+                       ;;             (target))
+                       ;;         (if (or (string= hash "*SUPPLIER*")
+                       ;;                 (string= hash "*BUILDER*")
+                       ;;                 (string= hash "*ADMIN*")
+                       ;;                 (string= hash "*EXPERT*"))
+                       ;;             (setf hash "*USER*"))
+                       ;;         (setf hash (intern hash :wizard))
+                       ;;         (setf target (gethash (parse-integer id :junk-allowed t) (symbol-value hash)))
+                       ;;         (if (and (slot-exists-p target 'owner)
+                       ;;                  (equal (a-owner target) subj))
+                       ;;             t
+                       ;;             nil))))
            ))
-        (t perm)))
+        (t (error perm))))
 
 
 (defun check-perm (perm subj obj)
   ;; t)
   (let ((rs (eval (perm-check perm subj obj))))
-    (safe-write (path "perm-log.txt") (format nil "perm: ~A; result: ~A; subj: ~A; obj: ~A~%" perm rs subj obj))
+    (safe-write (path "perm-log.txt")
+                (format nil "~A ~A | subj: ~A; obj: ~A~%"
+                        (if rs "✔" "✘")
+                        perm
+                        subj
+                        obj))
     (eval rs)
   ))
 
 
 ;; TEST
-;; (check-perm '(or :ADMIN :SELFPAGE) (gethash 0 *USER*) (gethash 1 *USER*))
+;; (check-perm '(or :ADMIN :SELF) (gethash 0 *USER*) (gethash 1 *USER*))
 ;; (perm-check '(or :admin (and :all :nobody)) 1 2)
 ;; (check-perm '(or :admin (or :all :nobody)) 1 2)
 ;; (check-perm ':nobody 1 2)

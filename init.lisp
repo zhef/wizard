@@ -336,25 +336,12 @@
 
 
 (defun passwords ()
+  (passwd)
   (restas:define-route passwords ("/passwords")
-    (passwd)
-    (list
-     (mi 'tpl :title "Пароли" :perm :ALL
-         :val (lambda ()
-                (format nil "<pre>~A</pre>"
-                        (read-file-into-string (path "passwd.txt")))))))
-  (restas:define-route passwords/post ("/passwords" :method :post)
-    (passwd)
-    (list
-     (mi 'tpl :title "Пароли" :perm :ALL
-         :val (lambda ()
-                (format nil "<pre>~A</pre>"
-                        (read-file-into-string (path "passwd.txt"))))))))
+    (format nil "<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" /></head><body><pre>~A</pre></body></html>"
+            (read-file-into-string (path "passwd.txt")))))
 
 (passwords)
-
-
-
 
 ;; (restas:mount-submodule -static- (#:restas.directory-publisher)
 ;;   (restas.directory-publisher:*directory* (path "static/")))

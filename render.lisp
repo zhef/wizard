@@ -1,7 +1,7 @@
 (in-package :wizard)
 
 (defmacro check-perm-for-cur-user-with-dbg (perm obj &body if-not-dbg)
-  `(if (check-perm (a-perm ,obj) (cur-user) ,obj)
+  `(if (check-perm ,perm (cur-user) ,obj)
        (call-next-method)
        (if (and (boundp '*dbg*) *dbg*)
            (format nil "<br/>~%Permisson [~A] denied for :~A [~A] <br/>~%"
@@ -10,7 +10,7 @@
                    (if (slot-exists-p obj 'value)
                        (a-value ,obj)
                        (a-title ,obj)))
-           "")))
+           ,@if-not-dbg)))
 
 ;; activate
 ;; example-json
@@ -209,6 +209,7 @@ function(){
 (defmethod restas:render-object :around ((designer grid-render) (obj fld))
   (check-perm-for-cur-user-with-dbg (a-show (a-perm obj)) obj nil))
 
+
 ;; BTN in GRID
 
 
@@ -222,9 +223,12 @@ function(){
      ("sortable" . nil)
      ("editable" . nil))))
 
-
 (defmethod restas:render-object :around ((designer grid-render) (obj btn))
-  (check-perm-for-cur-user-with-dbg (a-perm obj) obj nil))
+  ;; При выводе в гриде столбцов содержащих кнопки проверяются права на строчку а не на столбец
+  (call-next-method))
+
+(pprint (macroexpand-1 '(check-perm-for-cur-user-with-dbg (a-perm obj) obj nil)))
+
 
 ;; POPBTN in GRID
 

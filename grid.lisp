@@ -134,10 +134,9 @@
               (list* id
                      (loop :for (accessor . perm) :in (reverse field-cons) :collect
                         (if (check-perm perm (cur-user) obj)
-                            (replace-all (funcall accessor obj)
-                                         "%|id|%"
-                                         (format nil "~A" id))
-                            (if (and (boundp '*dbg*) *dbg*) "permission denied in grid pager" "")))))))
+                            (replace-all (funcall accessor obj) "%|id|%" (format nil "~A" id))
+                            (if (and (boundp '*dbg*) *dbg*) "permdenied-grid-pager" ""))
+                        )))))
       (values result cnt-rows))))
 
 
