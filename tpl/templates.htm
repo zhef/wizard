@@ -202,8 +202,8 @@
   </table>
 {/template}
 
-
-{template popup}
+<!-- Old Autorisation PopUp -->
+<!-- {template popup}
   <div id="{$id}"{\n}
        class="popupBox"{\n}
        style="position: absolute; top: {$top}px; left: {$left}px; width: {$width}px; height: {$height}px;  display: none;{\n}
@@ -236,8 +236,27 @@
       <input type="submit" name="AUTH" value="Войти" style="background-color: #E0E0E0; width: 160px;" />
     </form>
   </div>
+{/template} -->
+
+
+<!-- New Autorisation PopUp -->
+
+{template popup}
+  <div class="enter_up">{\n}
+      {$content |noAutoescape}
+  </div>{\n}
 {/template}
 
+{template popuplogin}
+    <span><strong class="key">Авторизация</strong> (<a href="#" onclick="ShowHide('popupLogin'); return false;">Отменить</a>)</span>
+    <form method="post" class="enter_form">
+      <input type="text" name="LOGIN" value="LOGIN" maxlength="64" />
+      <a href="#">Зарегистрироваться</a>
+      <input type="text" name="PASSWORD" value="PASSWORD" maxlength="64" />
+      <a href="#">Забыли пароль?</a>
+      <input type="submit" name="AUTH" value="Войти" style="background-color: #E0E0E0; width: 160px;" />
+    </form>
+{/template}
 
 {template col}
 <div style="border: 1px solid #7F9DB9; padding: 3px 5px 3px 5px;
