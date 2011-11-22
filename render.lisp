@@ -166,6 +166,12 @@ function(){
 
 ;; ACT: yamap
 (defmethod restas:render-object ((designer action-render) (obj yamap))
+  ;; debug demonstation difference addrs
+  ;; (setf (a-mark-points obj)
+  ;;       (append (a-mark-points obj)
+  ;;               (list
+  ;;                (mi 'yapoint :title "1" :link "2" :descr "3" :coord (geo-coder "Санкт-Петербург Екатерининский проспект 4")))))
+  ;; (error (a-mark-points obj))
   (tpl:map (list :center (a-center-coord obj)
                  :placemarks (format nil "~{~A~}"
                                      (mapcar #'(lambda (point)

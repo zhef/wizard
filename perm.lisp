@@ -44,13 +44,13 @@
            (:builder   (if (equal (type-of subj) 'BUILDER) t nil))   ;; Пользователь-Застройщик
            (:supplier  (if (equal (type-of subj) 'SUPPLIER) t nil))  ;; Пользователь-Поставщик
            ;; Objects
-           (:fair      (if (equal (type-of obj) 'SUPPLIER)           ;; Объект является добросовестным поставщиком
-                           (if (equal (a-status obj) :fair)
+           (:fair      (if (equal (type-of subj) 'SUPPLIER)           ;; Субьект (залогиненный пользователь) является добросовестным поставщиком
+                           (if (equal (a-status subj) :fair)
                                t
                                nil)
                            nil))
-           (:unfair    (if (equal (type-of obj) 'SUPPLIER)          ;; Объект является недобросовестным поставщиком
-                           (if (equal (a-status obj) :unfair)
+           (:unfair    (if (equal (type-of subj) 'SUPPLIER)           ;; Субьект (залогиненный пользователь) является недобросовестным поставщиком
+                           (if (equal (a-status subj) :unfair)
                                t
                                nil)
                            nil))
@@ -61,12 +61,14 @@
            (:finished  (error "perm-todo :finished"))  ;; Объект является завершенным тендером
            (:cancelled (error "perm-todo :cancelled")) ;; Объект является отмененным тендером
            ;; Mixed
-           (:selfpage  (destructuring-bind (root obj-type id) ;; Объект выполняет операцию на своей странице
-                           (request-list)
+           (:selfpage  (destructuring-bind (root obj-type id) ;; Залогиненный пользователь (subj) и просматриваемая страница (request-list)
+                           (request-list)                     ;; указывают на один объект.
                          (if (and (not (null obj-type))
                                   (not (null id))
                                   (equal id (format nil "~A" (parse-integer id :junk-allowed t)))
-                                  (string= (string-upcase obj-type) (type-of (gethash (parse-integer id :junk-allowed t) *USER*))))
+                                  (string= (string-upcase obj-type) (type-of (gethash (parse-integer id :junk-allowed t) *USER*)))
+                                  (equal subj (gethash (parse-integer id :junk-allowed t) *USER*))
+                                  )
                              t
                              nil)))
            (:owner     (destructuring-bind (root obj-type id) ;; Объект, над которым совершается действие имеет поле owner текущего пользователя
@@ -100,7 +102,7 @@
 
 
 ;; TEST
-;; (check-perm '(or :ADMIN :SELF) (gethash 0 *USER*) (gethash 1 *USER*))
+;; (check-perm '(or :ADMIN :SELFPAGE) (gethash 0 *USER*) (gethash 1 *USER*))
 ;; (perm-check '(or :admin (and :all :nobody)) 1 2)
 ;; (check-perm '(or :admin (or :all :nobody)) 1 2)
 ;; (check-perm ':nobody 1 2)
