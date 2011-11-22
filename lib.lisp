@@ -719,10 +719,20 @@ If objs are of different classes the result is NIL."
                     (let ((elt (cdr x)))
                       (list :date (a-date elt)
                             :title (a-title elt)
+                            :announce (a-announce elt)
                             :xref (format nil "/post/~A" (car x)))))
                 (last (remove-if-not #'(lambda (x)
                                          (equal section (a-section (cdr x))))
                                      (cons-hash-list *POST-ITEM*)) count))))
+
+(defun posts-by-sales (count)
+  (list (mapcar #'(lambda (x)
+                    (let ((elt (cdr x)))
+                      (list :date (a-date elt)
+                            :announce (a-announce elt)
+                            :title (a-title elt)
+                            :xref (format nil "/sale/~A" (car x)))))
+                (last (cons-hash-list *SALE*) count))))
 
 
 (defun re-tpl ()
@@ -760,10 +770,13 @@ If objs are of different classes the result is NIL."
     (restas.directory-publisher:*baseurl* '("pic_ivent"))
     (restas.directory-publisher:*directory* (path "ivent/pic_ivent/"))))
 
+(defun clear ()
+  (loop :for var :being :the :symbols :in :wizard.impl.routes :do (unintern var))
+  (restas:reconnect-all-routes))
+
 
 (re-tpl)
 (re-path)
-
 
 (defun re-load ()
   (load "lib.lisp")

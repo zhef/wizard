@@ -6,8 +6,9 @@
   <tr>
     <td>{$date}</td>
     <td>
+      <h3>{$title}</h3>
       <a href="{$xref}">
-        {$title |noAutoescape}
+        {$announce}
       </a>
     </td>
   </tr>
@@ -32,51 +33,13 @@
 {/template}
 
 {template main}
-  <div class="news_list">
-    <a href="news_list.html" class="right">Все новости</a>
-    <h2><img src="img/icons/rss_add.png" alt="" /> Новости строительной индустрии </h2>
-    <table>
-      <tr>
-        <th colspan="2">Сегодня, 08 ноября 2011</th>
-      </tr>
-      <tr>
-        <td>14:56</td>
-        <td>
-          <img src="img/trash/183208801_6.jpg" alt="Картинка в новости" />
-          <a href="news.html">Построен новый жилой комплекс в Купчино в соотвествии с новыми трендами и ГОСТами.</a>
-        </td>
-      </tr>
-      <tr>
-        <td>13:42</td>
-        <td>
-          <img src="img/trash/1.jpg" alt="Картинка в новости" />
-          <a href="news.html">В Каргополе прошел ежегодный конкурс архитекторов-самоучек "СамСебеАрхитектор'2011"</a></td>
-      </tr>
-      <tr>
-        <td>12:30</td>
-        <td>
-          <a href="news.html">Это текст анонса новости, который не сопровождается изображением</a>
-        </td>
-      </tr>
-      <tr>
-        <td>10:25</td>
-        <td>
-          <img src="img/trash/smeta_stroitelnykh_rabot.jpg" alt="Картинка в новости" />
-          <a href="news.html">
-            Разработка нового закона о кладке кирпичей может нанести существенные убытки печникам Центрального района
-            России
-          </a>
-        </td>
-      </tr>
-    </table>
-  </div>
-  <div class="banner_center"></div>
+  <!-- div class="banner_center"></div -->
 
   {foreach $elt in $postblocks}
     {call postblock data="$elt" /}
   {/foreach}
 
-  <div class="action">
+  <!-- div class="action">
     <a href="news_list.html" class="right">Все акции</a><h2><img src="img/icons/rss_add.png" alt="" /> Акции, скидки и предложения</h2>
     <table>
       <tr>
@@ -87,13 +50,13 @@
             Комплект включает в себя материалы, значительный набор крепежа, полный ассортимент торцевых шпонок. Доставка
             бесплатно
           </a>
-        </td>
+        </td -->
         <!--
            <td>
              <img src="img/trash/navigation-right-button_basic_red.png" alt="Картинка в новости" />
            </td>
            -->
-      </tr>
+      <!-- /tr>
       <tr>
         <td>
           <img src="img/trash/cad.png" alt="" />
@@ -101,13 +64,13 @@
           <a href="news.html">
             При покупке 5000 шт. Вам предоставляется еще 100 шт. бесплатно
           </a>
-        </td>
+        </td -->
         <!--
            <td>
              <img src="img/trash/hard-drive-download_sticker.png" alt="Картинка в новости" />
            </td>
            -->
-      </tr>
+      <!-- /tr>
       <tr>
         <td>
           <img src="img/trash/561612.jpg" alt="" />
@@ -116,15 +79,15 @@
             Беспрецендентное предложени - гипсокартон по цене туалетной бумаги. До 3000 листов в одни руки. Скидки
             постоянным покупателям. Самовывоз. Оплата по безналу.
           </a>
-        </td>
+        </td -->
         <!--
            <td>
              <img src="img/trash/icq_protoco2l.png" alt="Картинка в новости" />
            </td>-->
-      </tr>
+      <!-- /tr>
     </table>
-  </div>
-  <div class="new_company">
+  </div -->
+  <!-- div class="new_company">
     <a href="#" class="right">Все новые поставщики</a>
     <h2>Обновления в каталоге поставщиков</h2>
     <table>
@@ -197,7 +160,7 @@
         </td>
       </tr>
     </table>
-  </div>
+  </div -->
   <!--
      <div class="raiting_company left">
        <h2>Рейтинг компаний</h2>

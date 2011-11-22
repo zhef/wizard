@@ -309,11 +309,25 @@
                     (get-post-items-from-dir "techno")
                     (get-post-items-from-dir "news")))))
 
-
 (posts)
 (categoryes-and-resources)
 (users)
 (tenders)
+
+
+(push-hash *SALE* 'SALE
+  :title     "Акция от компании \"Невастрой\""
+  :announce  "Комплект включает в себя материалы, значительный набор крепежа, полный ассортимент торцевых шпонок. Доставка бесплатно")
+
+(push-hash *SALE* 'SALE
+  :title     "Сезонное предложение от \"КирпичПром\""
+  :announce  "При покупке 5000 шт. Вам предоставляется еще 100 шт. бесплатно")
+
+(push-hash *SALE* 'SALE
+  :title     "Распродажа со складов \"ГипроРусь\""
+  :announce  "Беспрецендентное предложени - гипсокартон по цене туалетной бумаги. До 3000 листов в одни руки. Скидки постоянным покупателям. Самовывоз. Оплата по безналу.")
+
+
 
 ;; (restas:mount-submodule -static- (#:restas.directory-publisher)
 ;;   (restas.directory-publisher:*directory* (path "static/")))

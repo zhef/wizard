@@ -74,19 +74,21 @@
                          (if (and (not (null obj-type))
                                   (not (null id))
                                   (equal id (format nil "~A" (parse-integer id :junk-allowed t))))
-                             (let* ((hash   (intern  (string-upcase (format nil "*~A*"  "tender")) :wizard))
-                                    (target (gethash (parse-integer "12" :junk-allowed t) (symbol-value hash))))
+                             (let ((hash (string-upcase (format nil "*~A*"  obj-type)))
+                                   (target))
+                               (if (or (string= hash "*SUPPLIER*")
+                                       (string= hash "*BUILDER*")
+                                       (string= hash "*ADMIN*")
+                                       (string= hash "*EXPERT*"))
+                                   (setf hash "*USER*"))
+                               (setf hash (intern hash :wizard))
+                               (setf target (gethash (parse-integer id :junk-allowed t) (symbol-value hash)))
                                (if (and (slot-exists-p target 'owner)
                                         (equal (a-owner target) subj))
                                    t
                                    nil)))))
            ))
         (t perm)))
-
-
-(let* ((hash   (intern  (string-upcase (format nil "*~A*"  "tender"))))
-       (target (gethash (parse-integer "12" :junk-allowed t) (symbol-value hash))))
-  target)
 
 
 (defun check-perm (perm subj obj)

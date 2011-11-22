@@ -130,14 +130,14 @@
     (:entity               sale
      :container            sale
      :fields
-     ((name                "Распродажа"                 (:str)
-                           '(:update :owner))
-      (owner               "Поставщик"                  (:link supplier)
-                           '(:update :admin))
-      (resource            "Ресурс"                     (:link supplier-resource))
-      (procent             "Процент скидки"             (:num))
-      (price               "Цена со скидкой"            (:num))
-      (notes               "Дополнительные условия"     (:list-of-str)))
+     ((title               "Название акции"             (:str))
+      (date                "Дата и время"               (:date))
+      (announce-photo      "Фото в анонсе"              (:img))
+      (announce            "Анонс"                      (:str))
+      (text-photo          "Фото в тексте"              (:img))
+      (text                "Текст"                      (:str))
+      (owner               "Поставщик"                  (:link supplier))
+      (resource            "Ресурс"                     (:link supplier-resource)))
      :perm
      (:create :supplier
       :delete :owner
@@ -201,7 +201,7 @@
                            '(:view   :logged))                              ;; Гость не видит банковские реквизиты
       (corresp-account     "Корреспондентский счет"     (:str)
                            '(:view   :logged))                              ;; Гость не видит банковские реквизиты
-      (client-account      "Рассчетный счет"            (:str)
+      (client-account      "Расчетный счет"            (:str)
                            '(:view   :logged))                              ;; Гость не видит банковские реквизиты
       (tenders             "Тендеры"                    (:list-of-links tender)
                            '(:view   :all))

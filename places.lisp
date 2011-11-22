@@ -8,7 +8,7 @@
      :url                  "/"
      :navpoint             "Главная"
      :actions
-     '((:tpl               "Главная"
+     '((:tpl               ""
         :val               (funcall (find-symbol "MAIN" 'tpl)
                             (list :postblocks (list (list* :xrefall "/event"
                                                            :titleall "все новости"
@@ -21,7 +21,11 @@
                                                     (list* :xrefall "/posts"
                                                            :titleall "все новости"
                                                            :title "Новости строительной сферы"
-                                                           :posts (posts-by-section "news" 3)))))
+                                                           :posts (posts-by-section "news" 3))
+                                                    (list* :xrefall "/posts"
+                                                           :titleall "все новости"
+                                                           :title "Акции, скидки и предложения"
+                                                           :posts (posts-by-sales 3)))))
         )))
 
     ;; Страница регистрации
@@ -412,32 +416,32 @@
                                                                    :price (cdr (assoc "PRICE" (form-data) :test #'equal)))
                                                                  (hunchentoot:redirect (hunchentoot:request-uri*)))))))
 
-                             ;; sales
-                             (:grid              "Акции"
-                              :perm              :all
-                              :entity            sale
-                              :val               (cons-inner-objs *SALE* (a-sales (gethash (cur-id) *USER*)))
-                              :fields            '((:fld name :width  700)
-                                                   (:btn "Страница распродажи"
-                                                    :perm :all
-                                                    :width 100
-                                                    :act (to "/sale/~A"  (caar (form-data))))
-                                                   (:btn "Удалить распродажу"
-                                                    :perm :owner
-                                                    :width 100
-                                                    :act (del-inner-obj
-                                                          (caar (form-data))
-                                                          *SALE*
-                                                          (a-sales (gethash (cur-id) *USER*))))))
+                             ;; ;; sales
+                             ;; (:grid              "Акции"
+                             ;;  :perm              :all
+                             ;;  :entity            sale
+                             ;;  :val               (cons-inner-objs *SALE* (a-sales (gethash (cur-id) *USER*)))
+                             ;;  :fields            '((:fld name :width  700)
+                             ;;                       (:btn "Страница распродажи"
+                             ;;                        :perm :all
+                             ;;                        :width 100
+                             ;;                        :act (to "/sale/~A"  (caar (form-data))))
+                             ;;                       (:btn "Удалить распродажу"
+                             ;;                        :perm :owner
+                             ;;                        :width 100
+                             ;;                        :act (del-inner-obj
+                             ;;                              (caar (form-data))
+                             ;;                              *SALE*
+                             ;;                              (a-sales (gethash (cur-id) *USER*))))))
 
-                             (:popbtn "Добавить распродажу"
-                              :perm :nobody
-                              :action '(:linear             "Добавление расподажи"
-                                       :perm               :selfpage
-                                       :entity             sale
-                                       :fields             '((:btn "Добавить распродажу"
-                                                              :perm :all
-                                                              :act (error "create-sale not implemented")))))
+                             ;; (:popbtn "Добавить распродажу"
+                             ;;  :perm :nobody
+                             ;;  :action '(:linear             "Добавление расподажи"
+                             ;;           :perm               :selfpage
+                             ;;           :entity             sale
+                             ;;           :fields             '((:btn "Добавить распродажу"
+                             ;;                                  :perm :all
+                             ;;                                  :act (error "create-sale not implemented")))))
 
                              ;; offers
                              (:grid              "Список заявок на тендеры"
@@ -486,33 +490,27 @@
     ;; Распродажи
     (:place                sales
      :url                  "/sale"
-     :navpoint             "Aкции"
      :actions
-     '((:grid              "Акции"
-        :perm              :all
-        :entity            sale
-        :val               (cons-hash-list *SALE*)
-        :fields            '((:fld name :xref "sale" :width 900)))))
+     '((:tpl               "Акции"
+        :val               (funcall (find-symbol "POSTPAGE" 'tpl)
+                            (list :postblocks (list (list* :xrefall "/event"
+                                                           :titleall ""
+                                                           :title ""
+                                                           :posts (posts-by-sales 100))
+                                                    )))
+        )))
 
     ;; Страница распродажи
     (:place                sale
      :url                  "/sale/:id"
      :actions
-     '((:linear            "Распродажа"
-        :perm              :all
+     '((:post              "%|title|%"
         :entity            sale
         :val               (gethash (cur-id) *SALE*)
-        :fields            '((:fld name)
-                             (:fld owner)
-                             (:fld procent)
-                             (:fld price)
-                             (:fld notes)
-                             (:fld resource)
-                             (:btn "Сохранить"
-                              :perm :selfpage
-                              :act (let ((obj (gethash (cur-id) *SALE*)))
-                                     (with-obj-save obj
-                                       name price procent notes)))))))
+        :fields            '((:fld title)
+                              (:fld date)
+                              (:fld text-photo)
+                              (:fld text)))))
 
     ;; Список застройщиков
     (:place                builders
