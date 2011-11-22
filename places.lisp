@@ -416,23 +416,20 @@
                                                                    :price (cdr (assoc "PRICE" (form-data) :test #'equal)))
                                                                  (hunchentoot:redirect (hunchentoot:request-uri*)))))))
 
-                             ;; ;; sales
-                             ;; (:grid              "Акции"
-                             ;;  :perm              :all
-                             ;;  :entity            sale
-                             ;;  :val               (cons-inner-objs *SALE* (a-sales (gethash (cur-id) *USER*)))
-                             ;;  :fields            '((:fld name :width  700)
-                             ;;                       (:btn "Страница распродажи"
-                             ;;                        :perm :all
-                             ;;                        :width 100
-                             ;;                        :act (to "/sale/~A"  (caar (form-data))))
-                             ;;                       (:btn "Удалить распродажу"
-                             ;;                        :perm :owner
-                             ;;                        :width 100
-                             ;;                        :act (del-inner-obj
-                             ;;                              (caar (form-data))
-                             ;;                              *SALE*
-                             ;;                              (a-sales (gethash (cur-id) *USER*))))))
+                             ;; sales
+                             (:grid              "Акции"
+                              :perm              :all
+                              :entity            sale
+                              :val               (cons-inner-objs *SALE* (a-sales (gethash (cur-id) *USER*)))
+                              :fields            '((:fld title :width 800 :xref "sale")
+                                                   (:btn "Удалить"
+                                                    :perm :all
+                                                    :width 100
+                                                    :act (del-inner-obj
+                                                          (caar (form-data))
+                                                          *SALE*
+                                                          (a-sales (gethash (cur-id) *USER*))))
+                                                   ))
 
                              ;; (:popbtn "Добавить распродажу"
                              ;;  :perm :nobody

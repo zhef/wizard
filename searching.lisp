@@ -139,21 +139,3 @@
        (mi 'tpl :title "Недостаточно прав" :perm :all
            :val (lambda ()
                   "Только залогиненные застройщики могут объявлять тендер!")))))
-
-
-(restas:define-route passwords ("/passwords")
-  (passwd)
-  (list
-   (mi 'tpl :title "Пароли" :perm :ALL
-       :val (lambda ()
-              (format nil "<pre>~A</pre>"
-                      (read-file-into-string (path "passwd.txt")))))))
-
-(restas:define-route passwords ("/passwords" :method :post)
-  (passwd)
-  (list
-   (mi 'tpl :title "Пароли" :perm :ALL
-       :val (lambda ()
-              (format nil "<pre>~A</pre>"
-                      (read-file-into-string (path "passwd.txt")))))))
-

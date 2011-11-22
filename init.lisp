@@ -315,17 +315,44 @@
 (tenders)
 
 
-(push-hash *SALE* 'SALE
-  :title     "Акция от компании \"Невастрой\""
-  :announce  "Комплект включает в себя материалы, значительный набор крепежа, полный ассортимент торцевых шпонок. Доставка бесплатно")
+(let ((o (push-hash *SALE* 'SALE
+           :title     "Акция от компании \"Невастрой\""
+           :owner     (gethash 2 *USER*)
+           :announce  "Комплект включает в себя материалы, значительный набор крепежа, полный ассортимент торцевых шпонок. Доставка бесплатно")))
+  (append-link (a-sales (gethash 2 *USER*)) o))
 
-(push-hash *SALE* 'SALE
-  :title     "Сезонное предложение от \"КирпичПром\""
-  :announce  "При покупке 5000 шт. Вам предоставляется еще 100 шт. бесплатно")
+(let ((o (push-hash *SALE* 'SALE
+           :title     "Сезонное предложение от \"КирпичПром\""
+           :owner     (gethash 2 *USER*)
+           :announce  "При покупке 5000 шт. Вам предоставляется еще 100 шт. бесплатно")))
+  (append-link (a-sales (gethash 2 *USER*)) o))
 
-(push-hash *SALE* 'SALE
-  :title     "Распродажа со складов \"ГипроРусь\""
-  :announce  "Беспрецендентное предложени - гипсокартон по цене туалетной бумаги. До 3000 листов в одни руки. Скидки постоянным покупателям. Самовывоз. Оплата по безналу.")
+(let ((o (push-hash *SALE* 'SALE
+           :title     "Распродажа со складов \"ГипроРусь\""
+           :owner     (gethash 2 *USER*)
+           :announce  "Беспрецендентное предложени - гипсокартон по цене туалетной бумаги. До 3000 листов в одни руки. Скидки постоянным покупателям. Самовывоз. Оплата по безналу.")))
+  (append-link (a-sales (gethash 2 *USER*)) o))
+
+
+
+(defun passwords ()
+  (restas:define-route passwords ("/passwords")
+    (passwd)
+    (list
+     (mi 'tpl :title "Пароли" :perm :ALL
+         :val (lambda ()
+                (format nil "<pre>~A</pre>"
+                        (read-file-into-string (path "passwd.txt")))))))
+  (restas:define-route passwords ("/passwords" :method :post)
+    (passwd)
+    (list
+     (mi 'tpl :title "Пароли" :perm :ALL
+         :val (lambda ()
+                (format nil "<pre>~A</pre>"
+                        (read-file-into-string (path "passwd.txt"))))))))
+
+(passwords)
+
 
 
 
