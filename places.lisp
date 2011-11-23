@@ -416,8 +416,7 @@
                              (:grid              "Акции"
                               :perm              :all
                               :entity            sale
-                              :val               (cons-hash-list *SALE*)
-                              ;; (cons-inner-objs *SALE* (a-sales (gethash (cur-id) *USER*)))
+                              :val               (cons-inner-objs *SALE* (a-sales (gethash (cur-id) *USER*)))
                               :fields            '((:fld title :width 800 :xref "sale")
                                                    (:btn "Удалить"
                                                     :perm :owner
