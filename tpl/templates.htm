@@ -88,22 +88,22 @@
 {/template}
 
 
-{template strview}
-  {$value |noAutoescape} <br />{\n}
-{/template}
-
 
 {template strupd}
-  <input type="text" name="{$name}" value="{$value}" style="width: 600px;" /> <br />{\n}
-{/template}
-
-
-{template strupd}
-  <input type="text" name="{$name}" value="{$value}" style="width: 600px;" /> <br />{\n}
+  <input type="text" name="{$name}" value="{$value}" style="width: 600px;" /><br />{\n}
 {/template}
 
 {template strview}
-  {$value}{\n}
+  {$value}<br />{\n}
+{/template}
+
+
+{template txtupd}
+  <textarea name="{$name}" rows="6" col="120" style="width: 600px;" />{$value}</textarea> <br />{\n}
+{/template}
+
+{template txtview}
+  {$value}<br />{\n}
 {/template}
 
 
@@ -146,9 +146,6 @@
 {/template}
 
 
-{template textupd}
-  <textarea name="{$name}" rows="6" col="120" style="width: 600px;" />{$value}</textarea> <br />{\n}
-{/template}
 
 
 {template pswdupd}

@@ -344,34 +344,33 @@
                                                     :perm   :owner
                                                     :width  100
                                                     :act    (delete-supplier-resource-price-elt))))
-       ;;                       ;; upload pricelist
-       ;;                       (:popbtn             "Загрузить прайс-лист"
-       ;;                        :top                1750
-       ;;                        :left               280
-       ;;                        :height             200
-       ;;                        :width              700
-       ;;                        :perm               :self
-       ;;                        :action '(:linear             "Добавление прайс-листа"
-       ;;                                  :perm               '(or :admin :self)
-       ;;                                  :entity             supplier-resource-price-elt
-       ;;                                  :val                :clear
-       ;;                                  :fields             '(
-       ;;                                                        (:file file
-       ;;                                                         :perm :all
-       ;;                                                         :name "Прайс")
-       ;;                                                        (:btn "Загрузить"
-       ;;                                                         :perm :all
-       ;;                                                         :act
-       ;;                                                         (progn
-       ;;                                                          ;; (awhen (car (hunchentoot:post-parameter "FILE"))
-       ;;                                                          ;;   (loop :for src :in (xls-processor it) :do
-       ;;                                                          ;;      (let ((obj (push-hash *supplier-resource-price-elt* 'supplier-resource-price-elt
-       ;;                                                          ;;                   :owner (cur-user)
-       ;;                                                          ;;                   :name (nth 1 src)
-       ;;                                                          ;;                   :unit (nth 2 src)
-       ;;                                                          ;;                   :price (nth 3 src))))
-       ;;                                                          ;;        (append-link (a-price-elts (cur-user)) obj))))
-       ;;                                                           (hunchentoot:redirect (hunchentoot:request-uri*)))))))
+                             ;; upload pricelist
+                             (:popbtn  "Загрузить прайс-лист (специально оставлено для всех чтобы проверить права на popup"
+                              :top      1750
+                              :left     280
+                              :height   200
+                              :width    700
+                              :perm     :all
+                              :action '(:linear     "Добавление прайс-листа"
+                                        :perm       :self
+                                        :entity     supplier-resource-price-elt
+                                        :val        :clear
+                                        :fields     '((:file file
+                                                       :perm :all
+                                                       :name "Прайс")
+                                                      (:btn "Загрузить"
+                                                       :perm :all
+                                                       :act
+                                                       (progn
+                                                        (awhen (car (hunchentoot:post-parameter "FILE"))
+                                                          (loop :for src :in (xls-processor it) :do
+                                                             (let ((obj (push-hash *supplier-resource-price-elt* 'supplier-resource-price-elt
+                                                                          :owner (cur-user)
+                                                                          :name (nth 1 src)
+                                                                          :unit (nth 2 src)
+                                                                          :price (nth 3 src))))
+                                                               (append-link (a-price-elts (cur-user)) obj))))
+                                                         (hunchentoot:redirect (hunchentoot:request-uri*)))))))
 
                              ;; resources
                              (:grid              "Ресурсы для конкурсов"
@@ -387,30 +386,30 @@
                                                           *SUPPLIER-RESOURCE*
                                                           (a-resources (gethash (cur-id) *USER*))))))
 
-       ;;                       (:popbtn            "Добавить ресурс"
-       ;;                        :top                2000
-       ;;                        :left               280
-       ;;                        :height             400
-       ;;                        :width              900
-       ;;                        :perm              '(or :admin :self)
-       ;;                        :action '(:grid               "Добавление ресурса"
-       ;;                                  :perm               :all
-       ;;                                  :entity             resource
-       ;;                                  :val                (cons-hash-list *RESOURCE*)
-       ;;                                  :height             250
-       ;;                                  :fields             '((:fld name :width 700)
-       ;;                                                        (:btn "Добавить ресурс"
-       ;;                                                         :width 120
-       ;;                                                         :perm :all
-       ;;                                                         :act
-       ;;                                                         (progn
-       ;;                                                           (push-hash *SUPPLIER-RESOURCE* 'SUPPLIER-RESOURCE
-       ;;                                                             :owner (gethash (cur-user) *USER*)
-       ;;                                                             :resource (gethash
-       ;;                                                                        (cdr (assoc "res" (form-data) :test #'equal))
-       ;;                                                                        *RESOURCE*)
-       ;;                                                             :price (cdr (assoc "PRICE" (form-data) :test #'equal)))
-       ;;                                                           (hunchentoot:redirect (hunchentoot:request-uri*)))))))
+                             (:popbtn  "Добавить ресурс"
+                              :top      2000
+                              :left     280
+                              :height   400
+                              :width    900
+                              :perm     :self
+                              :action '(:grid      "Добавление ресурса"
+                                        :perm       :all
+                                        :entity     resource
+                                        :val        (cons-hash-list *RESOURCE*)
+                                        :height     240
+                                        :fields     '((:fld name :width 700)
+                                                      (:btn "Добавить ресурс"
+                                                       :width 120
+                                                       :perm :all
+                                                       :act
+                                                       (let* ((owner    (cur-user))
+                                                              (resource (gethash (get-btn-key (caar (form-data))) *RESOURCE*))
+                                                              (supp-res (push-hash *SUPPLIER-RESOURCE* 'SUPPLIER-RESOURCE
+                                                                           :owner     owner
+                                                                           :resource  resource
+                                                                           :price     0)))
+                                                           (append-link (a-resources owner) supp-res)
+                                                           (hunchentoot:redirect (hunchentoot:request-uri*)))))))
 
                              ;; sales
                              (:grid              "Акции"
