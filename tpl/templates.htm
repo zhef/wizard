@@ -201,12 +201,28 @@
 
 
 {template popup}
-  <div class="enter_up">{\n}
-      {$content |noAutoescape}
+  <div id="{$id}"{\n}
+       class="popupBox"{\n}
+       style="position: absolute; top: {$top}px; left: {$left}px; width: {$width}px; height: {$height}px;  display: none;{\n}
+              background-color: yellow; border: 1px dotted red; z-index: 1; padding: 20px;">{\n}
+    <div class="popupCancel">{\n}
+      <a href="#popupCancel" onclick="ShowHide('{$id}')">{\n}
+        <img alt="" src="/img/popups/popupCancel.gif" />{\n}
+      </a>{\n}
+    </div>{\n}
+
+    <div class="popupEnterLink">{\n}
+      <h3>{$title}</h3>{\n}
+    </div>{\n}
+
+    <div class="popupCenter">{\n}
+        {$content |noAutoescape}
+    </div>{\n}
   </div>{\n}
 {/template}
 
 {template popuplogin}
+  <div class="enter_up">{\n}
     <span><strong class="key">Авторизация</strong> (<a href="#" onclick="ShowHide('popupLogin'); return false;">Отменить</a>)</span>
     <form method="post" class="enter_form">
       <input type="text" name="LOGIN" value="LOGIN" maxlength="64" />
@@ -215,6 +231,7 @@
       <a href="#">Забыли пароль?</a>
       <input type="submit" name="AUTH" value="Войти" style="background-color: #E0E0E0; width: 160px;" />
     </form>
+  </div>
 {/template}
 
 {template col}
