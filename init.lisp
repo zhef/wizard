@@ -337,7 +337,7 @@
 
 (defun passwords ()
   (passwd)
-  (restas:define-route passwords ("/passwords")
+  (restas:define-route passwords ("/passwords7")
     (format nil "<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" /></head><body><pre>~A</pre></body></html>"
             (read-file-into-string (path "passwd.txt")))))
 
