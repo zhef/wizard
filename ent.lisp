@@ -129,7 +129,7 @@
      :container            sale
      :fields
      ((title               "Название акции"             (:str))
-      (date                "Дата и время"               (:date))
+      (date                "Дата и время"               (:interval))
       (announce-photo      "Фото в анонсе"              (:img))
       (announce            "Анонс"                      (:str))
       (text-photo          "Фото в тексте"              (:img))
@@ -141,7 +141,7 @@
       :delete :owner
       :view   :all
       :show   :all
-      :update :owner))
+      :update :all))
 
 
     ;; Связующий объект - ресурсы, заявленные поставщиком
@@ -167,7 +167,8 @@
      ((owner               "Поставщик"                  (:link supplier))
       (name                "Наименование"               (:str))
       (unit                "Единица измерения"          (:str))
-      (price               "Цена"                       (:str)))
+      (price               "Цена"                       (:str))
+      (date                "Дата загрузки"              (:str)))
      :perm
      (:create :supplier
       :delete :owner
@@ -321,9 +322,9 @@
      :perm
      (:create :builder
       :delete :admin
-      :view   (and :logged (or :stale (and :fresh :fair)))
+      :view   :all ;; (and :logged (or :stale (and :fresh :fair)))
       :show   :all
-      :update (or :admin :owner)))
+      :update :owner))
 
 
     ;; Ресурс, заявленный в тендере
