@@ -298,32 +298,37 @@
         :perm              :all
         :entity            supplier
         :val               (gethash (cur-id) *USER*)
-        :fields            '((:fld name)
-                             (:fld status)
-                             (:fld juridical-address)
-                             (:fld actual-address)
-                             (:fld contacts)
-                             (:fld email)
-                             (:fld site)
-                             (:fld heads)
-                             (:fld inn)
-                             (:fld kpp)
-                             (:fld ogrn)
-                             (:fld bank-name)
-                             (:fld bik)
-                             (:fld corresp-account)
-                             (:fld client-account)
-                             (:fld addresses)
-                             (:fld contact-person)
-                             (:fld contact-phone)
-                             (:fld contact-email)
-                             (:btn               "Сохранить"
-                              :perm              :self
-                              :act (let ((obj (gethash (cur-id) *USER*)))
-                                     (with-obj-save obj
-                                       NAME JURIDICAL-ADDRESS ACTUAL-ADDRESS CONTACTS EMAIL SITE HEADS INN KPP OGRN BANK-NAME
-                                       BIK CORRESP-ACCOUNT CLIENT-ACCOUNT ADDRESSES CONTACT-PERSON contact-phone contact-email)
-                                     (hunchentoot:redirect (hunchentoot:request-uri*))))
+        :fields            '((:fld  name)
+                             (:fld  status)
+                             (:fld  juridical-address)
+                             (:fld  actual-address)
+                             (:fld  contacts)
+                             (:fld  email)
+                             (:fld  site)
+                             (:fld  heads)
+                             (:fld  inn)
+                             (:fld  kpp)
+                             (:fld  ogrn)
+                             (:fld  bank-name)
+                             (:fld  bik)
+                             (:fld  corresp-account)
+                             (:fld  client-account)
+                             (:fld  addresses)
+                             (:fld  contact-person)
+                             (:fld  contact-phone)
+                             (:fld  contact-email)
+                             (:btn  "Сохранить"
+                              :perm :self
+                              :act  (let ((obj (gethash (cur-id) *USER*)))
+                                      (with-obj-save obj
+                                        NAME JURIDICAL-ADDRESS ACTUAL-ADDRESS CONTACTS EMAIL SITE HEADS INN KPP OGRN BANK-NAME
+                                        BIK CORRESP-ACCOUNT CLIENT-ACCOUNT ADDRESSES CONTACT-PERSON contact-phone contact-email)
+                                      (hunchentoot:redirect (hunchentoot:request-uri*))))
+                             (:btn  "Отправить заявку на добросовестность"
+                              :perm '(and :self :unfair)
+                              :act  (progn
+                                      (setf (a-status (gethash (cur-id) *USER*)) :request)
+                                      (hunchentoot:redirect (hunchentoot:request-uri*))))
                              ;; affiliates
                              (:grid              "Адреса филиалов и магазинов"
                               :perm              :all
@@ -355,12 +360,12 @@
                                                     )))
 
                              ;; upload pricelist
-                             (:popbtn  "Загрузить прайс-лист (специально оставлено для всех чтобы проверить права на popup"
+                             (:popbtn  "Загрузить прайс-лист"
                               :top      1750
                               :left     280
                               :height   200
                               :width    700
-                              :perm     :all
+                              :perm     :self
                               :action '(:linear     "Добавление прайс-листа"
                                         :perm       :self
                                         :entity     supplier-resource-price-elt
@@ -449,13 +454,12 @@
                                          :perm     :all
                                          :entity   sale
                                          :val      :clear
-                                         :fields   '(
-                                                     (:fld title)
-                                                     (:fld date)
+                                         :fields   '((:fld title)
+                                                     ;; (:fld date)
                                                      ;; (:fld announce-photo)
-                                                     (:fld announce)
+                                                     ;; (:fld announce)
                                                      ;; (:fld text-photo)
-                                                     (:fld text)
+                                                     ;; (:fld text)
                                                      ;; (:fld owner)
                                                      ;; (:fld resource)
                                                      (:btn  "Добавить акцию"
@@ -487,16 +491,6 @@
 
                              ))
 
-
-       ;; (:linear            "Отправить заявку на добросовестность" ;; заявка на статус добросовестного поставщика (изменяет статус поставщика)
-       ;;  :perm              '(and :self :unfair)
-       ;;  :entity            supplier
-       ;;  :val               (gethash (cur-id) *USER*)
-       ;;  :fields            '((:btn "Отправить заявку на добросовестность"
-       ;;                        :perm :all
-       ;;                        :act (progn
-       ;;                               (setf (a-status (gethash (cur-id) *USER*)) :request)
-       ;;                               (hunchentoot:redirect (hunchentoot:request-uri*))))))
 
        (:yamap            "Адрес поставщика"
         :val               (let* ((supp (gethash (cur-id) *USER*))

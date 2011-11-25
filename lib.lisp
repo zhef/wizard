@@ -15,6 +15,9 @@
             year)))
 
 
+(defmacro err (var)
+  `(error (format nil "ERR:[~A]" ,var)))
+
 (defmacro with-query-select ((query-str fields) &body body)
   (let* ((fld-str (format nil "~{`~A`~^, ~}" fields))
          (fld-sym (loop :for fld :in fields :collect (intern (string-upcase fld) (find-package "WIZARD")))))

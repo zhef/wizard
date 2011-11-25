@@ -4,8 +4,9 @@
   `(if (check-perm ,perm (cur-user) ,obj)
        (call-next-method)
        (if (and (boundp '*dbg*) *dbg*)
-           (format nil "<br/>~%Permisson [~A] denied for :~A [~A] <br/>~%"
+           (format nil "<br/>~%Permisson [~A]=[~A] denied for :~A [~A] <br/>~%"
                    (bprint (a-perm ,obj))
+                   (bprint (perm-check (a-perm ,obj) (cur-user) ,obj))
                    (string-downcase (type-of ,obj))
                    (if (slot-exists-p obj 'value)
                        (a-value ,obj)

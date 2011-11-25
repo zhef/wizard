@@ -29,8 +29,11 @@
 
 (defun perm-check (perm subj obj)
   "subj - cur-user, obj - cur-obj"
-  (cond ((consp    perm)
+  (cond ((consp     perm)
          (loop :for item :in perm :collect (perm-check item subj obj)))
+        ((or (equal perm 'or)
+             (equal perm 'and))
+         perm)
         ((keywordp perm)
          (ecase perm
            (:all       t)                                            ;; Все пользователи
@@ -92,26 +95,23 @@
                        ;;                  (equal (a-owner target) subj))
                        ;;             t
                        ;;             nil))))
-           ))
-        (t (error perm))))
+           )
+         )
+        (t (error (format nil "error permissoin predicate: ~A" perm)))))
 
 
 (defun check-perm (perm subj obj)
-  ;; t)
   (let ((rs (eval (perm-check perm subj obj))))
-    (safe-write (path "perm-log.txt")
-                (format nil "~A ~A | subj: ~A; obj: ~A~%"
-                        (if rs "✔" "✘")
-                        perm
-                        subj
-                        obj))
-    (eval rs)
-  ))
+    (prog1 rs
+      (safe-write (path "perm-log.txt")
+                  (format nil "~A ~A | subj: ~A; obj: ~A~%"
+                          (if rs "✔" "✘")
+                          perm
+                          subj
+                          obj)))))
 
 
 ;; TEST
-;; (check-perm '(or :ADMIN :SELF) (gethash 0 *USER*) (gethash 1 *USER*))
-;; (perm-check '(or :admin (and :all :nobody)) 1 2)
-;; (check-perm '(or :admin (or :all :nobody)) 1 2)
-;; (check-perm ':nobody 1 2)
-;; (check-perm ':nobody 1 2)
+(perm-check '(or :logged (and :admin :supplier)) (gethash 0 *USER*) 'nine)
+(check-perm '(or :logged (and :admin :supplier)) (gethash 0 *USER*) 'nine)
+(check-perm :admin (gethash 1 *USER*) 'nine)
