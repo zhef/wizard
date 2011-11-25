@@ -287,45 +287,38 @@
 
 
 {template postannounce}
-  <table border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px; font-size: 12px;">
+  <table border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px;">
     <tr>
       <td>
-        <a href="/post/{$id}">{$title |noAutoescape}</a>
-      </td>
       <td width="1">
         {$date}
+      </td>
+        <a href="/post/{$id}">{$title |noAutoescape}</a>
       </td>
     </tr>
     <tr>
       <td colspan="2">{$photoannounce  |noAutoescape}</td>
     </tr>
     <tr>
-      <td colstan="2">{$announce  |noAutoescape}</td>
+      <td colspan="2">{$announce  |noAutoescape}</td>
     </tr>
   </table>
 {/template}
 
 
 {template posttext}
-  <table width="80%" border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px; font-size: 12px;">
+  <table width="90%" border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px;">
     <tr>
       <td>
-        <h1 style="font-size:32px">{$title  |noAutoescape}</h1>
-      </td>
-      <td width="1" align="right">
-        {$date}
+        <span class="data">{$date}</span>
+        <h2>{$title  |noAutoescape}</h2>
       </td>
     </tr>
     <tr>
       <td colspan="2">
-        &nbsp;
+         <span class="left">{$phototext  |noAutoescape}</span>
+         {$text  |noAutoescape}
       </td>
-    </tr>
-    <tr>
-      <td colspan="2">{$phototext  |noAutoescape}</td>
-    </tr>
-    <tr>
-      <td colstan="2">{$text  |noAutoescape}</td>
     </tr>
   </table>
 {/template}
