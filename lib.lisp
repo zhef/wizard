@@ -54,15 +54,27 @@
                (return-from in-ret cons)))
           nil))))
 
+(defmacro form-fld (fld)
+  `(cdr (assoc ,(symbol-name fld) (form-data) :test #'equal)))
+
 (defmacro del-inner-obj (form-element hash inner-lst)
-  `(let* ((key  (get-btn-key ,form-element))
-          (hobj (gethash key ,hash)))
-     (setf ,inner-lst
-           (remove-if #'(lambda (x)
-                          (equal x hobj))
-                      ,inner-lst))
-     (remhash key ,hash)
-     (hunchentoot:redirect (hunchentoot:request-uri*))))
+  (with-gensyms (key hobj)
+    `(let* ((,key  (get-btn-key ,form-element))
+            (,hobj (gethash ,key ,hash)))
+       (setf ,inner-lst
+             (remove-if #'(lambda (x)
+                            (equal x ,hobj))
+                        ,inner-lst))
+       (remhash ,key ,hash)
+       (hunchentoot:redirect (hunchentoot:request-uri*)))))
+
+(defmacro add-inner-obj (hash class inner-lst &body inits)
+  (with-gensyms (obj id)
+    `(multiple-value-bind (,obj ,id)
+         (push-hash ,hash ,class ,@inits)
+       (append-link ,inner-lst ,obj)
+       (values ,obj ,id))))
+
 
 (defmacro with-obj-save (obj &rest flds)
   `(progn

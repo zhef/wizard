@@ -374,13 +374,13 @@
                                                        (progn
                                                         (awhen (car (hunchentoot:post-parameter "FILE"))
                                                           (loop :for src :in (xls-processor it) :do
-                                                             (let ((obj (push-hash *supplier-resource-price-elt* 'supplier-resource-price-elt
-                                                                          :owner (cur-user)
-                                                                          :name  (nth 1 src)
-                                                                          :unit  (nth 2 src)
-                                                                          :price (nth 3 src)
-                                                                          :date  (decode-date (get-universal-time)))))
-                                                               (append-link (a-price-elts (cur-user)) obj))))
+                                                             (add-inner-obj *supplier-resource-price-elt* 'supplier-resource-price-elt
+                                                                 (a-price-elts (cur-user))
+                                                               :owner (cur-user)
+                                                               :name  (nth 1 src)
+                                                               :unit  (nth 2 src)
+                                                               :price (nth 3 src)
+                                                               :date  (decode-date (get-universal-time)))))
                                                         (hunchentoot:redirect (hunchentoot:request-uri*)))))))
 
                              ;; resources
@@ -397,6 +397,7 @@
                                                           *SUPPLIER-RESOURCE*
                                                           (a-resources (gethash (cur-id) *USER*))))))
 
+                             ;; Добавление ресурса
                              (:popbtn  "Добавить ресурс"
                               :top      2000
                               :left     280
@@ -414,13 +415,12 @@
                                                        :perm :all
                                                        :act
                                                        (let* ((owner    (cur-user))
-                                                              (resource (gethash (get-btn-key (caar (form-data))) *RESOURCE*))
-                                                              (supp-res (push-hash *SUPPLIER-RESOURCE* 'SUPPLIER-RESOURCE
-                                                                           :owner     owner
-                                                                           :resource  resource
-                                                                           :price     0)))
-                                                           (append-link (a-resources owner) supp-res)
-                                                           (hunchentoot:redirect (hunchentoot:request-uri*)))))))
+                                                              (resource (gethash (get-btn-key (caar (form-data))) *RESOURCE*)))
+                                                         (add-inner-obj *SUPPLIER-RESOURCE* 'SUPPLIER-RESOURCE (a-resources owner)
+                                                           :owner     owner
+                                                           :resource  resource
+                                                           :price     0)
+                                                         (hunchentoot:redirect (hunchentoot:request-uri*)))))))
 
                              ;; sales
                              (:grid    "Акции"
@@ -460,11 +460,10 @@
                                                      ;; (:fld resource)
                                                      (:btn  "Добавить акцию"
                                                       :perm :all
-                                                      :act  (let* ((owner (cur-user))
-                                                                   (sale  (push-hash *SALE* 'SALE
-                                                                               :owner     owner
-                                                                               :title     (cdr (assoc "TITLE" (form-data) :test #'equal)))))
-                                                              (append-link (a-sales owner) sale)
+                                                      :act  (let* ((owner (cur-user)))
+                                                              (add-inner-obj *SALE* 'SALE (a-sales owner)
+                                                                :owner     owner
+                                                                :title     (form-fld title))
                                                               (hunchentoot:redirect (hunchentoot:request-uri*)))
                                                       ))))
 
