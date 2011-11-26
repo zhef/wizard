@@ -1,13 +1,20 @@
 (in-package #:wizard)
 
-(defmacro def-fld (name &key (perm :all perm-p)  (xref nil xref-p)  (width 200 width-p))
+(defmacro def-fld (name &key (update nil update-p) (show nil show-p) (view nil view-p) (xref nil xref-p)  (width 200 width-p))
   (let ((rs `(:fld ,name)))
-    (if xref-p (nconc rs `(:xref ,xref)))
-    (if width-p (nconc rs `(:xref ,width)))
+    (if update-p  (nconc rs `(:update ,update)))
+    (if view-p    (nconc rs `(:view   ,view)))
+    (if show-p    (nconc rs `(:show   ,show)))
+    (if xref-p    (nconc rs `(:xref   ,xref)))
+    (if width-p   (nconc rs `(:width  ,width)))
     `',rs))
 
+(macroexpand-1 '
+ (def-fld name2 :width 550 :update :all))
+
+
 (defmacro def-btn ((title perm &key (width 200 width-p)) &body act)
-  (let ((rs `(:btn ,title)))
+  (let ((rs `(:btn ,title :perm ,perm)))
     (if width-p (nconc rs `(:width ,width)))
     (nconc rs `(:act ,@act))
     `',rs))
@@ -20,6 +27,7 @@
     (if width-p  (nconc rs `(:width  ,width)))
     (nconc rs `(:action ,@action))
     `',rs))
+
 
 ;; (macroexpand-1 '
 ;; (def-pop (name2 :all :width 550)
@@ -61,16 +69,16 @@
         :entity            supplier
         :perm              :all
         :val               :clear
-        :fields            '(,(def-fld  login)
-                             ,(def-fld  password)
-                             ,(def-fld  email)
-                             ,(def-fld  name)
-                             ,(def-fld  inn)
-                             ,(def-fld  ogrn)
-                             ,(def-fld  juridical-address)
-                             ,(def-fld  actual-address)
-                             ,(def-fld  contact-person)
-                             ,(def-fld  contact-phone)
+        :fields            '(,(def-fld  login             :update :all)
+                             ,(def-fld  password          :update :all)
+                             ,(def-fld  email             :update :all)
+                             ,(def-fld  name              :update :all)
+                             ,(def-fld  inn               :update :all)
+                             ,(def-fld  ogrn              :update :all)
+                             ,(def-fld  juridical-address :update :all)
+                             ,(def-fld  actual-address    :update :all)
+                             ,(def-fld  contact-person    :update :all)
+                             ,(def-fld  contact-phone     :update :all)
                              ,(def-btn  ("Зарегистрироваться" :all :width 120)
                                         (with-obj-create (*USER* 'SUPPLIER (login password email name inn ogrn juridical-address actual-address
                                                                                  contact-person contact-phone))

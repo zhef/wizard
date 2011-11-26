@@ -121,8 +121,8 @@
                                  (equal (car x) (a-title param))) ;; NB!: ent-to-me TITLE = NAME
                              (getf entity :fields)))
          (obj-perm  (getf entity :perm)))
-    ;; (print entity-param)
-    ;; (print record)
+    (print entity-param)
+    (print record)
     (destructuring-bind (fld name typedata &optional fld-perm)
         record
       (format nil "~%~6T (mi 'fld :name \"~A\" :typedata '~A :title ~A :width ~A :xref ~A ~%~15T :perm ~A)"
@@ -136,6 +136,8 @@
                    (if (null (getf fld-perm perm))
                        (setf (getf res-perm perm) (getf obj-perm perm))
                        (setf (getf res-perm perm) (getf fld-perm perm))))
+                (print res-perm)
+                (print param)
                 (push ''perm res-perm)
                 (push 'mi res-perm)
                 (bprint res-perm))))))

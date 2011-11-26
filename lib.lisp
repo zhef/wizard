@@ -16,7 +16,7 @@
 
 
 (defmacro err (var)
-  `(error (format nil "ERR:[~A]" ,var)))
+  `(error (format nil "ERR:[~A]" (bprint ,var))))
 
 (defmacro with-query-select ((query-str fields) &body body)
   (let* ((fld-str (format nil "~{`~A`~^, ~}" fields))
@@ -637,9 +637,7 @@ If objs are of different classes the result is NIL."
 (with-defclass (perm ())
   (update :all)
   (show   :all)
-  (view   :all)
-  (delete :all)
-  (create :all))
+  (view   :all))
 
 ;; CLASS FLD
 (with-defclass (fld ())
@@ -648,7 +646,10 @@ If objs are of different classes the result is NIL."
   (typedata '(:str))
   (width 200)
   (xref nil)
-  (perm (mi 'perm)))
+  (update :err)
+  (view :err)
+  (show :err))
+
 
 (with-defclass (btn ())
   (name "")

@@ -6,7 +6,6 @@
 ;; Для полей наследуются разрешения объекта, если иное явно не указано в поле
 (defparameter *entityes*
   '(
-
     ;; Администратор
     (:entity               admin
      :container            user
@@ -17,8 +16,7 @@
      (:view                :self
       :update              :self))
 
-
-    ;; Эксперт - имеет доступ не ко всем тендерам (в будущем!)
+    ;; Эксперт
     (:entity               expert
      :container            user
      :fields
@@ -26,9 +24,9 @@
       (password            "Пароль"                     (:pswd))
       (name                "ФИО"                        (:str)))
      :perm
-     (:view                (or :admin :self)
-      :show                (or :admin :self)
-      :update              (or :admin :self)))
+     (:view                :all
+      :show                :all
+      :update              :all))
 
   ;; Новости
     (:entity               post-item
@@ -44,66 +42,43 @@
      :perm
      (:view                :all
       :show                :all
-      :update              :admin))
+      :update              :nobody))
 
     ;; Поставщик
     (:entity               supplier
      :container            user
      :fields
-     ((login               "Логин"                      (:str))
-      (password            "Пароль"                     (:pswd))
-      (name                "Название организации"       (:str))
-      (referal             "Реферал"                    (:link user)
-                           '(:view   (or :admin :expert) ;; Если застройщик привел этого поставщика то здесь ссылка на застройщика
-                             :update :nobody))
-      (status              "Статус"                     (:list-of-keys supplier-status)
-                           '(:view   :all
-                             :update :admin))
-      (juridical-address   "Юридический адрес"          (:str)
-                           '(:view   :logged))          ;; Гость не видит
-      (actual-address      "Фактический адрес"          (:str))
-      (contacts            "Контактные телефоны"        (:txt)     ;; cписок телефонов с возможностью ввода
-                           '(:view   (or :logged :fair)))                  ;; незалогиненные могут видеть только тел. добросовестных
-      (email               "Email"                      (:str)             ;; отображение как ссылка mailto://....
-                           '(:view   (or :logged :fair)))
-      (site                "Сайт организации"           (:str)             ;; отображение как ссылка http://....
-                           '(:view   (or :logged :fair)))
-      (heads               "Руководство"                (:txt)
-                           '(:view   :logged))                              ;; Гости не видят руководство фирм-поставщиков
-      (inn                 "ИНН"                        (:str)
-                           '(:view   (or :logged :fair)))                   ;; Незалогиненные видят только добросовестных
-      (kpp                 "КПП"                        (:str)
-                           '(:view   (or :logged :fair)))                   ;; Незалогиненные видят только добросовестных
-      (ogrn                "ОГРН"                       (:str)
-                           '(:view   (or :logged :fair)))                   ;; Незалогиненные видят только добросовестных
-      (bank-name           "Название банка"             (:str)
-                           '(:view   :logged))                              ;; Гость не видит банковские реквизиты
-      (bik                 "Банковский идентификационный код" (:str)
-                           '(:view   :logged))                              ;; Гость не видит банковские реквизиты
-      (corresp-account     "Корреспондентский счет"    (:str)
-                           '(:view   :logged))                              ;; Гость не видит банковские реквизиты
-      (client-account      "Расчетный счет"            (:str)
-                           '(:view   :logged))                              ;; Гость не видит банковские реквизиты
-      (addresses           "Адреса офисов и магазинов" (:txt)
-                           '(:view   (or :logged :fair)))                   ;; Гость не видит у недобросовестных
-      (affiliates          "Адреса офисов и магазинов" (:list-of-links supplier-affiliate))
-      (contact-person      "Контактное лицо"           (:str)
-                           '(:view   (or :logged :fair)))                   ;; Гость не видит у недобросовестных
-      (contact-phone       "Контактный телефон"        (:str)
-                           '(:view   (or :logged :fair)))                   ;; Гость не видит у недобросовестных
-      (contact-email       "Контактный email"          (:str)
-                           '(:view   (or :logged :fair)))                   ;; Гость не видит у недобросовестных
-      (resources           "Поставляемые ресурсы"      (:list-of-links supplier-resource))
-      (price-elts          "Ресурсы из прайсa"         (:list-of-links supplier-resource-price-elt))
-      (offers              "Посланные приглашения на тендеры"  (:list-of-links offer)
-                           '(:view :self
-                             :update :self))  ;; offer - связующий объект
-      (sales               "Распродажи"                (:list-of-links sale)))    ;; sale - связующий объект
+     ((login               "Логин"                             (:str))
+      (password            "Пароль"                            (:pswd))
+      (name                "Название организации"              (:str))
+      (referal             "Реферал"                           (:link user))
+      (status              "Статус"                            (:list-of-keys supplier-status))
+      (juridical-address   "Юридический адрес"                 (:str))
+      (actual-address      "Фактический адрес"                 (:str))
+      (contacts            "Контактные телефоны"               (:txt))
+      (email               "Email"                             (:str))
+      (site                "Сайт организации"                  (:str))
+      (heads               "Руководство"                       (:txt))
+      (inn                 "ИНН"                               (:str))
+      (kpp                 "КПП"                               (:str))
+      (ogrn                "ОГРН"                              (:str))
+      (bank-name           "Название банка"                    (:str))
+      (bik                 "Банковский идентификационный код"  (:str))
+      (corresp-account     "Корреспондентский счет"            (:str))
+      (client-account      "Расчетный счет"                    (:str))
+      (addresses           "Адреса офисов и магазинов"         (:txt))
+      (affiliates          "Адреса офисов и магазинов"         (:list-of-links supplier-affiliate))
+      (contact-person      "Контактное лицо"                   (:str))
+      (contact-phone       "Контактный телефон"                (:str))
+      (contact-email       "Контактный email"                  (:str))
+      (resources           "Поставляемые ресурсы"              (:list-of-links supplier-resource))
+      (price-elts          "Ресурсы из прайсa"                 (:list-of-links supplier-resource-price-elt))
+      (offers              "Посланные приглашения на тендеры"  (:list-of-links offer))
+      (sales               "Распродажи"                        (:list-of-links sale)))
      :perm
-     (:view               :all
-      :show               :all
-      :update             :self))
-
+     (:view                :all
+      :show                :all
+      :update              :self))
 
     ;; Филиалы поставщика
     (:entity               supplier-affiliate
@@ -112,12 +87,11 @@
      ((owner               "Поставщик"                  (:link supplier))
       (address             "Адрес"                      (:str)))
      :perm
-     (:view               :all ;; (or :logged :fair))
-      :show               :all
-      :update             (or :admin :self)))
+     (:view                :all ;; (or :logged :fair))
+      :show                :all
+      :update              :self))
 
-
-    ;; Связующий объект: Распродажи - связывает поставщика, объявленный им ресурс и хранит условия скидки
+    ;; Распродажи - связывает поставщика, объявленный им ресурс и хранит условия скидки
     (:entity               sale
      :container            sale
      :fields
@@ -130,24 +104,21 @@
       (owner               "Поставщик"                  (:link supplier))
       (resource            "Ресурс"                     (:link supplier-resource)))
      :perm
-     (:view   :all
-      :show   :all
-      :update :all))
+     (:view                :all
+      :show                :all
+      :update              :all))
 
-
-    ;; Связующий объект - ресурсы, заявленные поставщиком
+    ;; Ресурсы, заявленные поставщиком для конкурсов
     (:entity               supplier-resource
      :container            supplier-resource
      :fields
-     ((owner               "Поставщик"                  (:link supplier)
-                           '(:update :nobody))
+     ((owner               "Поставщик"                  (:link supplier))
       (resource            "Ресурс"                     (:link resource))
       (price               "Цена поставщика"            (:num)))
      :perm
-     (:view   :all
-      :show   :all
-      :update :owner))
-
+     (:view                :all
+      :show                :all
+      :update              :owner))
 
     ;; Ресурсы, которые поставщик загружает на свою страницу (из xls-файлов)
     (:entity               supplier-resource-price-elt
@@ -159,11 +130,11 @@
       (price               "Цена"                       (:str))
       (date                "Дата загрузки"              (:str)))
      :perm
-     (:view   :all
-      :show   :all
-      :update :owner))
+     (:view                :all
+      :show                :all
+      :update              :owner))
 
-
+    ;; Застройщик
     (:entity               builder
      :container            user
      :fields
@@ -175,32 +146,22 @@
       (contacts            "Контактные телефоны"        (:txt))    ;; cписок телефонов с возможностью ввода
       (email               "Email"                      (:str))            ;; отображение как ссылка mailto://....
       (site                "Сайт организации"           (:str))            ;; отображение как ссылка http://....
-      (inn                 "Инн"                        (:str)
-                           '(:view   (or :logged :fair)))                   ;; Незалогиненные видят только добросовестных
-      (kpp                 "КПП"                        (:str)
-                           '(:view   (or :logged :fair)))                   ;; Незалогиненные видят только добросовестных
-      (ogrn                "ОГРН"                       (:str)
-                           '(:view   (or :logged :fair)))                   ;; Незалогиненные видят только добросовестных
-      (bank-name           "Название банка"             (:str)
-                           '(:view   :logged))                              ;; Гость не видит банковские реквизиты
-      (bik                 "Банковский идентификационный код" (:str)
-                           '(:view   :logged))                              ;; Гость не видит банковские реквизиты
-      (corresp-account     "Корреспондентский счет"     (:str)
-                           '(:view   :logged))                              ;; Гость не видит банковские реквизиты
-      (client-account      "Расчетный счет"            (:str)
-                           '(:view   :logged))                              ;; Гость не видит банковские реквизиты
-      (tenders             "Тендеры"                    (:list-of-links tender)
-                           '(:view   :all))
-      (rating              "Рейтинг"                    (:num)
-                           '(:update :system)))
+      (inn                 "Инн"                        (:str))
+      (kpp                 "КПП"                        (:str))
+      (ogrn                "ОГРН"                       (:str))
+      (bank-name           "Название банка"             (:str))
+      (bik                 "Банковский идентификационный код" (:str))
+      (corresp-account     "Корреспондентский счет"     (:str))
+      (client-account      "Расчетный счет"            (:str))
+      (tenders             "Тендеры"                    (:list-of-links tender))
+      (rating              "Рейтинг"                    (:num)))
      :perm
-     (:view   :all
-      :show   :all
-      :update :self))
+     (:view                :all
+      :show                :all
+      :update              :self))
 
 
     ;; Иерархический каталог ресурсов
-
 
     ;; Категория - группа ресурсов, не содержащая в себе ресурсы, а ссылающаяся на них
     (:entity               category
@@ -211,10 +172,9 @@
       (child-categoryes    "Дочерние группы"            (:list-of-links category))
       (resources           "Ресурсы"                    (:list-of-links resource)))
      :perm
-     (:view   :all
-      :show   :all
-      :update :system))
-
+     (:view                :all
+      :show                :all
+      :update              :nobody))
 
     ;; Ресурс
     (:entity               resource
@@ -227,10 +187,9 @@
       (suppliers           "Поставляющие организации"   (:list-box supplier))
       (resource-prices     "Цены ресурса"               (:list-of-links resource-price)))
      :perm
-     (:view   :all
-      :show   :all
-      :update :system))
-
+     (:view                :all
+      :show                :all
+      :update              :nobody))
 
     ;; Цены на ресурс
     (:entity               resource-price
@@ -241,10 +200,9 @@
       (price-reference     "Справочник цен"             (:link price-reference))
       (resource            "Ресурс"                     (:link resource)))
      :perm
-     (:view   :all
-      :show   :all
-      :update :system))
-
+     (:view                :all
+      :show                :all
+      :update              :nobody))
 
     ;; Справочники цен
     (:entity               price-reference
@@ -254,9 +212,9 @@
       (date                "Дата"                       (:str))
       (resource-prices     "Цены"                       (:list-of-links resource-price)))
      :perm
-     (:view   :all
-      :show   :all
-      :update :system))
+     (:view                :all
+      :show                :all
+      :update              :nobody))
 
 
     ;; Тендеры
@@ -265,42 +223,25 @@
     (:entity               tender
      :container            tender
      :fields
-     ((name                "Название"                   (:str)
-                           '(:view   :all))
-      (status              "Статус"                     (:list-of-keys tender-status)
-                           '(:view   :all))
-      (owner               "Заказчик"                   (:link builder)
-                           '(:update :admin))
+     ((name                "Название"                   (:str))
+      (status              "Статус"                     (:list-of-keys tender-status))
+      (owner               "Заказчик"                   (:link builder))
       ;; Дата, когда тендер стал активным (первые сутки новые тендеры видят только добростовестные поставщики)
-      (all                 "Срок проведения"            (:interval)
-                           '(:view   :all
-                             :update (or :admin  (and :owner :unactive))))
-      (claim               "Срок подачи заявок"         (:interval)
-                           '(:update (or :admin  (and :owner :unactive))))
-      (analize             "Срок рассмотрения заявок"   (:interval)
-                           '(:update (or :admin  (and :owner :unactive))))
-      (interview           "Срок проведения интервью"   (:interval)
-                           '(:update (or :admin  (and :owner :unactive))))
-      (result              "Срок подведения итогов"     (:interval)
-                           '(:update (or :admin (and :owner :unactive))))
-      (winner              "Победитель тендера"         (:link supplier)
-                           '(:view   :finished))
-      (price               "Рекомендуемая стоимость"    (:num) ;; вычисляется автоматически на основании заявленных ресурсов
-                           '(:update :system))
-      (resources           "Ресурсы"                    (:list-of-links tender-resource)
-                           '(:update (and :owner :unactive)))
-      (documents           "Документы"                  (:list-of-links document) ;; закачка и удаление файлов
-                           '(:update (and :owner :unactive)))
-      (suppliers           "Поставщики"                 (:list-of-links supplier) ;; строится по ресурсам автоматически при создании тендера
-                           '(:update :system))                                    ;; по ресурсам тендера
-      (offers              "Заявки"                     (:list-of-links offer)
-                           '(:update :system)
-                           ))
+      (all                 "Срок проведения"            (:interval))
+      (claim               "Срок подачи заявок"         (:interval))
+      (analize             "Срок рассмотрения заявок"   (:interval))
+      (interview           "Срок проведения интервью"   (:interval))
+      (result              "Срок подведения итогов"     (:interval))
+      (winner              "Победитель тендера"         (:link supplier))
+      (price               "Рекомендуемая стоимость"    (:num)) ;; вычисляется автоматически на основании заявленных ресурсов
+      (resources           "Ресурсы"                    (:list-of-links tender-resource))
+      (documents           "Документы"                  (:list-of-links document)) ;; закачка и удаление файлов
+      (suppliers           "Поставщики"                 (:list-of-links supplier)) ;; строится по ресурсам автоматически при создании тендера
+      (offers              "Заявки"                     (:list-of-links offer)))
      :perm
-     (:view   :all ;; (and :logged (or :stale (and :fresh :fair)))
-      :show   :all
-      :update :owner))
-
+     (:view                :all ;; (and :logged (or :stale (and :fresh :fair)))
+      :show                :all
+      :update              :owner))
 
     ;; Ресурс, заявленный в тендере
     (:entity               tender-resource
@@ -315,9 +256,9 @@
       (delivery           "Доставка"                    (:bool))
       (basic              "Основной"                    (:bool)))
      :perm
-     (:view   (and :logged (or :stale (and :fresh :fair)))
-      :show   :all
-      :update (or :admin :owner)))
+     (:view               :all  ;;(and :logged (or :stale (and :fresh :fair)))
+      :show               :all
+      :update             :all))  ;;(or :admin :owner)))
 
 
     ;; Приглашение-заявка на участие в тендере.
@@ -335,30 +276,28 @@
       (resources           "Ресурсы"                    (:list-of-links offer-resource))
       (allow-modify        "Разрешено изменять"         (:bool)))
       :perm
-     (:view   :all
-      :show   :all
-      :update (and :active :owner)    ;; Заявка модет быть отредактирвана пока срок приема заявок не истек.
-      ))
-
+     (:view                :all
+      :show                :all
+      :update              :all)) ;;(and :active :owner)    ;; Заявка модет быть отредактирвана пока срок приема заявок не истек.
 
     ;; Связующий объект: Ресурсы и цены для заявки на участие в тендере
-    (:entity               offer-resource
-     :container            offer-resource
+    (:entity                offer-resource
+     :container             offer-resource
      :fields
-     ((offer              "Заявка"                      (:link offer))
-      (tender-resource    "Ресурс тендера"              (:link tender-resource))
-      (quantity           "Кол-во"                      (:num))
-      (price              "Цена до собеседования"       (:num)) ;; Первоначально цена заполняется из справочника
-      (price-result       "Цена после собеседования"    (:num))
-      (comment            "Комментарий"                 (:str))
-      (delivery           "Доставка"                    (:bool))
-      (delivery-price     "Стоимость доставки"          (:num))
-      (marked             "Отметка застройщика"         (:bool))
-      (rank               "Занятое место"               (:num)))
+     ((offer               "Заявка"                      (:link offer))
+      (tender-resource     "Ресурс тендера"              (:link tender-resource))
+      (quantity            "Кол-во"                      (:num))
+      (price               "Цена до собеседования"       (:num)) ;; Первоначально цена заполняется из справочника
+      (price-result        "Цена после собеседования"    (:num))
+      (comment             "Комментарий"                 (:str))
+      (delivery            "Доставка"                    (:bool))
+      (delivery-price      "Стоимость доставки"          (:num))
+      (marked              "Отметка застройщика"         (:bool))
+      (rank                "Занятое место"               (:num)))
      :perm
-     (:view   :all
-      :show   :all
-      :update (and :active :owner)))
+     (:view                :all
+      :show                :all
+      :update              :all)) ;; (and :active :owner)))
 
 
     ;; Связанные с тендерами документы
@@ -369,9 +308,9 @@
       (filename            "Имя файла"                  (:str))
       (tender              "Тендер"                     (:link tender)))
      :perm
-     (:view   :all
-      :show   :all
-      :update :owner))
+     (:view                :all
+      :show                :all
+      :update              :owner))
     ))
 
 
