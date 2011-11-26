@@ -123,22 +123,21 @@
          (obj-perm  (getf entity :perm)))
     (destructuring-bind (fld name typedata)
         record
-      (format nil "~%~6T (mi 'fld :name \"~A\" :typedata '~A :title ~A :width ~A :xref ~A ~%~15T :perm ~A)"
+      (format nil "~%~6T (mi 'fld :name \"~A\" :typedata '~A :title ~A :width ~A ~A ~%~15T :update ~A :view ~A :show ~A)"
               (bprint fld)
               (bprint typedata)
               (bprint name)
               (aif (a-width param) it 200)
-              (bprint (a-xref param))
-              (let ((res-perm obj-perm))
-                (if (not (null (a-update param)))
-                    (setf (getf res-perm :update) (a-update param)))
-                (if (not (null (a-view param)))
-                    (setf (getf res-perm :view) (a-view param)))
-                (if (not (null (a-show param)))
-                    (setf (getf res-perm :show) (a-show param)))
-                (push ''perm res-perm)
-                (push 'mi res-perm)
-                (bprint res-perm))))))
+              (aif (a-xref param)  (format nil ":xref ~A" (bprint it)) "")
+              (bprint (aif (a-update param)
+                           (a-update param)
+                           (getf obj-perm :update)))
+              (bprint (aif (a-view param)
+                           (a-view param)
+                           (getf obj-perm :view)))
+              (bprint (aif (a-show param)
+                           (a-show param)
+                           (getf obj-perm :show)))))))
 
 
 (defmethod gen ((param btn) &key entity-param)

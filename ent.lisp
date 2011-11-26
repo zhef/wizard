@@ -76,7 +76,7 @@
       (offers              "Посланные приглашения на тендеры"  (:list-of-links offer))
       (sales               "Распродажи"                        (:list-of-links sale)))
      :perm
-     (:view                :all
+     (:view                '(or :all :self)
       :show                :all
       :update              :self))
 

@@ -646,10 +646,9 @@ If objs are of different classes the result is NIL."
   (typedata '(:str))
   (width 200)
   (xref nil)
-  (update :err)
-  (view :err)
-  (show :err)
-  (perm (mi 'perm)))
+  (update nil)
+  (view nil)
+  (show nil))
 
 
 (with-defclass (btn ())

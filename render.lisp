@@ -267,7 +267,7 @@ function(){
   (let ((val       (funcall      *val*))
         (namefld   (a-name       obj))
         (captfld   (a-title      obj))
-        (permfld   (a-perm       obj))
+        (permfld   (mi 'perm :update (a-update obj) :view (a-view obj) :show (a-show obj)))
         (typedata  (a-typedata   obj)))
     (declare (ignore permfld))
     (show-linear-elt typedata val namefld captfld permfld)))
