@@ -60,6 +60,20 @@
 (defmacro form-fld (fld)
   `(cdr (assoc ,(symbol-name fld) (form-data) :test #'equal)))
 
+(defmacro with-obj-create ((hash class flds) &body body)
+  `(multiple-value-bind (obj id)
+       (push-hash ,hash ,class)
+     ,@(loop :for fld :in flds :collect
+          `(setf (,(intern (format nil "A-~A" (symbol-name fld))) obj)
+                 (form-fld ,fld)))
+     ,@body))
+
+(defmacro with-obj-save (obj &rest flds)
+  `(progn
+     ,@(loop :for fld :in flds :collect
+          `(setf (,(intern (format nil "A-~A" (symbol-name fld))) ,obj)
+                 (form-fld ,fld)))))
+
 (defmacro del-inner-obj (form-element hash inner-lst)
   (with-gensyms (key hobj)
     `(let* ((,key  (get-btn-key ,form-element))
@@ -78,13 +92,6 @@
        (append-link ,inner-lst ,obj)
        (values ,obj ,id))))
 
-
-(defmacro with-obj-save (obj &rest flds)
-  `(progn
-     ,@(loop :for fld :in flds :collect
-          `(setf (,(intern (format nil "A-~A" (symbol-name fld))) ,obj)
-                 (cdr (assoc ,(symbol-name fld) (form-data) :test #'equal))))
-     (hunchentoot:redirect (hunchentoot:request-uri*))))
 
 (defmacro append-link (lst elt)
   `(setf ,lst (append ,lst (list ,elt))))
@@ -117,14 +124,15 @@
   (merge-pathnames relative *basedir*))
 
 (defun cur-user-id ()
+  "get current logged user id as string"
   (hunchentoot:session-value 'userid))
 
 (defun cur-user ()
-  "get current user obj form session"
+  "get current logged user obj from session"
   (gethash (cur-user-id) *USER*))
 
-(defun cur-id ()
-  "get current obj"
+(defun cur-page-id ()
+  "get current viewed page obj"
   (parse-integer (car (last (request-list))) :junk-allowed t))
 
 (defun form-data ()

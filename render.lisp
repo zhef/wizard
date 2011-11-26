@@ -98,7 +98,7 @@
                            :idpager pager-id
                            :json (replace-all
                                   (json:encode-json-to-string
-                                   `(("url" . ,(format nil "/~A~A" (a-grid obj) (if (a-param-id obj) (format nil "/~A" (cur-id)) ""))) ;; absolute uri
+                                   `(("url" . ,(format nil "/~A~A" (a-grid obj) (if (a-param-id obj) (format nil "/~A" (cur-page-id)) ""))) ;; absolute uri
                                      ("datatype" . "json")
                                      ("colNames" . ,(reverse col-titles))
                                      ("colModel" . ,(reverse col-models))

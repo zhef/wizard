@@ -64,7 +64,7 @@
            (:finished  (error "perm-todo :finished"))  ;; Объект является завершенным тендером
            (:cancelled (error "perm-todo :cancelled")) ;; Объект является отмененным тендером
            ;; Mixed
-           (:self      (destructuring-bind (root obj-type id) ;; Залогиненный пользователь (subj) и просматриваемая страница (request-list)
+           (:self      (destructuring-bind (root &optional obj-type id) ;; Залогиненный пользователь (subj) и просматриваемая страница (request-list)
                            (request-list)                     ;; указывают на один объект.
                          (if (and (not (null obj-type))       ;; Этот вид прав не должен использоваться с ajax-объектамми, например grid,
                                   (not (null id))             ;; так как requuest-list для них не указывает на объект!
@@ -97,7 +97,7 @@
                        ;;             nil))))
            )
          )
-        (t (error (format nil "error permissoin predicate: ~A" perm)))))
+        (t (error (format nil "error perm predicate: ~A" perm)))))
 
 
 (defun check-perm (perm subj obj)
@@ -112,6 +112,6 @@
 
 
 ;; TEST
-(perm-check '(or :logged (and :admin :supplier)) (gethash 0 *USER*) 'nine)
-(check-perm '(or :logged (and :admin :supplier)) (gethash 0 *USER*) 'nine)
-(check-perm :admin (gethash 1 *USER*) 'nine)
+;; (perm-check '(or :logged (and :admin :supplier)) (gethash 0 *USER*) 'nine)
+;; (check-perm '(or :logged (and :admin :supplier)) (gethash 0 *USER*) 'nine)
+;; (check-perm :admin (gethash 1 *USER*) 'nine)

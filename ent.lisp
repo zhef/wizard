@@ -26,9 +26,7 @@
       (password            "Пароль"                     (:pswd))
       (name                "ФИО"                        (:str)))
      :perm
-     (:create              :admin
-      :delete              :admin
-      :view                (or :admin :self)
+     (:view                (or :admin :self)
       :show                (or :admin :self)
       :update              (or :admin :self)))
 
@@ -44,9 +42,7 @@
       (text                "Текст"                      (:str))
       (section             "Раздел"                     (:str)))
      :perm
-     (:create              :admin
-      :delete              :admin
-      :view                :all
+     (:view                :all
       :show                :all
       :update              :admin))
 
@@ -58,8 +54,7 @@
       (password            "Пароль"                     (:pswd))
       (name                "Название организации"       (:str))
       (referal             "Реферал"                    (:link user)
-                           '(:create :system             ;; Если застройщик привел этого поставщика
-                             :view   (or :admin :expert) ;; то здесь ссылка на застройщика
+                           '(:view   (or :admin :expert) ;; Если застройщик привел этого поставщика то здесь ссылка на застройщика
                              :update :nobody))
       (status              "Статус"                     (:list-of-keys supplier-status)
                            '(:view   :all
@@ -117,9 +112,7 @@
      ((owner               "Поставщик"                  (:link supplier))
       (address             "Адрес"                      (:str)))
      :perm
-     (:create             :admin
-      :delete             :admin
-      :view               :all ;; (or :logged :fair))
+     (:view               :all ;; (or :logged :fair))
       :show               :all
       :update             (or :admin :self)))
 
@@ -137,9 +130,7 @@
       (owner               "Поставщик"                  (:link supplier))
       (resource            "Ресурс"                     (:link supplier-resource)))
      :perm
-     (:create :supplier
-      :delete :owner
-      :view   :all
+     (:view   :all
       :show   :all
       :update :all))
 
@@ -153,9 +144,7 @@
       (resource            "Ресурс"                     (:link resource))
       (price               "Цена поставщика"            (:num)))
      :perm
-     (:create :owner
-      :delete :owner
-      :view   :all
+     (:view   :all
       :show   :all
       :update :owner))
 
@@ -170,9 +159,7 @@
       (price               "Цена"                       (:str))
       (date                "Дата загрузки"              (:str)))
      :perm
-     (:create :supplier
-      :delete :owner
-      :view   :all
+     (:view   :all
       :show   :all
       :update :owner))
 
@@ -207,11 +194,9 @@
       (rating              "Рейтинг"                    (:num)
                            '(:update :system)))
      :perm
-     (:create :admin
-      :delete :admin
-      :view   :all
+     (:view   :all
       :show   :all
-      :update (or :admin :self)))
+      :update :self))
 
 
     ;; Иерархический каталог ресурсов
@@ -226,9 +211,7 @@
       (child-categoryes    "Дочерние группы"            (:list-of-links category))
       (resources           "Ресурсы"                    (:list-of-links resource)))
      :perm
-     (:create :system
-      :delete :system
-      :view   :all
+     (:view   :all
       :show   :all
       :update :system))
 
@@ -244,9 +227,7 @@
       (suppliers           "Поставляющие организации"   (:list-box supplier))
       (resource-prices     "Цены ресурса"               (:list-of-links resource-price)))
      :perm
-     (:create :system
-      :delete :system
-      :view   :all
+     (:view   :all
       :show   :all
       :update :system))
 
@@ -260,9 +241,7 @@
       (price-reference     "Справочник цен"             (:link price-reference))
       (resource            "Ресурс"                     (:link resource)))
      :perm
-     (:create :system
-      :delete :system
-      :view   :all
+     (:view   :all
       :show   :all
       :update :system))
 
@@ -275,9 +254,7 @@
       (date                "Дата"                       (:str))
       (resource-prices     "Цены"                       (:list-of-links resource-price)))
      :perm
-     (:create :system
-      :delete :system
-      :view   :all
+     (:view   :all
       :show   :all
       :update :system))
 
@@ -320,9 +297,7 @@
                            '(:update :system)
                            ))
      :perm
-     (:create :builder
-      :delete :admin
-      :view   :all ;; (and :logged (or :stale (and :fresh :fair)))
+     (:view   :all ;; (and :logged (or :stale (and :fresh :fair)))
       :show   :all
       :update :owner))
 
@@ -340,9 +315,7 @@
       (delivery           "Доставка"                    (:bool))
       (basic              "Основной"                    (:bool)))
      :perm
-     (:create :builder
-      :delete :admin
-      :view   (and :logged (or :stale (and :fresh :fair)))
+     (:view   (and :logged (or :stale (and :fresh :fair)))
       :show   :all
       :update (or :admin :owner)))
 
@@ -362,9 +335,7 @@
       (resources           "Ресурсы"                    (:list-of-links offer-resource))
       (allow-modify        "Разрешено изменять"         (:bool)))
       :perm
-     (:create (and :active :supplier) ;; создается связанный объект offer-resource, содержащие ресурсы заявки
-      :delete (and :owner  :active)   ;; удаляются связанный объект offer-resource
-      :view   :all
+     (:view   :all
       :show   :all
       :update (and :active :owner)    ;; Заявка модет быть отредактирвана пока срок приема заявок не истек.
       ))
@@ -385,9 +356,7 @@
       (marked             "Отметка застройщика"         (:bool))
       (rank               "Занятое место"               (:num)))
      :perm
-     (:create :owner
-      :delete :owner
-      :view   :all
+     (:view   :all
       :show   :all
       :update (and :active :owner)))
 
@@ -400,9 +369,7 @@
       (filename            "Имя файла"                  (:str))
       (tender              "Тендер"                     (:link tender)))
      :perm
-     (:create :owner
-      :delete (and :owner :unactive)
-      :view   :all
+     (:view   :all
       :show   :all
       :update :owner))
     ))
