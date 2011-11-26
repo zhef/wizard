@@ -648,7 +648,8 @@ If objs are of different classes the result is NIL."
   (xref nil)
   (update :err)
   (view :err)
-  (show :err))
+  (show :err)
+  (perm (mi 'perm)))
 
 
 (with-defclass (btn ())
