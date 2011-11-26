@@ -208,7 +208,7 @@ function(){
      ("editable" . nil))))
 
 (defmethod restas:render-object :around ((designer grid-render) (obj fld))
-  (check-perm-for-cur-user-with-dbg (a-show (a-perm obj)) obj nil))
+  (check-perm-for-cur-user-with-dbg (a-show obj) obj nil))
 
 
 ;; BTN in GRID

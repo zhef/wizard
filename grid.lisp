@@ -15,7 +15,7 @@
 
 
 (defmethod get-accessor-perm ((infld fld))
-  (let ((perm  (a-show (a-perm infld)))
+  (let ((perm  (a-show infld))
         (symb  (find-symbol (format nil "A-~A" (a-name infld)) (find-package "WIZARD")))
         (accessor))
     (cond ((equal '(:bool)                             (a-typedata infld))
