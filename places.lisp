@@ -9,10 +9,6 @@
     (if width-p   (nconc rs `(:width  ,width)))
     `',rs))
 
-;; (macroexpand-1 '
-;;  (def-fld name2 :width 550 :update :all))
-
-
 (defmacro def-btn ((title perm &key (width 200 width-p)) &body act)
   (let ((rs `(:btn ,title :perm ,perm)))
     (if width-p (nconc rs `(:width ,width)))
@@ -28,10 +24,6 @@
     (nconc rs `(:action ,@action))
     `',rs))
 
-;; (macroexpand-1 '
-;; (def-pop (name2 :all :width 550)
-;;   'aaa))
-
 (defmacro def-grd ((title perm entity val &key (height 100 height-p)) &body fields)
   (let ((rs `(:grid ,title :perm ,perm :entity ,entity :val ,val)))
     (if height-p (nconc rs `(:height ,height)))
@@ -39,57 +31,74 @@
                              (eval (macroexpand-1 item)))))
     `',rs))
 
-
-;; ;; (macroexpand-1 '
-;; (def-grd ("Список заявок на тендеры" :all offer (cons-inner-objs *OFFER* (a-offers (gethash 2 *USER*))))
-;;   (def-fld tender :xref "offer" :width 680)
-;;   (def-btn ("Страница заявки" :all :width 115)))
-
-
 (defmacro def-lin ((title perm entity val) &body fields)
   (let ((rs `(:linear ,title :perm ,perm :entity ,entity :val ,val)))
     (nconc rs `(:fields ',(loop :for item :in fields :collect
                              (eval (macroexpand-1 item)))))
     `',rs))
 
-;; (def-lin ("Регистрация" supplier :all :clear)
-;;   (def-fld  login             :update '(or :nobody :all))
-;;   (def-fld  password          :update :all))
+(defmacro def-tpl ((tpl) &body val)
+  (let ((rs `(:tpl ,tpl)))
+    (nconc rs `(:val ,@val))
+    `',rs))
+
+(defmacro def-map ((yamap) &body val)
+  (let ((rs `(:yamap ,yamap)))
+    (nconc rs `(:val ,@val))
+    `',rs))
+
+(defmacro def-nop ((none))
+  (let ((rs `(:none ,none)))
+    `',rs))
+
+(defmacro def-pst ((post entity val) &body fields)
+  (let ((rs `(:post ,post :entity ,entity :val ,val)))
+    (nconc rs `(:fields ',(loop :for item :in fields :collect
+                             (eval (macroexpand-1 item)))))
+    `',rs))
+
+(defmacro def-ann ((announce entity val) &body fields)
+  (let ((rs `(:announce ,announce :entity ,entity :val ,val)))
+    (nconc rs `(:fields ',(loop :for item :in fields :collect
+                             (eval (macroexpand-1 item)))))
+    `',rs))
+
+(defmacro def-plc ((name url &key (navpoint nil navpoint-p)) &body actions)
+  (let ((rs `(:place ,name :url ,url)))
+    (if navpoint-p (nconc rs `(:navpoint ,navpoint)))
+    (nconc rs `(:actions ',(loop :for item :in actions :collect
+                              (eval (macroexpand-1 item)))))
+    `',rs))
 
 
 
 (defparameter *places*
   `(
     ;; Главная страница
-    (:place         main
-     :url           "/"
-     :navpoint      "Главная"
-     :actions
-     '((:tpl        ""
-        :val        (funcall (find-symbol "MAIN" 'tpl)
-                     (list :postblocks (list (list* :xrefall "/posts"
-                                                    :titleall "все новости"
-                                                    :title "Новости строительной сферы"
-                                                    :posts (posts-by-section "news" 3))
-                                             (list* :xrefall "/technologies"
-                                                    :titleall "все новости"
-                                                    :title "Новые технологии"
-                                                    :posts (posts-by-section "techno" 3))
-                                             (list* :xrefall "/event"
-                                                    :titleall "все новости"
-                                                    :title "Календарь событий"
-                                                    :posts (posts-by-section "ivent" 3))
-                                             (list* :xrefall "/posts"
-                                                    :titleall "все новости"
-                                                    :title "Акции, скидки и предложения"
-                                                    :posts (posts-by-sales 3))))))))
+    ,(def-plc (main "/" :navpoint "Главная")
+              (def-tpl ("")
+                (funcall (find-symbol "MAIN" 'tpl)
+                         (list :postblocks (list (list* :xrefall "/posts"
+                                                        :titleall "все новости"
+                                                        :title "Новости строительной сферы"
+                                                        :posts (posts-by-section "news" 3))
+                                                 (list* :xrefall "/technologies"
+                                                        :titleall "все новости"
+                                                        :title "Новые технологии"
+                                                        :posts (posts-by-section "techno" 3))
+                                                 (list* :xrefall "/event"
+                                                        :titleall "все новости"
+                                                        :title "Календарь событий"
+                                                        :posts (posts-by-section "ivent" 3))
+                                                 (list* :xrefall "/posts"
+                                                        :titleall "все новости"
+                                                        :title "Акции, скидки и предложения"
+                                                        :posts (posts-by-sales 3)))))))
 
-    ;; Страница регистрации
-    (:place         register
-     :url           "/register"
-     :actions
-     '(,(def-lin ("Регистрация" :all supplier :clear)
-                 (def-fld  login             :update '(or :nobody :all))
+     ;; Страница регистрации
+     ,(def-plc (register "/register")
+               (def-lin ("Регистрация" :all supplier :clear)
+                 (def-fld  login             :update :all)
                  (def-fld  password          :update :all)
                  (def-fld  email             :update :all)
                  (def-fld  name              :update :all)
@@ -100,209 +109,81 @@
                  (def-fld  contact-person    :update :all)
                  (def-fld  contact-phone     :update :all)
                  (def-btn  ("Зарегистрироваться" :all :width 120)
-                           (with-obj-create (*USER* 'SUPPLIER (login password email name inn ogrn juridical-address actual-address
-                                                                    contact-person contact-phone))
-                             (setf (a-status obj) :unfair)
-                             (hunchentoot:redirect (format nil "/supplier/~A" id)))))))
+                   (with-obj-create (*USER* 'SUPPLIER (login password email name inn ogrn juridical-address actual-address
+                                                             contact-person contact-phone))
+                     (setf (a-status obj) :unfair)
+                     (hunchentoot:redirect (format nil "/supplier/~A" id))))))
 
-    ;; Новости
-    (:place         posts
-     :url           "/posts"
-     :navpoint      "Новости"
-     :actions
-     '((:tpl        "Новости"
-        :val        (funcall (find-symbol "POSTPAGE" 'tpl)
-                     (list :postblocks (list (list* :xrefall "/posts"
-                                                    :titleall "все новости"
-                                                    :title "Новости строительной сферы"
-                                                    :posts (posts-by-section "news" 3))
-                                             (list* :xrefall "/technologies"
-                                                    :titleall "все новости"
-                                                    :title "Новые технологии"
-                                                    :posts (posts-by-section "techno" 3))))))))
+     ;; Новости
+     ,(def-plc (posts "/posts" :navpoint "Новости")
+               (def-tpl ("Новости")
+                 (funcall (find-symbol "POSTPAGE" 'tpl)
+                          (list :postblocks (list (list* :xrefall "/posts"
+                                                         :titleall "все новости"
+                                                         :title "Новости строительной сферы"
+                                                         :posts (posts-by-section "news" 3))
+                                                  (list* :xrefall "/technologies"
+                                                         :titleall "все новости"
+                                                         :title "Новые технологии"
+                                                         :posts (posts-by-section "techno" 3)))))))
 
-    ;; Новость
-    (:place         post
-     :url           "/post/:id"
-     :actions
-     '((:post       "%|title|%"
-        :entity     post-item
-        :val        (gethash (cur-page-id) *POST-ITEM*)
-        :fields     '(,(def-fld title)
-                      ,(def-fld date)
-                      ,(def-fld text-photo)
-                      ,(def-fld text)))))
+     ;; Новость
+     ,(def-plc (post "/post/:id")
+               (def-pst ("%|title|%" post-item (gethash (cur-page-id) *POST-ITEM*))
+                 (def-fld title)
+                 (def-fld date)
+                 (def-fld text-photo)
+                 (def-fld text)))
 
-    ;; Аналитика
-    (:place         anal
-     :url           "/analytics"
-     :navpoint      "Аналитика"
-     :actions
-     '((:none       "Аналитика")))
+     ;; Аналитика
+     ,(def-plc (anal "/analytics" :navpoint "Аналитика")
+               (def-nop ("Аналитика")))
 
-    ;; Каталог материалов
-    (:place         material
-     :url           "/material"
-     :navpoint      "Каталог ресурсов"
-     :actions
-     '(,(def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
-                                                           (a-child-categoryes
-                                                            (cdr (car (remove-if-not #'(lambda (x)
-                                                                                         (null (a-parent (cdr x))))
-                                                                                     (cons-hash-list *CATEGORY*)))))))
-                 (def-fld name :xref "category" :width 900))))
+     ;; Каталог ресурсов
+     ,(def-plc (material "/material" :navpoint "Каталог ресурсов")
+               (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
+                                                                 (a-child-categoryes
+                                                                  (cdr (car (remove-if-not #'(lambda (x)
+                                                                                               (null (a-parent (cdr x))))
+                                                                                           (cons-hash-list *CATEGORY*)))))))
+                 (def-fld name :xref "category" :width 900)))
+
+     ;; Строительная техника
+     ,(def-plc (machine "/machine" :navpoint "Строительная техника")
+               (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
+                                                                 (a-child-categoryes
+                                                                  (cdr (cadr (remove-if-not #'(lambda (x)
+                                                                                                (null (a-parent (cdr x))))
+                                                                                            (cons-hash-list *CATEGORY*))))))
+                                  :height     400)
+                 (def-fld name :xref "category" :width 900)))
 
 
-    ;; ;; Каталог материалов
-    (:place         machine
-     :url           "/machine"
-     :navpoint      "Строительная техника"
-     :actions
-     '(,(def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
-                                                           (a-child-categoryes
-                                                            (cdr (cadr (remove-if-not #'(lambda (x)
-                                                                                          (null (a-parent (cdr x))))
-                                                                                      (cons-hash-list *CATEGORY*))))))
-                            :height     400)
-                  (def-fld name :xref "category" :width 900))))
-
-
-    ;; Каталог ресурсов - содержимое категории
-    (:place         category
-     :url           "/category/:id"
-     :actions
-     '(,(def-lin ("Группа" :all category :clear)
+     ;; Каталог ресурсов - содержимое категории
+     ,(def-plc (category "/category/:id")
+               (def-lin ("Группа" :all category :clear)
                  (def-grd ("Подгруппы" :all category (cons-inner-objs *CATEGORY* (a-child-categoryes (gethash (cur-page-id) *CATEGORY*))))
                    (def-fld name :xref "category" :width 900))
                  (def-grd ("Ресурсы группы" :all resource (remove-if-not #'(lambda (x)
                                                                              (equal (a-category (cdr x))
                                                                                     (gethash (cur-page-id) *CATEGORY*)))
                                                                          (cons-hash-list *RESOURCE*)))
-                   (def-fld name :xref "resource" :width 900)))))
+                   (def-fld name :xref "resource" :width 900))))
 
-    ;; Страница ресурса
-    (:place                resource
-     :url                  "/resource/:id"
-     :actions
-     '(,(def-lin ("Ресурс" :all resource (gethash (cur-page-id) *RESOURCE*))
+     ;; Страница ресурса
+     ,(def-plc (resource "/resource/:id")
+               (def-lin ("Ресурс" :all resource (gethash (cur-page-id) *RESOURCE*))
                  (def-fld name)
                  (def-fld category)
                  (def-fld resource-type)
-                 (def-fld unit))))
+                 (def-fld unit)))
 
-    ;; ;; Личный кабинет Администратора
-    ;; (:place                admin
-    ;;  :url                  "/admin"
-    ;;  ;; :navpoint             "Администратор"
-    ;;  :actions
-    ;;  '((:linear            "Изменить себе пароль"
-    ;;     :perm              :admin
-    ;;     :entity            admin
-    ;;     :val               (cur-user)
-    ;;     :fields            '((:fld login)
-    ;;                          (:fld password)
-    ;;                          (:btn "Изменить пароль"
-    ;;                           :perm :all
-    ;;                           :act (let ((obj (cur-user)))
-    ;;                                  (with-obj-save obj
-    ;;                                    LOGIN
-    ;;                                    PASSWORD)
-    ;;                                  (hunchentoot:redirect (hunchentoot:request-uri*))))
-    ;;                          (:btn   "Кнопка всплывающего окна"
-    ;;                           :perm  :all
-    ;;                           :popup '(:linear            "Заголовок всплывающего окна"
-    ;;                                    :perm              :admin
-    ;;                                    :entity            admin
-    ;;                                    :val               (cur-user)
-    ;;                                    :fields            '((:fld login)
-    ;;                                                         (:fld password)
-    ;;                                                         (:btn "Изменить пароль"
-    ;;                                                         :perm :all
-    ;;                                                          :act (let ((obj (cur-user)))
-    ;;                                                                 (with-obj-save obj
-    ;;                                                                   LOGIN
-    ;;                                                                   PASSWORD)
-    ;; (hunchentoot:redirect (hunchentoot:request-uri*)))))))))
-    ;;    (:linear            "Создать аккаунт эксперта"
-    ;;     :perm              :admin
-    ;;     :entity            expert
-    ;;     :val               :clear
-    ;;     :fields            '((:fld login)
-    ;;                          (:fld password)
-    ;;                          (:fld name)
-    ;;                          (:btn "Создать новый аккаунт эксперта"
-    ;;                           :perm :all
-    ;;                           :act (progn
-    ;;                                  (push-hash *USER* 'EXPERT
-    ;;                                    :login (cdr (assoc "LOGIN" (form-data) :test #'equal))
-    ;;                                    :password (cdr (assoc "PASSWORD" (form-data) :test #'equal))
-    ;;                                    :name (cdr (assoc "NAME" (form-data) :test #'equal)))
-    ;;                                  (hunchentoot:redirect (hunchentoot:request-uri*))))))
-    ;;    (:grid             "Эксперты"
-    ;;     :perm              :admin
-    ;;     :entity            expert
-    ;;     :val               (remove-if-not #'(lambda (x)
-    ;;                                           (equal 'expert (type-of (cdr x))))
-    ;;                         (cons-hash-list *USER*))
-    ;;     :fields            '((:fld name)
-    ;;                          (:fld login)
-    ;;                          (:btn  "Удалить"
-    ;;                           :perm :all
-    ;;                           :act  (let ((key (get-btn-key (caar (form-data)))))
-    ;;                                   (remhash key *USER*)
-    ;;                                   (hunchentoot:redirect (hunchentoot:request-uri*))))
-    ;;                          (:btn "Страница эксперта"
-    ;;                           :perm :all
-    ;;                           :act (to "/expert/~A" (caar (form-data))))))
-    ;;    (:grid            "Заявки поставщиков на добросовестность"
-    ;;     :perm              :admin
-    ;;     :entity            supplier
-    ;;     :val               (remove-if-not #'(lambda (x)
-    ;;                                           (and (equal 'supplier (type-of (cdr x)))
-    ;;                                                (equal (a-status (cdr x)) :request)
-    ;;                                                ))
-    ;;                         (cons-hash-list *USER*))
-    ;;     :fields            '((:fld name)
-    ;;                          (:fld login)
-    ;;                          (:btn "Сделать добросовестным"
-    ;;                           :perm :all
-    ;;                           :act (let ((key (get-btn-key (caar (form-data)))))
-    ;;                                  (setf (a-status (gethash key *USER*)) :fair)
-    ;;                                  (hunchentoot:redirect (hunchentoot:request-uri*))))))))
 
-    ;; ;; Список экспертов
-    ;; (:place                experts
-    ;;  :url                  "/expert"
-    ;;  ;; :navpoint             "Эксперты"
-    ;;  :actions
-    ;;  '((:grid              "Эксперты"
-    ;;     :perm              :all
-    ;;     :entity            expert
-    ;;     :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'EXPERT)) (cons-hash-list *USER*))
-    ;;     :fields            '((:fld name)
-    ;;                          (:fld login)
-    ;;                          (:btn  "Страница эксперта"
-    ;;                           :perm :all
-    ;;                           :act  (to "/expert/~A" (caar (form-data))))))))
-    ;; ;; Страница эксперта
-    ;; (:place                expert
-    ;;  :url                  "/expert/:id"
-    ;;  :actions
-    ;;  '((:linear            "Эксперт"
-    ;;     :perm              :all
-    ;;     :entity            expert
-    ;;     :val               (gethash (cur-page-id) *USER*)
-    ;;     :fields            '((:fld name)
-    ;;                          (:fld login)))))
-
-    ;; Список поставщиков
-    (:place         suppliers
-     :url           "/supplier"
-     :navpoint      "Поставщики"
-     :actions
-     '(,(def-grd ("Каталог поставщиков" :all supplier (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'SUPPLIER))  (cons-hash-list *USER*)))
-                  (def-fld name :xref "supplier" :width 300)
-                  (def-fld actual-address :width 600))))
+     ;; Список поставщиков
+     ,(def-plc (suppliers "/supplier" :navpoint "Поставщики")
+               (def-grd ("Каталог поставщиков" :all supplier (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'SUPPLIER))  (cons-hash-list *USER*)))
+                 (def-fld name :xref "supplier" :width 300)
+                 (def-fld actual-address :width 600)))
 
     ;; Страница поставщика
     (:place         supplier
@@ -455,8 +336,8 @@
                            *OFFER*
                            (a-offers (gethash (cur-page-id) *USER*)))))
                       ))
-       (:yamap  "Адрес поставщика"
-        :val     (let* ((supp (gethash (cur-page-id) *USER*))
+       ,(def-map ("Адрес поставщика")
+                 (let* ((supp (gethash (cur-page-id) *USER*))
                         (name (a-name supp))
                         (addr (a-actual-address supp))
                         (affi (a-affiliates supp)))
@@ -470,73 +351,60 @@
                              (list addr))))))
        ))
 
-    ;; ;; Распродажи
-    ;; (:place                sales
-    ;;  :url                  "/sale"
-    ;;  :actions
-    ;;  '((:tpl               "Акции"
-    ;;     :val               (funcall (find-symbol "POSTPAGE" 'tpl)
-    ;;                         (list :postblocks (list (list* :xrefall "/event"
-    ;;                                                        :titleall ""
-    ;;                                                        :title ""
-    ;;                                                        :posts (posts-by-sales 100))
-    ;;                                                 )))
-    ;;     )))
+    ;; Распродажи
+    ,(def-plc (sales "/sale")
+              (def-tpl ("Акции")
+                (funcall (find-symbol "POSTPAGE" 'tpl)
+                         (list :postblocks (list (list* :xrefall "/event"
+                                                        :titleall ""
+                                                        :title ""
+                                                        :posts (posts-by-sales 100)))))))
 
-    ;; ;; Страница распродажи
-    ;; (:place                sale
-    ;;  :url                  "/sale/:id"
-    ;;  :actions
-    ;;  '((:post              "%|title|%"
-    ;;     :entity            sale
-    ;;     :val               (gethash (cur-page-id) *SALE*)
-    ;;     :fields            '((:fld title)
-    ;;                           (:fld date)
-    ;;                           (:fld text-photo)
-    ;;                           (:fld text)))))
+    ;; Страница распродажи
+    ,(def-plc (sale "/sale/:id")
+              (def-pst ("%|title|%" sale (gethash (cur-page-id) *SALE*))
+                (def-fld title)
+                (def-fld date)
+                (def-fld text-photo)
+                (def-fld text)))
 
-    ;; ;; Список застройщиков
-    ;; (:place                builders
-    ;;  :url                  "/builder"
+     ;; Список застройщиков
+     ,(def-plc (builders "/builder")
+               (def-grd ("Организации-застройщики" :all builder (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'BUILDER)) (cons-hash-list *USER*)))
+                 (def-fld name :xref "builder" :width 750)
+                 (def-fld login :width 150)))
+
+    ;; ;; Страница застройщика
+    ;; (:place                builder
+    ;;  :url                  "/builder/:id"
     ;;  :actions
-    ;;  '((:grid            "Организации-застройщики"
+    ;;  '((:linear            "Застройщик"
     ;;     :perm              :all
     ;;     :entity            builder
-    ;;     :val               (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'BUILDER)) (cons-hash-list *USER*))
-    ;;     :fields            '((:fld name :xref "builder" :width 750)
-    ;;                          (:fld login :width 150)))))
-
-    ;; ;; ;; Страница застройщика
-    ;; ;; (:place                builder
-    ;; ;;  :url                  "/builder/:id"
-    ;; ;;  :actions
-    ;; ;;  '((:linear            "Застройщик"
-    ;; ;;     :perm              :all
-    ;; ;;     :entity            builder
-    ;; ;;     :val               (gethash (cur-page-id) *USER*)
-    ;; ;;     :fields            '(,(def-fld  name)
-    ;; ;;                          ,(def-fld  juridical-address)
-    ;; ;;                          ,(def-fld  inn)
-    ;; ;;                          ,(def-fld  kpp)
-    ;; ;;                          ,(def-fld  ogrn)
-    ;; ;;                          ,(def-fld  bank-name)
-    ;; ;;                          ,(def-fld  bik)
-    ;; ;;                          ,(def-fld  corresp-account)
-    ;; ;;                          ,(def-fld  client-account)
-    ;; ;;                          ,(def-fld  rating)
-    ;; ;;                          ,(def-btn  "Сохранить" :all
-    ;; ;;                                     (progn
-    ;; ;;                                       (with-obj-save (gethash (cur-page-id) *USER*)
-    ;; ;;                                         NAME JURIDICAL-ADDRESS INN KPP OGRN BANK-NAME BIK CORRESP-ACCOUNT CLIENT-ACCOUNT RATING)
-    ;; ;;                                       (hunchentoot:redirect (hunchentoot:request-uri*))))
-    ;; ;;                          ;; tenders
-    ;; ;;                          (:grid             "Тендеры застройщика"
-    ;; ;;                           :perm             :all
-    ;; ;;                           :entity           tender
-    ;; ;;                           :val              (cons-inner-objs *TENDER* (a-tenders (gethash (cur-page-id) *USER*)))
-    ;; ;;                           :fields           '(,(def-fld name :xref "tender" :width 550)
-    ;; ;;                                               (:fld status :width 150)
-    ;; ;;                                               (:fld all :width 200)))))
+    ;;     :val               (gethash (cur-page-id) *USER*)
+    ;;     :fields            '(,(def-fld  name)
+    ;;                          ,(def-fld  juridical-address)
+    ;;                          ,(def-fld  inn)
+    ;;                          ,(def-fld  kpp)
+    ;;                          ,(def-fld  ogrn)
+    ;;                          ,(def-fld  bank-name)
+    ;;                          ,(def-fld  bik)
+    ;;                          ,(def-fld  corresp-account)
+    ;;                          ,(def-fld  client-account)
+    ;;                          ,(def-fld  rating)
+    ;;                          ,(def-btn  "Сохранить" :all
+    ;;                                     (progn
+    ;;                                       (with-obj-save (gethash (cur-page-id) *USER*)
+    ;;                                         NAME JURIDICAL-ADDRESS INN KPP OGRN BANK-NAME BIK CORRESP-ACCOUNT CLIENT-ACCOUNT RATING)
+    ;;                                       (hunchentoot:redirect (hunchentoot:request-uri*))))
+    ;;                          ;; tenders
+    ;;                          (:grid             "Тендеры застройщика"
+    ;;                           :perm             :all
+    ;;                           :entity           tender
+    ;;                           :val              (cons-inner-objs *TENDER* (a-tenders (gethash (cur-page-id) *USER*)))
+    ;;                           :fields           '(,(def-fld name :xref "tender" :width 550)
+    ;;                                               (:fld status :width 150)
+    ;;                                               (:fld all :width 200)))))
 
     ;;    (:linear            "Объявить новый тендер"
     ;;     :perm              :self
@@ -568,18 +436,12 @@
     ;;                           )))))
 
 
-    ;; ;; Список тендеров
-    ;; (:place                tenders
-    ;;  :url                  "/tender"
-    ;;  :navpoint             "Тендеры"
-    ;;  :actions
-    ;;  '((:grid              "Тендеры"
-    ;;     :perm              :all
-    ;;     :entity            tender
-    ;;     :val               (cons-hash-list *TENDER*)
-    ;;     :fields            '((:fld name :xref "tender")
-    ;;                          (:fld status)
-    ;;                          (:fld owner)))))
+     ;; Список тендеров
+     ,(def-plc (tenders "/tender" :navpoint "Тендеры")
+               (def-grd ("Тендеры" :all tender (cons-hash-list *TENDER*))
+                 (def-fld name :xref "tender")
+                 (def-fld status)
+                 (def-fld owner)))
 
     ;; ;; Страница тендера (поставщик может откликнуться)
     ;; (:place                tender
@@ -927,72 +789,49 @@
     ;;                                  (hunchentoot:redirect (format nil "/offer/~A" offer-id))))))))
 
 
-    ;; Календарь событий
-    (:place                event
-     :url                  "/event"
-     :navpoint             "Календарь событий"
-     :actions
-     '((:announce          "Анонсы"
-        :entity            post-item
-        :val               (remove-if-not #'(lambda (x)
-                                              (equal "ivent" (a-section (cdr x))))
-                            (cons-hash-list *POST-ITEM*))
-        :fields            '(,(def-fld title)
-                             ,(def-fld date)
-                             ,(def-fld announce-photo)
-                             ,(def-fld announce)))))
+     ;; Календарь событий
+     ,(def-plc (event "/event" :navpoint "Календарь событий")
+               (def-ann ("Анонсы" post-item (remove-if-not #'(lambda (x)
+                                                               (equal "ivent" (a-section (cdr x))))
+                                                           (cons-hash-list *POST-ITEM*)))
+                 (def-fld title)
+                 (def-fld date)
+                 (def-fld announce-photo)
+                 (def-fld announce)))
 
-    ;; Новые технологии
-    (:place                technologies
-     :url                  "/technologies"
-     :navpoint             "Технологии"
-     :actions
-     '((:announce          "Новые технологии"
-        :entity            post-item
-        :val               (remove-if-not #'(lambda (x)
-                                              (equal "techno" (a-section (cdr x))))
-                            (cons-hash-list *POST-ITEM*))
-        :fields            '(,(def-fld title)
-                             ,(def-fld date)
-                             ,(def-fld announce-photo)
-                             ,(def-fld announce)))))
+     ;; Новые технологии
+     ,(def-plc (technologies "/technologies" :navpoint "Технологии")
+               (def-ann ("Новые технологии" post-item (remove-if-not #'(lambda (x)
+                                                                         (equal "techno" (a-section (cdr x))))
+                                                                     (cons-hash-list *POST-ITEM*)))
+                 (def-fld title)
+                 (def-fld date)
+                 (def-fld announce-photo)
+                 (def-fld announce)))
 
 
-    ;; Новости законодальства
-    (:place                laws
-     :url                  "/laws"
-     ;; :navpoint             "Новости законодательства"
-     :actions
-     '((:announce          "Новости законодательства"
-        :entity            post-item
-        :val               (remove-if-not #'(lambda (x)
-                                              (equal "laws" (a-section (cdr x))))
-                            (cons-hash-list *POST-ITEM*))
-        :fields            '(,(def-fld title)
-                             ,(def-fld date)
-                             ,(def-fld announce-photo)
-                             ,(def-fld announce)))))
+     ;; Новости законодальства
+     ,(def-plc (laws "/laws" #|:navpoint"Новости законодательства"|#)
+               (def-ann ("Новости законодательства" post-item (remove-if-not #'(lambda (x)
+                                                                                 (equal "laws" (a-section (cdr x))))
+                                                                             (cons-hash-list *POST-ITEM*)))
+                 (def-fld title)
+                 (def-fld date)
+                 (def-fld announce-photo)
+                 (def-fld announce)))
 
-    ;; О портале
-    (:place                about
-     :url                  "/about"
-     :actions
-     '((:tpl               "О портале"
-        :val               (funcall (find-symbol "ABOUT" 'tpl)))))
+     ;; О портале
+     ,(def-plc (about "/about")
+               (def-tpl ("О портале")
+                 (funcall (find-symbol "ABOUT" 'tpl))))
 
-    ;; Услуги портала
-    (:place                services
-     :url                  "/services"
-     :navpoint             "Услуги портала"
-     :actions
-     '((:tpl               "Услуги портала"
-        :val               (funcall (find-symbol "SERVICES" 'tpl)))))
+     ;; Услуги портала
+     ,(def-plc (services "/services" :navpoint "Услуги портала")
+               (def-tpl ("Услуги портала")
+                 (funcall (find-symbol "SERVICES" 'tpl))))
 
-    ;; Контакты
-    (:place                contacts
-     :url                  "/contacts"
-     :navpoint             "Контакты"
-     :actions
-     '((:tpl               "Контакты"
-        :val               (funcall (find-symbol "CONTACTS" 'tpl)))))
-    ))
+     ;; Контакты
+     ,(def-plc (contacts "/contacts" :navpoint "Контакты")
+               (def-tpl ("Контакты")
+                 (funcall (find-symbol "CONTACTS" 'tpl))))
+     ))

@@ -259,3 +259,34 @@ http://www.slideshare.net/chaitanyagupta/slime-1180051
 
 
 http://habrahabr.ru/blogs/algorithm/132128/ - Shift-OR
+
+
+
+[01:36] rigidus> Ну строго говоря я хотел бы делать всякие вещи после
+того как пришел запрос, но до того как он начал роутиться
+[01:36] rigidus> мне для этого использовать декораторы или что?
+[01:37] rigidus> archimag: ?
+[01:37] archimag> rigidus: да
+[01:37] rigidus> archimag: ага, ок
+[01:37] archimag> хотя
+[01:37] archimag> если до того, как он начал роутиться
+[01:37] archimag> то не
+[01:37] rigidus> а как быть?
+[01:38] archimag> надо на уровне acceptor перегружать
+[01:38] rigidus> это как?
+[01:38] rigidus> я бы хотел иметь (defmethod restas :around... ^_^
+[01:38] archimag> определяешь свой класс acceptor, который наследует
+от restas-acceptor
+[01:39] archimag> ну что бы сделать свой defmethod надо свой класс
+иметь
+[01:39] archimag> вот, можно сделать наследника от restas-acceptor
+[01:39] rigidus> мне бы пример кода, а то боюсь запутаться и уйти не
+туда
+[01:39] archimag> и тупо хак, для restas::*acceptors* сделать
+change-class
+[01:40] archimag> посмотри код restas/src/hunchentoot.lisp
+[01:40] archimag> я сейчас тут не могу долго присутствовать
+[01:41] archimag> или напиши в форуме, там за несколько дней можно
+будет чего-нибудь соорудить
+[01:41] rigidus> хорошо, напишу на форуме
+---
