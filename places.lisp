@@ -85,29 +85,6 @@
      (defparameter *places*    -places-)
      (defparameter *navpoints* (cdr -navpoints-))))
 
-
-(def-asm
-  ;; Главная страница
-  (def-plc (main "/" :navpoint "Главная")
-    (def-tpl ("")
-      (funcall (find-symbol "MAIN" 'tpl)
-               (list :postblocks (list (list* :xrefall "/posts"
-                                              :titleall "все новости"
-                                              :title "Акции, скидки и предложения"
-                                              :posts (posts-by-sales 3)))))))
-  ;; Страница регистрации
-  (def-plc (register "/register" :navpoint "Главная2")
-    (def-lin ("Регистрация" :all supplier :clear)
-      (def-fld  login             :update :all)
-      (def-btn  ("Зарегистрироваться" :all :width 120)
-        (with-obj-create (*USER* 'SUPPLIER (login password email name inn ogrn juridical-address actual-address contact-person contact-phone))
-          (setf (a-status obj) :unfair)
-          (hunchentoot:redirect (format nil "/supplier/~A" id)))))))
-
-;; (print *places*)
-;; (print *navpoints*)
-
-
 (def-asm
   ;; Главная страница
   (def-plc (main "/" :navpoint "Главная")
@@ -841,3 +818,4 @@
     (def-tpl ("Контакты")
       (funcall (find-symbol "CONTACTS" 'tpl))))
   )
+
