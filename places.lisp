@@ -74,281 +74,283 @@
                               (eval (macroexpand-1 item)))))
     `',rs))
 
-
+(defmacro def-asm (&body places)
+  (let ((rs (loop :for item :in places :collect
+               (eval (macroexpand-1 item)))))
+    `',rs))
 
 (defparameter *places*
-  `(
+  (def-asm
     ;; Главная страница
-    ,(def-plc (main "/" :navpoint "Главная")
-              (def-tpl ("")
-                (funcall (find-symbol "MAIN" 'tpl)
-                         (list :postblocks (list (list* :xrefall "/posts"
-                                                        :titleall "все новости"
-                                                        :title "Новости строительной сферы"
-                                                        :posts (posts-by-section "news" 3))
-                                                 (list* :xrefall "/technologies"
-                                                        :titleall "все новости"
-                                                        :title "Новые технологии"
-                                                        :posts (posts-by-section "techno" 3))
-                                                 (list* :xrefall "/event"
-                                                        :titleall "все новости"
-                                                        :title "Календарь событий"
-                                                        :posts (posts-by-section "ivent" 3))
-                                                 (list* :xrefall "/posts"
-                                                        :titleall "все новости"
-                                                        :title "Акции, скидки и предложения"
-                                                        :posts (posts-by-sales 3)))))))
+    (def-plc (main "/" :navpoint "Главная")
+      (def-tpl ("")
+        (funcall (find-symbol "MAIN" 'tpl)
+                 (list :postblocks (list (list* :xrefall "/posts"
+                                                :titleall "все новости"
+                                                :title "Новости строительной сферы"
+                                                :posts (posts-by-section "news" 3))
+                                         (list* :xrefall "/technologies"
+                                                :titleall "все новости"
+                                                :title "Новые технологии"
+                                                :posts (posts-by-section "techno" 3))
+                                         (list* :xrefall "/event"
+                                                :titleall "все новости"
+                                                :title "Календарь событий"
+                                                :posts (posts-by-section "ivent" 3))
+                                         (list* :xrefall "/posts"
+                                                :titleall "все новости"
+                                                :title "Акции, скидки и предложения"
+                                                :posts (posts-by-sales 3)))))))
 
-     ;; Страница регистрации
-     ,(def-plc (register "/register")
-               (def-lin ("Регистрация" :all supplier :clear)
-                 (def-fld  login             :update :all)
-                 (def-fld  password          :update :all)
-                 (def-fld  email             :update :all)
-                 (def-fld  name              :update :all)
-                 (def-fld  inn               :update :all)
-                 (def-fld  ogrn              :update :all)
-                 (def-fld  juridical-address :update :all)
-                 (def-fld  actual-address    :update :all)
-                 (def-fld  contact-person    :update :all)
-                 (def-fld  contact-phone     :update :all)
-                 (def-btn  ("Зарегистрироваться" :all :width 120)
-                   (with-obj-create (*USER* 'SUPPLIER (login password email name inn ogrn juridical-address actual-address
-                                                             contact-person contact-phone))
-                     (setf (a-status obj) :unfair)
-                     (hunchentoot:redirect (format nil "/supplier/~A" id))))))
+    ;; Страница регистрации
+    (def-plc (register "/register")
+      (def-lin ("Регистрация" :all supplier :clear)
+        (def-fld  login             :update :all)
+        (def-fld  password          :update :all)
+        (def-fld  email             :update :all)
+        (def-fld  name              :update :all)
+        (def-fld  inn               :update :all)
+        (def-fld  ogrn              :update :all)
+        (def-fld  juridical-address :update :all)
+        (def-fld  actual-address    :update :all)
+        (def-fld  contact-person    :update :all)
+        (def-fld  contact-phone     :update :all)
+        (def-btn  ("Зарегистрироваться" :all :width 120)
+          (with-obj-create (*USER* 'SUPPLIER (login password email name inn ogrn juridical-address actual-address contact-person contact-phone))
+            (setf (a-status obj) :unfair)
+            (hunchentoot:redirect (format nil "/supplier/~A" id))))))
 
-     ;; Новости
-     ,(def-plc (posts "/posts" :navpoint "Новости")
-               (def-tpl ("Новости")
-                 (funcall (find-symbol "POSTPAGE" 'tpl)
-                          (list :postblocks (list (list* :xrefall "/posts"
-                                                         :titleall "все новости"
-                                                         :title "Новости строительной сферы"
-                                                         :posts (posts-by-section "news" 3))
-                                                  (list* :xrefall "/technologies"
-                                                         :titleall "все новости"
-                                                         :title "Новые технологии"
-                                                         :posts (posts-by-section "techno" 3)))))))
+    ;; Новости
+    (def-plc (posts "/posts" :navpoint "Новости")
+      (def-tpl ("Новости")
+        (funcall (find-symbol "POSTPAGE" 'tpl)
+                 (list :postblocks (list (list* :xrefall "/posts"
+                                                :titleall "все новости"
+                                                :title "Новости строительной сферы"
+                                                :posts (posts-by-section "news" 3))
+                                         (list* :xrefall "/technologies"
+                                                :titleall "все новости"
+                                                :title "Новые технологии"
+                                                :posts (posts-by-section "techno" 3)))))))
 
-     ;; Новость
-     ,(def-plc (post "/post/:id")
-               (def-pst ("%|title|%" post-item (gethash (cur-page-id) *POST-ITEM*))
-                 (def-fld title)
-                 (def-fld date)
-                 (def-fld text-photo)
-                 (def-fld text)))
+    ;; Новость
+    (def-plc (post "/post/:id")
+      (def-pst ("%|title|%" post-item (gethash (cur-page-id) *POST-ITEM*))
+        (def-fld title)
+        (def-fld date)
+        (def-fld text-photo)
+        (def-fld text)))
 
-     ;; Аналитика
-     ,(def-plc (anal "/analytics" :navpoint "Аналитика")
-               (def-nop ("Аналитика")))
+    ;; Аналитика
+    (def-plc (anal "/analytics" :navpoint "Аналитика")
+      (def-nop ("Аналитика")))
 
-     ;; Каталог ресурсов
-     ,(def-plc (material "/material" :navpoint "Каталог ресурсов")
-               (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
-                                                                 (a-child-categoryes
-                                                                  (cdr (car (remove-if-not #'(lambda (x)
-                                                                                               (null (a-parent (cdr x))))
-                                                                                           (cons-hash-list *CATEGORY*)))))))
-                 (def-fld name :xref "category" :width 900)))
+    ;; Каталог ресурсов
+    (def-plc (material "/material" :navpoint "Каталог ресурсов")
+      (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
+                                                        (a-child-categoryes
+                                                         (cdr (car (remove-if-not #'(lambda (x)
+                                                                                      (null (a-parent (cdr x))))
+                                                                                  (cons-hash-list *CATEGORY*)))))))
+        (def-fld name :xref "category" :width 900)))
 
-     ;; Строительная техника
-     ,(def-plc (machine "/machine" :navpoint "Строительная техника")
-               (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
-                                                                 (a-child-categoryes
-                                                                  (cdr (cadr (remove-if-not #'(lambda (x)
-                                                                                                (null (a-parent (cdr x))))
-                                                                                            (cons-hash-list *CATEGORY*))))))
-                                  :height     400)
-                 (def-fld name :xref "category" :width 900)))
-
-
-     ;; Каталог ресурсов - содержимое категории
-     ,(def-plc (category "/category/:id")
-               (def-lin ("Группа" :all category :clear)
-                 (def-grd ("Подгруппы" :all category (cons-inner-objs *CATEGORY* (a-child-categoryes (gethash (cur-page-id) *CATEGORY*))))
-                   (def-fld name :xref "category" :width 900))
-                 (def-grd ("Ресурсы группы" :all resource (remove-if-not #'(lambda (x)
-                                                                             (equal (a-category (cdr x))
-                                                                                    (gethash (cur-page-id) *CATEGORY*)))
-                                                                         (cons-hash-list *RESOURCE*)))
-                   (def-fld name :xref "resource" :width 900))))
-
-     ;; Страница ресурса
-     ,(def-plc (resource "/resource/:id")
-               (def-lin ("Ресурс" :all resource (gethash (cur-page-id) *RESOURCE*))
-                 (def-fld name)
-                 (def-fld category)
-                 (def-fld resource-type)
-                 (def-fld unit)))
+    ;; Строительная техника
+    (def-plc (machine "/machine" :navpoint "Строительная техника")
+      (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
+                                                        (a-child-categoryes
+                                                         (cdr (cadr (remove-if-not #'(lambda (x)
+                                                                                       (null (a-parent (cdr x))))
+                                                                                   (cons-hash-list *CATEGORY*))))))
+                         :height     400)
+        (def-fld name :xref "category" :width 900)))
 
 
-     ;; Список поставщиков
-     ,(def-plc (suppliers "/supplier" :navpoint "Поставщики")
-               (def-grd ("Каталог поставщиков" :all supplier (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'SUPPLIER))  (cons-hash-list *USER*)))
-                 (def-fld name :xref "supplier" :width 300)
-                 (def-fld actual-address :width 600)))
+    ;; Каталог ресурсов - содержимое категории
+    (def-plc (category "/category/:id")
+      (def-lin ("Группа" :all category :clear)
+        (def-grd ("Подгруппы" :all category (cons-inner-objs *CATEGORY* (a-child-categoryes (gethash (cur-page-id) *CATEGORY*))))
+          (def-fld name :xref "category" :width 900))
+        (def-grd ("Ресурсы группы" :all resource (remove-if-not #'(lambda (x)
+                                                                    (equal (a-category (cdr x))
+                                                                           (gethash (cur-page-id) *CATEGORY*)))
+                                                                (cons-hash-list *RESOURCE*)))
+          (def-fld name :xref "resource" :width 900))))
 
-     ;; Страница поставщика
-     ,(def-plc (supplier "/supplier/:id")
-               (def-lin ("Поставщик" :all supplier (gethash (cur-page-id) *USER*))
-                 (def-fld  name)
-                 (def-fld  status)
-                 (def-fld  juridical-address)
-                 (def-fld  actual-address)
-                 (def-fld  contacts)
-                 (def-fld  email)
-                 (def-fld  site)
-                 (def-fld  heads)
-                 (def-fld  inn)
-                 (def-fld  kpp)
-                 (def-fld  ogrn)
-                 (def-fld  bank-name)
-                 (def-fld  bik)
-                 (def-fld  corresp-account)
-                 (def-fld  client-account)
-                 (def-fld  addresses)
-                 (def-fld  contact-person)
-                 (def-fld  contact-phone)
-                 (def-fld  contact-email)
-                 (def-btn  ("Сохранить" :self)
-                           (let ((obj (gethash (cur-page-id) *USER*)))
-                             (with-obj-save obj
-                               NAME JURIDICAL-ADDRESS ACTUAL-ADDRESS CONTACTS EMAIL SITE HEADS INN KPP OGRN BANK-NAME
-                               BIK CORRESP-ACCOUNT CLIENT-ACCOUNT ADDRESSES CONTACT-PERSON contact-phone contact-email)
-                             (hunchentoot:redirect (hunchentoot:request-uri*))))
-                 (def-btn  ("Отправить заявку на добросовестность" '(and :self :unfair))
-                           (progn
-                             (setf (a-status (gethash (cur-page-id) *USER*)) :request)
-                             (hunchentoot:redirect (hunchentoot:request-uri*))))
-                 ; affiliates
-                 (def-grd ("Адреса филиалов и магазинов" :all supplier-affiliate
-                                                          (cons-inner-objs *supplier-affiliate* (a-affiliates (gethash (cur-page-id) *user*))))
-                           (def-fld address :width 900))
-                 ; pricelist
-                 (def-grd ("Прайс-лист" :all supplier-resource-price-elt (remove-if-not #'(lambda (x)
-                                                                                             (equal (a-owner (cdr x)) (gethash (cur-page-id) *user*)))
-                                                                                         (cons-hash-list *supplier-resource-price-elt*)))
-                           (def-fld  name  :width 350)
-                           (def-fld  unit  :width 150)
-                           (def-fld  price :width 150)
-                           (def-fld  date  :width 150)
-                           (def-btn  ("Удалить" :owner :width  100)
-                             (let* ((key (get-btn-key (caar (form-data))))
-                                    (hobj (gethash key *supplier-resource-price-elt*)))
-                               (setf (a-price-elts (cur-user))
-                                     (remove-if #'(lambda (x) (equal x hobj))
-                                                (a-price-elts (cur-user))))
-                               (remhash key *supplier-resource-price-elt*)
-                               (hunchentoot:redirect (hunchentoot:request-uri*)))))
-                 ; upload pricelist
-                 (def-pop ("Загрузить прайс-лист" :self :top 1750 :left 280 :height 200 :width 700)
-                          (def-lin ("Добавление прайс-листа" :self supplier-resource-price-elt :clear)
-                            (def-upl (file :all "Прайс"))
-                            (def-btn ("Загрузить" :all)
-                              (progn
-                                (awhen (car (hunchentoot:post-parameter "FILE"))
-                                  (loop :for src :in (xls-processor it) :do
-                                     (add-inner-obj *supplier-resource-price-elt* 'supplier-resource-price-elt
-                                         (a-price-elts (cur-user))
-                                       :owner (cur-user)
-                                       :name  (nth 1 src)
-                                       :unit  (nth 2 src)
-                                       :price (nth 3 src)
-                                       :date  (decode-date (get-universal-time)))))
-                                (hunchentoot:redirect (hunchentoot:request-uri*))))))
-                 ; resources
-                 (def-grd ("Ресурсы для конкурсов" :all supplier-resource
-                                                    (cons-inner-objs *SUPPLIER-RESOURCE* (a-resources (gethash (cur-page-id) *USER*))))
-                           (def-fld resource :width 800)
-                           (def-btn ("Удалить" :owner :width 100)
-                             (del-inner-obj
-                              (caar (form-data))
-                              *SUPPLIER-RESOURCE*
-                              (a-resources (gethash (cur-page-id) *USER*)))))
-                 ; Добавление ресурса
-                 (def-pop ("Добавить ресурс" :self :top 2000 :left 280 :height 400 :width 900)
-                          (def-grd ("Добавление ресурса" :all resource (cons-hash-list *RESOURCE*) :height 240)
-                            (def-fld name :width 700)
-                            (def-btn ("Добавить ресурс" :all :width 120)
-                              (let* ((owner    (cur-user))
-                                     (resource (gethash (get-btn-key (caar (form-data))) *RESOURCE*)))
-                                (add-inner-obj *SUPPLIER-RESOURCE* 'SUPPLIER-RESOURCE (a-resources owner)
-                                  :owner     owner
-                                  :resource  resource
-                                  :price     0)
-                                (hunchentoot:redirect (hunchentoot:request-uri*))))))
-                 ; sales
-                 (def-grd ("Акции" :all sale (cons-inner-objs *SALE* (a-sales (gethash (cur-page-id) *USER*))))
-                           (def-fld title :width 800 :xref "sale")
-                           (def-btn ("Удалить" :owner :width 100)
-                             (del-inner-obj
-                              (caar (form-data))
-                              *SALE*
-                              (a-sales (gethash (cur-page-id) *USER*)))))
-                 ; Добавление акции
-                 (def-pop ("Добавить акцию" :self :top 2200 :left 280 :height 400 :width 900)
-                          (def-lin ("Добавление акции" :all sale :clear)
-                            (def-fld title)
-                            ;; (:fld date)
-                            ;; (:fld announce-photo)
-                            ;; (:fld announce)
-                            ;; (:fld text-photo)
-                            ;; (:fld text)
-                            ;; (:fld owner)
-                            ;; (:fld resource)
-                            (def-btn ("Добавить акцию" :all)
-                              (let* ((owner (cur-user)))
-                                (add-inner-obj *SALE* 'SALE (a-sales owner)
-                                  :owner     owner
-                                  :title     (form-fld title))
-                                (hunchentoot:redirect (hunchentoot:request-uri*))))))
-                 ; offers
-                 (def-grd ("Список заявок на тендеры" :logged offer (cons-inner-objs *OFFER* (a-offers (gethash (cur-page-id) *USER*))))
-                  (def-fld tender :xref "offer" :width 680)
-                  (def-btn ("Страница заявки" :all :width 115)
-                    (to "/offer/~A" (caar (form-data))))
-                  (def-btn ("Удалить заявку" :all :width 105)
-                    (del-inner-obj
-                     (caar (form-data))
-                     *OFFER*
-                     (a-offers (gethash (cur-page-id) *USER*))))))
-               (def-map ("Адрес поставщика")
-                 (let* ((supp (gethash (cur-page-id) *USER*))
-                        (name (a-name supp))
-                        (addr (a-actual-address supp))
-                        (affi (a-affiliates supp)))
-                   (mapcar #'(lambda (x)
-                               (list name x (geo-coder x)))
-                           (remove-duplicates
-                            (append
-                             (mapcar #'(lambda (x)
-                                         (a-address x))
-                                     affi)
-                             (list addr)))))))
+    ;; Страница ресурса
+    (def-plc (resource "/resource/:id")
+      (def-lin ("Ресурс" :all resource (gethash (cur-page-id) *RESOURCE*))
+        (def-fld name)
+        (def-fld category)
+        (def-fld resource-type)
+        (def-fld unit)))
+
+
+    ;; Список поставщиков
+    (def-plc (suppliers "/supplier" :navpoint "Поставщики")
+      (def-grd ("Каталог поставщиков" :all supplier (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'SUPPLIER))  (cons-hash-list *USER*)))
+        (def-fld name :xref "supplier" :width 300)
+        (def-fld actual-address :width 600)))
+
+    ;; Страница поставщика
+    (def-plc (supplier "/supplier/:id")
+      (def-lin ("Поставщик" :all supplier (gethash (cur-page-id) *USER*))
+        (def-fld  name)
+        (def-fld  status)
+        (def-fld  juridical-address)
+        (def-fld  actual-address)
+        (def-fld  contacts)
+        (def-fld  email)
+        (def-fld  site)
+        (def-fld  heads)
+        (def-fld  inn)
+        (def-fld  kpp)
+        (def-fld  ogrn)
+        (def-fld  bank-name)
+        (def-fld  bik)
+        (def-fld  corresp-account)
+        (def-fld  client-account)
+        (def-fld  addresses)
+        (def-fld  contact-person)
+        (def-fld  contact-phone)
+        (def-fld  contact-email)
+        (def-btn  ("Сохранить" :self)
+          (let ((obj (gethash (cur-page-id) *USER*)))
+            (with-obj-save obj
+              NAME JURIDICAL-ADDRESS ACTUAL-ADDRESS CONTACTS EMAIL SITE HEADS INN KPP OGRN BANK-NAME
+              BIK CORRESP-ACCOUNT CLIENT-ACCOUNT ADDRESSES CONTACT-PERSON contact-phone contact-email)
+            (hunchentoot:redirect (hunchentoot:request-uri*))))
+        (def-btn  ("Отправить заявку на добросовестность" '(and :self :unfair))
+          (progn
+            (setf (a-status (gethash (cur-page-id) *USER*)) :request)
+            (hunchentoot:redirect (hunchentoot:request-uri*))))
+        ;; affiliates
+        (def-grd ("Адреса филиалов и магазинов" :all supplier-affiliate
+                                                (cons-inner-objs *supplier-affiliate* (a-affiliates (gethash (cur-page-id) *user*))))
+          (def-fld address :width 900))
+        ;; pricelist
+        (def-grd ("Прайс-лист" :all supplier-resource-price-elt (remove-if-not #'(lambda (x)
+                                                                                   (equal (a-owner (cdr x)) (gethash (cur-page-id) *user*)))
+                                                                               (cons-hash-list *supplier-resource-price-elt*)))
+          (def-fld  name  :width 350)
+          (def-fld  unit  :width 150)
+          (def-fld  price :width 150)
+          (def-fld  date  :width 150)
+          (def-btn  ("Удалить" :owner :width  100)
+            (let* ((key (get-btn-key (caar (form-data))))
+                   (hobj (gethash key *supplier-resource-price-elt*)))
+              (setf (a-price-elts (cur-user))
+                    (remove-if #'(lambda (x) (equal x hobj))
+                               (a-price-elts (cur-user))))
+              (remhash key *supplier-resource-price-elt*)
+              (hunchentoot:redirect (hunchentoot:request-uri*)))))
+        ;; upload pricelist
+        (def-pop ("Загрузить прайс-лист" :self :top 1750 :left 280 :height 200 :width 700)
+          (def-lin ("Добавление прайс-листа" :self supplier-resource-price-elt :clear)
+            (def-upl (file :all "Прайс"))
+            (def-btn ("Загрузить" :all)
+              (progn
+                (awhen (car (hunchentoot:post-parameter "FILE"))
+                  (loop :for src :in (xls-processor it) :do
+                     (add-inner-obj *supplier-resource-price-elt* 'supplier-resource-price-elt
+                         (a-price-elts (cur-user))
+                       :owner (cur-user)
+                       :name  (nth 1 src)
+                       :unit  (nth 2 src)
+                       :price (nth 3 src)
+                       :date  (decode-date (get-universal-time)))))
+                (hunchentoot:redirect (hunchentoot:request-uri*))))))
+        ;; resources
+        (def-grd ("Ресурсы для конкурсов" :all supplier-resource
+                                          (cons-inner-objs *SUPPLIER-RESOURCE* (a-resources (gethash (cur-page-id) *USER*))))
+          (def-fld resource :width 800)
+          (def-btn ("Удалить" :owner :width 100)
+            (del-inner-obj
+             (caar (form-data))
+             *SUPPLIER-RESOURCE*
+             (a-resources (gethash (cur-page-id) *USER*)))))
+        ;; Добавление ресурса
+        (def-pop ("Добавить ресурс" :self :top 2000 :left 280 :height 400 :width 900)
+          (def-grd ("Добавление ресурса" :all resource (cons-hash-list *RESOURCE*) :height 240)
+            (def-fld name :width 700)
+            (def-btn ("Добавить ресурс" :all :width 120)
+              (let* ((owner    (cur-user))
+                     (resource (gethash (get-btn-key (caar (form-data))) *RESOURCE*)))
+                (add-inner-obj *SUPPLIER-RESOURCE* 'SUPPLIER-RESOURCE (a-resources owner)
+                  :owner     owner
+                  :resource  resource
+                  :price     0)
+                (hunchentoot:redirect (hunchentoot:request-uri*))))))
+        ;; sales
+        (def-grd ("Акции" :all sale (cons-inner-objs *SALE* (a-sales (gethash (cur-page-id) *USER*))))
+          (def-fld title :width 800 :xref "sale")
+          (def-btn ("Удалить" :owner :width 100)
+            (del-inner-obj
+             (caar (form-data))
+             *SALE*
+             (a-sales (gethash (cur-page-id) *USER*)))))
+        ;; Добавление акции
+        (def-pop ("Добавить акцию" :self :top 2200 :left 280 :height 400 :width 900)
+          (def-lin ("Добавление акции" :all sale :clear)
+            (def-fld title)
+            ;; (:fld date)
+            ;; (:fld announce-photo)
+            ;; (:fld announce)
+            ;; (:fld text-photo)
+            ;; (:fld text)
+            ;; (:fld owner)
+            ;; (:fld resource)
+            (def-btn ("Добавить акцию" :all)
+              (let* ((owner (cur-user)))
+                (add-inner-obj *SALE* 'SALE (a-sales owner)
+                  :owner     owner
+                  :title     (form-fld title))
+                (hunchentoot:redirect (hunchentoot:request-uri*))))))
+                                        ; offers
+        (def-grd ("Список заявок на тендеры" :logged offer (cons-inner-objs *OFFER* (a-offers (gethash (cur-page-id) *USER*))))
+          (def-fld tender :xref "offer" :width 680)
+          (def-btn ("Страница заявки" :all :width 115)
+            (to "/offer/~A" (caar (form-data))))
+          (def-btn ("Удалить заявку" :all :width 105)
+            (del-inner-obj
+             (caar (form-data))
+             *OFFER*
+             (a-offers (gethash (cur-page-id) *USER*))))))
+      (def-map ("Адрес поставщика")
+        (let* ((supp (gethash (cur-page-id) *USER*))
+               (name (a-name supp))
+               (addr (a-actual-address supp))
+               (affi (a-affiliates supp)))
+          (mapcar #'(lambda (x)
+                      (list name x (geo-coder x)))
+                  (remove-duplicates
+                   (append
+                    (mapcar #'(lambda (x)
+                                (a-address x))
+                            affi)
+                    (list addr)))))))
 
     ;; Распродажи
-    ,(def-plc (sales "/sale")
-              (def-tpl ("Акции")
-                (funcall (find-symbol "POSTPAGE" 'tpl)
-                         (list :postblocks (list (list* :xrefall "/event"
-                                                        :titleall ""
-                                                        :title ""
-                                                        :posts (posts-by-sales 100)))))))
+    (def-plc (sales "/sale")
+      (def-tpl ("Акции")
+        (funcall (find-symbol "POSTPAGE" 'tpl)
+                 (list :postblocks (list (list* :xrefall "/event"
+                                                :titleall ""
+                                                :title ""
+                                                :posts (posts-by-sales 100)))))))
 
     ;; Страница распродажи
-    ,(def-plc (sale "/sale/:id")
-              (def-pst ("%|title|%" sale (gethash (cur-page-id) *SALE*))
-                (def-fld title)
-                (def-fld date)
-                (def-fld text-photo)
-                (def-fld text)))
+    (def-plc (sale "/sale/:id")
+      (def-pst ("%|title|%" sale (gethash (cur-page-id) *SALE*))
+        (def-fld title)
+        (def-fld date)
+        (def-fld text-photo)
+        (def-fld text)))
 
-     ;; Список застройщиков
-     ,(def-plc (builders "/builder")
-               (def-grd ("Организации-застройщики" :all builder (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'BUILDER)) (cons-hash-list *USER*)))
-                 (def-fld name :xref "builder" :width 750)
-                 (def-fld login :width 150)))
+    ;; Список застройщиков
+    (def-plc (builders "/builder")
+      (def-grd ("Организации-застройщики" :all builder (remove-if-not #'(lambda (x) (equal (type-of (cdr x)) 'BUILDER)) (cons-hash-list *USER*)))
+        (def-fld name :xref "builder" :width 750)
+        (def-fld login :width 150)))
 
     ;; ;; Страница застройщика
     ;; (:place                builder
@@ -412,12 +414,12 @@
     ;;                           )))))
 
 
-     ;; Список тендеров
-     ,(def-plc (tenders "/tender" :navpoint "Тендеры")
-               (def-grd ("Тендеры" :all tender (cons-hash-list *TENDER*))
-                 (def-fld name :xref "tender")
-                 (def-fld status)
-                 (def-fld owner)))
+    ;; Список тендеров
+    (def-plc (tenders "/tender" :navpoint "Тендеры")
+      (def-grd ("Тендеры" :all tender (cons-hash-list *TENDER*))
+        (def-fld name :xref "tender")
+        (def-fld status)
+        (def-fld owner)))
 
     ;; ;; Страница тендера (поставщик может откликнуться)
     ;; (:place                tender
@@ -765,49 +767,49 @@
     ;;                                  (hunchentoot:redirect (format nil "/offer/~A" offer-id))))))))
 
 
-     ;; Календарь событий
-     ,(def-plc (event "/event" :navpoint "Календарь событий")
-               (def-ann ("Анонсы" post-item (remove-if-not #'(lambda (x)
-                                                               (equal "ivent" (a-section (cdr x))))
-                                                           (cons-hash-list *POST-ITEM*)))
-                 (def-fld title)
-                 (def-fld date)
-                 (def-fld announce-photo)
-                 (def-fld announce)))
+    ;; Календарь событий
+    (def-plc (event "/event" :navpoint "Календарь событий")
+      (def-ann ("Анонсы" post-item (remove-if-not #'(lambda (x)
+                                                      (equal "ivent" (a-section (cdr x))))
+                                                  (cons-hash-list *POST-ITEM*)))
+        (def-fld title)
+        (def-fld date)
+        (def-fld announce-photo)
+        (def-fld announce)))
 
-     ;; Новые технологии
-     ,(def-plc (technologies "/technologies" :navpoint "Технологии")
-               (def-ann ("Новые технологии" post-item (remove-if-not #'(lambda (x)
-                                                                         (equal "techno" (a-section (cdr x))))
-                                                                     (cons-hash-list *POST-ITEM*)))
-                 (def-fld title)
-                 (def-fld date)
-                 (def-fld announce-photo)
-                 (def-fld announce)))
+    ;; Новые технологии
+    (def-plc (technologies "/technologies" :navpoint "Технологии")
+      (def-ann ("Новые технологии" post-item (remove-if-not #'(lambda (x)
+                                                                (equal "techno" (a-section (cdr x))))
+                                                            (cons-hash-list *POST-ITEM*)))
+        (def-fld title)
+        (def-fld date)
+        (def-fld announce-photo)
+        (def-fld announce)))
 
 
-     ;; Новости законодальства
-     ,(def-plc (laws "/laws" #|:navpoint"Новости законодательства"|#)
-               (def-ann ("Новости законодательства" post-item (remove-if-not #'(lambda (x)
-                                                                                 (equal "laws" (a-section (cdr x))))
-                                                                             (cons-hash-list *POST-ITEM*)))
-                 (def-fld title)
-                 (def-fld date)
-                 (def-fld announce-photo)
-                 (def-fld announce)))
+    ;; Новости законодальства
+    (def-plc (laws "/laws" #|:navpoint"Новости законодательства"|#)
+      (def-ann ("Новости законодательства" post-item (remove-if-not #'(lambda (x)
+                                                                        (equal "laws" (a-section (cdr x))))
+                                                                    (cons-hash-list *POST-ITEM*)))
+        (def-fld title)
+        (def-fld date)
+        (def-fld announce-photo)
+        (def-fld announce)))
 
-     ;; О портале
-     ,(def-plc (about "/about")
-               (def-tpl ("О портале")
-                 (funcall (find-symbol "ABOUT" 'tpl))))
+    ;; О портале
+    (def-plc (about "/about")
+      (def-tpl ("О портале")
+        (funcall (find-symbol "ABOUT" 'tpl))))
 
-     ;; Услуги портала
-     ,(def-plc (services "/services" :navpoint "Услуги портала")
-               (def-tpl ("Услуги портала")
-                 (funcall (find-symbol "SERVICES" 'tpl))))
+    ;; Услуги портала
+    (def-plc (services "/services" :navpoint "Услуги портала")
+      (def-tpl ("Услуги портала")
+        (funcall (find-symbol "SERVICES" 'tpl))))
 
-     ;; Контакты
-     ,(def-plc (contacts "/contacts" :navpoint "Контакты")
-               (def-tpl ("Контакты")
-                 (funcall (find-symbol "CONTACTS" 'tpl))))
-     ))
+    ;; Контакты
+    (def-plc (contacts "/contacts" :navpoint "Контакты")
+      (def-tpl ("Контакты")
+        (funcall (find-symbol "CONTACTS" 'tpl))))
+    ))
