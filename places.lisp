@@ -15,8 +15,12 @@
     (nconc rs `(:act ,@act))
     `',rs))
 
+(defmacro def-upl ((file perm name))
+  (let ((rs `(:file ,file :perm ,perm :name ,name)))
+    `',rs))
+
 (defmacro def-pop ((title perm &key (top 100 top-p)  (left 100 left-p)  (height 100 height-p)  (width 200 width-p)) &body action)
-  (let ((rs `(:popbtn ,title)))
+  (let ((rs `(:popbtn ,title :perm ,perm)))
     (if top-p    (nconc rs `(:top    ,top)))
     (if left-p   (nconc rs `(:left   ,left)))
     (if height-p (nconc rs `(:height ,height)))
@@ -253,7 +257,7 @@
                                  :perm       :self
                                  :entity     supplier-resource-price-elt
                                  :val        :clear
-                                 :fields     '((:file file :perm :all :name "Прайс")
+                                 :fields     '(,(def-upl (file :all "Прайс"))
                                                ,(def-btn ("Загрузить" :all)
                                                   (progn
                                                     (awhen (car (hunchentoot:post-parameter "FILE"))
@@ -275,23 +279,18 @@
                                     (caar (form-data))
                                     *SUPPLIER-RESOURCE*
                                     (a-resources (gethash (cur-page-id) *USER*)))))
-                      ;; ;; Добавление ресурса
-                      (:popbtn  "Добавить ресурс"
-                       :top      2000
-                       :left     280
-                       :height   400
-                       :width    900
-                       :perm     :self
-                       :action ',(def-grd ("Добавление ресурса" :all resource (cons-hash-list *RESOURCE*) :height 240)
-                                           (def-fld name :width 700)
-                                           (def-btn ("Добавить ресурс" :all :width 120)
-                                             (let* ((owner    (cur-user))
-                                                    (resource (gethash (get-btn-key (caar (form-data))) *RESOURCE*)))
-                                               (add-inner-obj *SUPPLIER-RESOURCE* 'SUPPLIER-RESOURCE (a-resources owner)
-                                                 :owner     owner
-                                                 :resource  resource
-                                                 :price     0)
-                                               (hunchentoot:redirect (hunchentoot:request-uri*))))))
+                      ;; Добавление ресурса
+                      ,(def-pop ("Добавить ресурс" :self :top 2000 :left 280 :height 400 :width 900)
+                                (def-grd ("Добавление ресурса" :all resource (cons-hash-list *RESOURCE*) :height 240)
+                                  (def-fld name :width 700)
+                                  (def-btn ("Добавить ресурс" :all :width 120)
+                                    (let* ((owner    (cur-user))
+                                           (resource (gethash (get-btn-key (caar (form-data))) *RESOURCE*)))
+                                      (add-inner-obj *SUPPLIER-RESOURCE* 'SUPPLIER-RESOURCE (a-resources owner)
+                                        :owner     owner
+                                        :resource  resource
+                                        :price     0)
+                                      (hunchentoot:redirect (hunchentoot:request-uri*))))))
                       ;; sales
                       ,(def-grd ("Акции" :all sale (cons-inner-objs *SALE* (a-sales (gethash (cur-page-id) *USER*))))
                                  (def-fld title :width 800 :xref "sale")
