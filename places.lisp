@@ -247,29 +247,21 @@
                                      (remhash key *supplier-resource-price-elt*)
                                      (hunchentoot:redirect (hunchentoot:request-uri*)))))
                       ;; upload pricelist
-                      (:popbtn  "Загрузить прайс-лист"
-                       :top      1750
-                       :left     280
-                       :height   200
-                       :width    700
-                       :perm     :self
-                       :action '(:linear     "Добавление прайс-листа"
-                                 :perm       :self
-                                 :entity     supplier-resource-price-elt
-                                 :val        :clear
-                                 :fields     '(,(def-upl (file :all "Прайс"))
-                                               ,(def-btn ("Загрузить" :all)
-                                                  (progn
-                                                    (awhen (car (hunchentoot:post-parameter "FILE"))
-                                                      (loop :for src :in (xls-processor it) :do
-                                                         (add-inner-obj *supplier-resource-price-elt* 'supplier-resource-price-elt
-                                                             (a-price-elts (cur-user))
-                                                           :owner (cur-user)
-                                                           :name  (nth 1 src)
-                                                           :unit  (nth 2 src)
-                                                           :price (nth 3 src)
-                                                           :date  (decode-date (get-universal-time)))))
-                                                    (hunchentoot:redirect (hunchentoot:request-uri*)))))))
+                      ,(def-pop ("Загрузить прайс-лист" :self :top 1750 :left 280 :height 200 :width 700)
+                                (def-lin ("Добавление прайс-листа" :self supplier-resource-price-elt :clear)
+                                  (def-upl (file :all "Прайс"))
+                                  (def-btn ("Загрузить" :all)
+                                    (progn
+                                      (awhen (car (hunchentoot:post-parameter "FILE"))
+                                        (loop :for src :in (xls-processor it) :do
+                                           (add-inner-obj *supplier-resource-price-elt* 'supplier-resource-price-elt
+                                               (a-price-elts (cur-user))
+                                             :owner (cur-user)
+                                             :name  (nth 1 src)
+                                             :unit  (nth 2 src)
+                                             :price (nth 3 src)
+                                             :date  (decode-date (get-universal-time)))))
+                                      (hunchentoot:redirect (hunchentoot:request-uri*))))))
                       ;; resources
                       ,(def-grd ("Ресурсы для конкурсов" :all supplier-resource
                                                           (cons-inner-objs *SUPPLIER-RESOURCE* (a-resources (gethash (cur-page-id) *USER*))))
@@ -300,30 +292,22 @@
                                     *SALE*
                                     (a-sales (gethash (cur-page-id) *USER*)))))
                       ;; Добавление акции
-                      (:popbtn  "Добавить акцию"
-                       :top      2200
-                       :left     280
-                       :height   400
-                       :width    900
-                       :perm     :all
-                       :action  '(:linear  "Добавление акции"
-                                  :perm     :all
-                                  :entity   sale
-                                  :val      :clear
-                                  :fields   '(,(def-fld title)
-                                              ;; (:fld date)
-                                              ;; (:fld announce-photo)
-                                              ;; (:fld announce)
-                                              ;; (:fld text-photo)
-                                              ;; (:fld text)
-                                              ;; (:fld owner)
-                                              ;; (:fld resource)
-                                              ,(def-btn ("Добавить акцию" :all)
-                                                  (let* ((owner (cur-user)))
-                                                    (add-inner-obj *SALE* 'SALE (a-sales owner)
-                                                      :owner     owner
-                                                      :title     (form-fld title))
-                                                    (hunchentoot:redirect (hunchentoot:request-uri*)))))))
+                      ,(def-pop ("Добавить акцию" :self :top 2200 :left 280 :height 400 :width 900)
+                                (def-lin ("Добавление акции" :all sale :clear)
+                                  (def-fld title)
+                                  ;; (:fld date)
+                                  ;; (:fld announce-photo)
+                                  ;; (:fld announce)
+                                  ;; (:fld text-photo)
+                                  ;; (:fld text)
+                                  ;; (:fld owner)
+                                  ;; (:fld resource)
+                                  (def-btn ("Добавить акцию" :all)
+                                    (let* ((owner (cur-user)))
+                                      (add-inner-obj *SALE* 'SALE (a-sales owner)
+                                        :owner     owner
+                                        :title     (form-fld title))
+                                      (hunchentoot:redirect (hunchentoot:request-uri*))))))
                       ;; offers
                       ,(def-grd ("Список заявок на тендеры" :logged offer (cons-inner-objs *OFFER* (a-offers (gethash (cur-page-id) *USER*))))
                         (def-fld tender :xref "offer" :width 680)
