@@ -45,6 +45,16 @@
   (let ((rs `(:tpl ,tpl)))
     (nconc rs `(:val ,@val))
     `',rs))
+  ;; `(mi 'tpl :title ,tpl :perm :all :val (lambda () ,@val)))
+
+;; test
+;; (print (macroexpand-1 '(def-tpl ("")
+;;                         (funcall (find-symbol "MAIN" 'tpl)
+;;                          (list :postblocks (list (list* :xrefall "/posts"
+;;                                                         :titleall "все новости"
+;;                                                         :title "Акции, скидки и предложения"
+;;                                                         :posts (posts-by-sales 3))))))))
+
 
 (defmacro def-map ((yamap) &body val)
   (let ((rs `(:yamap ,yamap)))
@@ -68,22 +78,63 @@
     `',rs))
 
 (defmacro def-plc ((name url &key (navpoint nil navpoint-p)) &body actions)
-  "TODO: -navpoints- -controllers-"
+  "TODO: -controllers-"
   `(let ((rs (list :place ',name :url ,url)))
      ,(if navpoint-p
           `(progn
              (nconc rs (list :navpoint ,navpoint))
-             ;; (nconc -navpoints- (list (list :link ,url :title ,navpoint)))
-             ))
-     (nconc rs (list :actions (list 'quote (list ,@(loop :for item :in actions :collect item)))))
+             (if (boundp '-navpoints-) ;; if exists special var -navpoints- — save navpoint!
+                 (nconc -navpoints- (list (list :link ,url :title ,navpoint))))))
+     (nconc rs (list :actions (list 'quote (list ,@actions))))
      rs))
+  ;; `(let* ((-controllers- (list 'dymmy ("b1188" . ,(lambda () (WITH-OBJ-CREATE (*USER* 'SUPPLIER
+  ;;                                                                                     (LOGIN PASSWORD))
+  ;;                                                              (SETF (A-STATUS OBJ) :UNFAIR)
+  ;;                                                              (HUNCHENTOOT:REDIRECT (FORMAT NIL "/supplier/~A" ID)))))
+  ;;                              )))
+  ;;    (declare (special -controllers-)) ;; special for controllers
+  ;;    (restas:define-route ,(intern (format nil "~A-PAGE" (symbol-name name))) (,url)
+  ;;      (list ,@actions))
+  ;;    (restas:define-route ,(intern (format nil "~A-CTRS" (symbol-name name))) ("/" :method :post)
+  ;;      (let ((session (hunchentoot:start-session))
+  ;;            (acts (list -controllers-)))
+  ;;                   ;; @,(loop :for item :in (cdr -controllers-) :collect
+  ;;                    ;; (cons ,(car item) ,(lambda () ,(cdr item))))
+  ;;        (declare (ignore session))
+  ;;        (activate acts)))
+  ;;    ))
+
+
+;; test
+;; (def-plc (main "/" :navpoint "Главная")
+;;   (def-tpl ("")
+;;     (funcall (find-symbol "MAIN" 'tpl)
+;;              (list :postblocks (list (list* :xrefall "/posts"
+;;                                             :titleall "все новости"
+;;                                             :title "Акции, скидки и предложения"
+;;                                             :posts (posts-by-sales 3)))))))
+
+;; (print (macroexpand-1 '(def-plc (main "/" :navpoint "Главная")
+;;                         (def-tpl ("")
+;;                           (funcall (find-symbol "MAIN" 'tpl)
+;;                                    (list :postblocks (list (list* :xrefall "/posts"
+;;                                                                   :titleall "все новости"
+;;                                                                   :title "Акции, скидки и предложения"
+;;                                                                   :posts (posts-by-sales 3))))))
+;;                         (def-tpl ("")
+;;                           (funcall (find-symbol "MAIN" 'tpl)
+;;                                    (list :postblocks (list (list* :xrefall "/posts"
+;;                                                                   :titleall "все новости"
+;;                                                                   :title "Акции, скидки и предложения"
+;;                                                                   :posts (posts-by-sales 3)))))))))
 
 (defmacro def-asm (&body places)
   "TODO: -ajax-data-set-"
-  `(let* ((-navpoints- (list 'dymmy))
-          (-places-    (list ,@(loop :for item :in places :collect item))))
-     (defparameter *places*    -places-)
-     (defparameter *navpoints* (cdr -navpoints-))))
+  `(let* ((-navpoints- (list 'dymmy)))
+     (declare (special -navpoints-)) ;; special for menu
+     (let ((-places- (list ,@(loop :for item :in places :collect item))))
+       (defparameter *places* (remove-if #'null -places-))
+       (defparameter *navpoints* (cdr -navpoints-)))))
 
 (def-asm
   ;; Главная страница

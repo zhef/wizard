@@ -159,10 +159,12 @@ function(){
 ;; ACT: post
 (defmethod restas:render-object ((designer action-render) (obj post))
   (let ((val (funcall (a-val obj))))
-    (tpl:posttext (list :title (a-title val)
-                        :text (a-text val)
-                        :date (a-date val)
-                        :phototext (or (a-text-photo val) "")))))
+    (if (null val)
+        "404 Not Found Post"
+        (tpl:posttext (list :title (a-title val)
+                            :text (a-text val)
+                            :date (a-date val)
+                            :phototext (or (a-text-photo val) ""))))))
 
 
 ;; ACT: yamap

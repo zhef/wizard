@@ -1,6 +1,5 @@
 (in-package #:WIZARD)
 
-(defparameter *menu*               nil)
 (defparameter *controllers*        nil)
 (defparameter *ajaxdataset*        nil)
 (defparameter *param-id-flag*      nil)
@@ -203,23 +202,21 @@
                (loop :for field :in (getf entity :fields) :collect
                   (format nil "(~A ~23:T nil)" (car field))))))
   ;; Places
-  (setf *menu* nil)
   (setf *ajaxdataset* nil)
   (loop :for place :in *places* :do
      ;; *param-id-flag*
      (setf *param-id-flag* (not (null (search "/:id" (getf place :url) :test #'equal))))
      ;; clear *controllers*
      (setf *controllers* nil)
-     ;; menu
-     (unless (null (getf place :navpoint))
-       (push (list :link (getf place :url) :title (getf place :navpoint)) *menu*))
      ;; base route
      ;; (format t "~%--------::place::[~A]" (getf place :place)) ;;
      (format out "~%~%(restas:define-route ~A-page (\"~A\")"
              (string-downcase (getf place :place))
              (getf place :url))
-     (format out "~A~%  (list ~{~A~}))"
-             (if *param-id-flag* (format nil "~% (declare (ignore id))") "")
+     (format out "~A~%  (list ~{~A~})))"
+             (if (not *param-id-flag*)
+                 (format nil "~%  (block ret-404")
+                 (format nil "~%  (declare (ignore id))~%  (block ret-404~%    (unless (string= id (format nil \"~~A\" (parse-integer id :junk-allowed t)))~%      (return-from ret-404 405))"))
              (loop :for action :in (eval (getf place :actions)) :collect
                 (gen action) ;; <-- dispatcher: (defmethod gen ((param list) &key entity-param)
                 ))
@@ -250,5 +247,5 @@
                fields)))
   ;; out *menu*
   (format out "~%~%~%(defun menu ()  '")
-  (pprint (reverse *menu*) out)
+  (pprint *navpoints* out)
   (format out ")"))
