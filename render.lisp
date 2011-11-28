@@ -230,8 +230,6 @@ function(){
   ;; При выводе в гриде столбцов содержащих кнопки проверяются права на строчку а не на столбец
   (call-next-method))
 
-(pprint (macroexpand-1 '(check-perm-for-cur-user-with-dbg (a-perm obj) obj nil)))
-
 
 ;; POPBTN in GRID
 
