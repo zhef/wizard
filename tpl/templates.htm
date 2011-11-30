@@ -200,6 +200,27 @@
 {/template}
 
 
+{template dialog}
+<script>
+$(document).ready(function() {lb}
+  var $dialog = $('<div></div>')
+  .html('{$content |noAutoescape} <input type="button" onclick="alert(\'aaa\');" value="1">')
+  .dialog({lb}
+    autoOpen: false,
+    title: '{$title |noAutoescape}',
+    modal: true
+  {rb});
+  $('#opener').click(function() {lb}
+    $dialog.dialog('open');
+    return false;
+  {rb});
+{rb});
+</script>
+<input type="button" onclick="$dialog.dialog('open'); return false;" value="test" />
+<button id="opener">Open the dialog</button>
+{/template}
+
+
 {template popup}
   <div id="{$id}"{\n}
        class="popupBox"{\n}

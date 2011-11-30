@@ -310,3 +310,11 @@ Hunchentoot
 [01:52] archimag>
 http://weitz.de/hunchentoot/#acceptor-dispatch-request
 [02:08] rigidus> Большое спасибо!
+[2011-11-28 01:49] archimag> теперь в restas:start появился ключ
+:acceptor-class, там можно указать свой класс акцептора
+[2011-11-28 01:50] archimag> опеределяешь свой acceptor, определяешь
+для него что хочешь
+[2011-11-28 01:50] archimag> http://weitz.de/hunchentoot/#acceptors
+[2011-11-28 01:51] archimag> hunchentoot:acceptor-dispatch-request -
+основной метод, в котором происходит обработка запроса
+[2011-11-28 01:52] archimag> делаешь для него around и всё
