@@ -1,6 +1,7 @@
 (in-package #:wizard)
 
 (connect :user "root" :password "root" :database "ktopostavlyaet")
+;; (connect :user "root" :password "12" :database "ktopostavlyaet")
 (query "SET NAMES utf8")
 
 
@@ -312,7 +313,7 @@
 (posts)
 (categoryes-and-resources)
 (users)
-(tenders)
+;; (tenders)
 
 
 (let ((o (push-hash *SALE* 'SALE

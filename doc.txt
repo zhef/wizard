@@ -11,6 +11,8 @@ sbcl --lose-on-corruption --disable-ldb --dynamic-space-size 1024
 
 (swank:create-server :coding-system "utf-8-unix" :dont-close t :port 8008)
 
+ssh -2 -N -f -L 4005:localhost:4005 gtadm@83.68.35.138
+
 
 (defun clear ()
   (loop :for var :being :the :symbols :in :wizard.impl.routes :do (unintern var))
@@ -318,3 +320,11 @@ http://weitz.de/hunchentoot/#acceptor-dispatch-request
 [2011-11-28 01:51] archimag> hunchentoot:acceptor-dispatch-request -
 основной метод, в котором происходит обработка запроса
 [2011-11-28 01:52] archimag> делаешь для него around и всё
+
+[17:38] Macro> а есть ли способ сказать (format) в CL чтобы он nil не
+печатал вообще?
+[17:39] Macro> например (format nil "~a" (foo)), если foo вернёт nil -
+то будет напечатано "NIL", а мне надо чтобы было ""
+[17:39] Macro> а если (foo) вернёт число или строку - то нужно чтобы
+была строка или число напечатано
+[17:41] jsv> ~@[~a~]
