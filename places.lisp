@@ -201,44 +201,44 @@
   (def-plc (anal "/analytics" :navpoint "Аналитика")
     (def-nop ("Аналитика")))
 
-  ;; Каталог ресурсов
-  (def-plc (material "/material" :navpoint "Каталог ресурсов")
-    (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
-                                                      (a-child-categoryes
-                                                       (cdr (car (remove-if-not #'(lambda (x)
-                                                                                    (null (a-parent (cdr x))))
-                                                                                (cons-hash-list *CATEGORY*)))))))
-      (def-fld name :xref "category" :width 900)))
+  ;; ;; Каталог ресурсов
+  ;; (def-plc (material "/material" :navpoint "Каталог ресурсов")
+  ;;   (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
+  ;;                                                     (a-child-categoryes
+  ;;                                                      (cdr (car (remove-if-not #'(lambda (x)
+  ;;                                                                                   (null (a-parent (cdr x))))
+  ;;                                                                               (cons-hash-list *CATEGORY*)))))))
+  ;;     (def-fld name :xref "category" :width 900)))
 
-  ;; Строительная техника
-  (def-plc (machine "/machine" :navpoint "Строительная техника")
-    (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
-                                                      (a-child-categoryes
-                                                       (cdr (cadr (remove-if-not #'(lambda (x)
-                                                                                     (null (a-parent (cdr x))))
-                                                                                 (cons-hash-list *CATEGORY*))))))
-                       :height     400)
-      (def-fld name :xref "category" :width 900)))
+  ;; ;; Строительная техника
+  ;; (def-plc (machine "/machine" :navpoint "Строительная техника")
+  ;;   (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
+  ;;                                                     (a-child-categoryes
+  ;;                                                      (cdr (cadr (remove-if-not #'(lambda (x)
+  ;;                                                                                    (null (a-parent (cdr x))))
+  ;;                                                                                (cons-hash-list *CATEGORY*))))))
+  ;;                      :height     400)
+  ;;     (def-fld name :xref "category" :width 900)))
 
 
-  ;; Каталог ресурсов - содержимое категории
-  (def-plc (category "/category/:id")
-    (def-lin ("Группа" :all category :clear)
-      (def-grd ("Подгруппы" :all category (cons-inner-objs *CATEGORY* (a-child-categoryes (gethash (cur-page-id) *CATEGORY*))))
-        (def-fld name :xref "category" :width 900))
-      (def-grd ("Ресурсы группы" :all resource (remove-if-not #'(lambda (x)
-                                                                  (equal (a-category (cdr x))
-                                                                         (gethash (cur-page-id) *CATEGORY*)))
-                                                              (cons-hash-list *RESOURCE*)))
-        (def-fld name :xref "resource" :width 900))))
+  ;; ;; Каталог ресурсов - содержимое категории
+  ;; (def-plc (category "/category/:id")
+  ;;   (def-lin ("Группа" :all category :clear)
+  ;;     (def-grd ("Подгруппы" :all category (cons-inner-objs *CATEGORY* (a-child-categoryes (gethash (cur-page-id) *CATEGORY*))))
+  ;;       (def-fld name :xref "category" :width 900))
+  ;;     (def-grd ("Ресурсы группы" :all resource (remove-if-not #'(lambda (x)
+  ;;                                                                 (equal (a-category (cdr x))
+  ;;                                                                        (gethash (cur-page-id) *CATEGORY*)))
+  ;;                                                             (cons-hash-list *RESOURCE*)))
+  ;;       (def-fld name :xref "resource" :width 900))))
 
-  ;; Страница ресурса
-  (def-plc (resource "/resource/:id")
-    (def-lin ("Ресурс" :all resource (gethash (cur-page-id) *RESOURCE*))
-      (def-fld name)
-      (def-fld category)
-      (def-fld resource-type)
-      (def-fld unit)))
+  ;; ;; Страница ресурса
+  ;; (def-plc (resource "/resource/:id")
+  ;;   (def-lin ("Ресурс" :all resource (gethash (cur-page-id) *RESOURCE*))
+  ;;     (def-fld name)
+  ;;     (def-fld category)
+  ;;     (def-fld resource-type)
+  ;;     (def-fld unit)))
 
 
   ;; Список поставщиков

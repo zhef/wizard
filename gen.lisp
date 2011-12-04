@@ -120,6 +120,8 @@
                                  (equal (car x) (a-title param))) ;; NB!: ent-to-me TITLE = NAME
                              (getf entity :fields)))
          (obj-perm  (getf entity :perm)))
+    ;; (format t "~%entity: ~A" entity)
+    ;; (format t "~%record: ~A" record)
     (destructuring-bind (fld name typedata)
         record
       (format nil "~%~6T (mi 'fld :name \"~A\" :typedata '~A :title ~A :width ~A ~A ~%~15T :update ~A :view ~A :show ~A)"

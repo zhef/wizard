@@ -18,80 +18,85 @@
                         ("id" "name"))
       (setf (gethash id measures) name))
 
-    ;; ;; ------------------------------
-    ;; ;; Забираем ресурсы
-    ;; (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_resource`")
-    ;;                     ("id" "name" "unit_id" "group_id" "type"))
-    ;;   ;; Создаем ресурс, не заполняя его категории
-    ;;   (setf (gethash id *RESOURCE*)
-    ;;         (mi 'RESOURCE
-    ;;             :name name
-    ;;             :resource-type (if (equal 1 type) :material :machine)
-    ;;             :unit (gethash unit_id measures))))
-    ;; ;; Забираем категории
-    ;; (with-query-select ("SELECT |:::| FROM `jos_gt_resource_group`"
-    ;;                     ("id" "name" "type" "parent_id"))
-    ;;   (setf (gethash id *CATEGORY*)
-    ;;         (mi 'CATEGORY
-    ;;             :name name
-    ;;             ;; здесь parent еще числовой
-    ;;             :parent parent_id)))
-    ;; ;; Связываем категории в дерево - здесь parent становится категорией, и слот child-categoryes становится валидным
-    ;; (maphash #'(lambda (key category)
-    ;;              (let ((parent-category (gethash (a-parent category) *CATEGORY*)))
-    ;;                (setf (a-parent category) parent-category)
-    ;;                (when parent-category
-    ;;                  (append-link (a-child-categoryes parent-category) category))))
-    ;;          *CATEGORY*)
-    ;; ;; Забираем связи и связываем ресурсы с категориями и категории с ресурсами
-    ;; (with-query-select ("SELECT |:::| FROM `jos_gt_resource_group_bind`"
-    ;;                     ("id" "group_id" "resource_id"))
-    ;;   (let ((category (gethash group_id *CATEGORY*))
-    ;;         (resource (gethash resource_id *RESOURCE*)))
-    ;;     (append-link (a-resources category) resource)
-    ;;     (append-link (a-categoryes resource) category)))))
-
-
-    ;; -------------------------------
-    ;; Забираем сырые данные по категориям из базы
+    ;; ------------------------------
+    ;; Забираем ресурсы
+    (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_resource`")
+                        ("id" "name" "unit_id" "group_id" "type"))
+      ;; Создаем ресурс, не заполняя его категории
+      (setf (gethash id *RESOURCE*)
+            (mi 'RESOURCE
+                :name name
+                :resource-type (if (equal 1 type) :material :machine)
+                :unit (gethash unit_id measures))))
+    ;; Забираем категории
     (with-query-select ("SELECT |:::| FROM `jos_gt_resource_group`"
                         ("id" "name" "type" "parent_id"))
-      (let ((save-group-id   id)
-            (save-group-name name)
-            (this-category   (setf (gethash id *CATEGORY*)
-                                   (make-instance 'CATEGORY
-                                                  :name name
-                                                  ;; здесь parent еще числовой
-                                                  :parent parent_id))))
-        ;; Забираем ресурсы, принадлежащие этой категории
-        (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_resource` WHERE `group_id` = '~A'" id)
-                            ("id" "name" "unit_id" "group_id" "type"))
-          ;; Создаем ресурс, связывая его с категорией
-          (let ((this-resource (setf (gethash id *RESOURCE*)
-                                     (make-instance 'RESOURCE
-                                                    :name name
-                                                    :category this-category
-                                                    :resource-type (if (equal 1 type) :material :machine)
-                                                    :unit (gethash unit_id measures)))))
-            ;; Выдаем warning если в базе связь ресурс-категория не совпадает со связью категория-ресурс
-            (unless (equal save-group-id group_id)
-              (format t "~&warn: not equal link to category (~A | ~A) and resource (~A | ~A)"
-                      save-group-id
-                      save-group-name
-                      id
-                      name))
-            ;; Добавляем этот ресурс в категорию, т.е. связываем категорию с ресурсом
-            (append-link (a-resources this-category) this-resource)
-            ;; TODO: Тут  нужно еще связать ресурс с ценой через справочник
-            t)t)t)t)t)
-  ;; Связываем категории в дерево - здесь parent становится категорией, и слот child-categoryes становится валидным
-  (maphash #'(lambda (key category)
-               (let ((parent-category (gethash (a-parent category) *CATEGORY*)))
-                 (setf (a-parent category) parent-category)
-                 (when parent-category
-                   (append-link (a-child-categoryes parent-category) category))))
-           *CATEGORY*)
-  t)
+      (setf (gethash id *CATEGORY*)
+            (mi 'CATEGORY
+                :name name
+                ;; здесь parent еще числовой
+                :parent parent_id)))
+    ;; Связываем категории в дерево - здесь parent становится категорией, и слот child-categoryes становится валидным
+    (maphash #'(lambda (key category)
+                 (let ((parent-category (gethash (a-parent category) *CATEGORY*)))
+                   (setf (a-parent category) parent-category)
+                   (when parent-category
+                     (append-link (a-child-categoryes parent-category) category))))
+             *CATEGORY*)
+    ;; Забираем связи и связываем ресурсы с категориями и категории с ресурсами
+    (with-query-select ("SELECT |:::| FROM `jos_gt_resource_group_bind`"
+                        ("id" "group_id" "resource_id"))
+      (let ((category (gethash group_id *CATEGORY*))
+            (resource (gethash resource_id *RESOURCE*)))
+        (if (or (null category)
+                (null resource))
+            (format t "link category [~A] and resource [~A] not exists" group_id resource_id)
+            ;; else
+            (progn
+              (append-link (a-resources category) resource)
+              (append-link (a-categoryes resource) category)))))))
+
+
+  ;;   ;; -------------------------------
+  ;;   ;; Забираем сырые данные по категориям из базы
+  ;;   (with-query-select ("SELECT |:::| FROM `jos_gt_resource_group`"
+  ;;                       ("id" "name" "type" "parent_id"))
+  ;;     (let ((save-group-id   id)
+  ;;           (save-group-name name)
+  ;;           (this-category   (setf (gethash id *CATEGORY*)
+  ;;                                  (make-instance 'CATEGORY
+  ;;                                                 :name name
+  ;;                                                 ;; здесь parent еще числовой
+  ;;                                                 :parent parent_id))))
+  ;;       ;; Забираем ресурсы, принадлежащие этой категории
+  ;;       (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_resource` WHERE `group_id` = '~A'" id)
+  ;;                           ("id" "name" "unit_id" "group_id" "type"))
+  ;;         ;; Создаем ресурс, связывая его с категорией
+  ;;         (let ((this-resource (setf (gethash id *RESOURCE*)
+  ;;                                    (make-instance 'RESOURCE
+  ;;                                                   :name name
+  ;;                                                   :category this-category
+  ;;                                                   :resource-type (if (equal 1 type) :material :machine)
+  ;;                                                   :unit (gethash unit_id measures)))))
+  ;;           ;; Выдаем warning если в базе связь ресурс-категория не совпадает со связью категория-ресурс
+  ;;           (unless (equal save-group-id group_id)
+  ;;             (format t "~&warn: not equal link to category (~A | ~A) and resource (~A | ~A)"
+  ;;                     save-group-id
+  ;;                     save-group-name
+  ;;                     id
+  ;;                     name))
+  ;;           ;; Добавляем этот ресурс в категорию, т.е. связываем категорию с ресурсом
+  ;;           (append-link (a-resources this-category) this-resource)
+  ;;           ;; TODO: Тут  нужно еще связать ресурс с ценой через справочник
+  ;;           t)t)t)t)t)
+  ;; ;; Связываем категории в дерево - здесь parent становится категорией, и слот child-categoryes становится валидным
+  ;; (maphash #'(lambda (key category)
+  ;;              (let ((parent-category (gethash (a-parent category) *CATEGORY*)))
+  ;;                (setf (a-parent category) parent-category)
+  ;;                (when parent-category
+  ;;                  (append-link (a-child-categoryes parent-category) category))))
+  ;;          *CATEGORY*)
+  ;; t)
 
 
 

@@ -182,6 +182,7 @@
      :fields
      ((name                "Наименование"               (:str))
       (categoryes          "Группы"                     (:list-of-links category))
+      ;; (category            "Группа"                     (:link category))
       (resource-type       "Тип ресурса"                (:list-of-keys resource-types))
       (unit                "Единица измерения"          (:str))
       (suppliers           "Поставляющие организации"   (:list-box supplier))
