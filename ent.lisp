@@ -181,7 +181,7 @@
      :container            resource
      :fields
      ((name                "Наименование"               (:str))
-      (category            "Группа"                     (:link category))
+      (categoryes          "Группы"                     (:list-of-links category))
       (resource-type       "Тип ресурса"                (:list-of-keys resource-types))
       (unit                "Единица измерения"          (:str))
       (suppliers           "Поставляющие организации"   (:list-box supplier))

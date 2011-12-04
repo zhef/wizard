@@ -17,6 +17,42 @@
     (with-query-select ("SELECT |:::| FROM `jos_gt_measure_unit`"
                         ("id" "name"))
       (setf (gethash id measures) name))
+
+    ;; ;; ------------------------------
+    ;; ;; Забираем ресурсы
+    ;; (with-query-select ((format nil "SELECT |:::| FROM `jos_gt_resource`")
+    ;;                     ("id" "name" "unit_id" "group_id" "type"))
+    ;;   ;; Создаем ресурс, не заполняя его категории
+    ;;   (setf (gethash id *RESOURCE*)
+    ;;         (mi 'RESOURCE
+    ;;             :name name
+    ;;             :resource-type (if (equal 1 type) :material :machine)
+    ;;             :unit (gethash unit_id measures))))
+    ;; ;; Забираем категории
+    ;; (with-query-select ("SELECT |:::| FROM `jos_gt_resource_group`"
+    ;;                     ("id" "name" "type" "parent_id"))
+    ;;   (setf (gethash id *CATEGORY*)
+    ;;         (mi 'CATEGORY
+    ;;             :name name
+    ;;             ;; здесь parent еще числовой
+    ;;             :parent parent_id)))
+    ;; ;; Связываем категории в дерево - здесь parent становится категорией, и слот child-categoryes становится валидным
+    ;; (maphash #'(lambda (key category)
+    ;;              (let ((parent-category (gethash (a-parent category) *CATEGORY*)))
+    ;;                (setf (a-parent category) parent-category)
+    ;;                (when parent-category
+    ;;                  (append-link (a-child-categoryes parent-category) category))))
+    ;;          *CATEGORY*)
+    ;; ;; Забираем связи и связываем ресурсы с категориями и категории с ресурсами
+    ;; (with-query-select ("SELECT |:::| FROM `jos_gt_resource_group_bind`"
+    ;;                     ("id" "group_id" "resource_id"))
+    ;;   (let ((category (gethash group_id *CATEGORY*))
+    ;;         (resource (gethash resource_id *RESOURCE*)))
+    ;;     (append-link (a-resources category) resource)
+    ;;     (append-link (a-categoryes resource) category)))))
+
+
+    ;; -------------------------------
     ;; Забираем сырые данные по категориям из базы
     (with-query-select ("SELECT |:::| FROM `jos_gt_resource_group`"
                         ("id" "name" "type" "parent_id"))
