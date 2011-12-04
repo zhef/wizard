@@ -1,8 +1,5 @@
 (in-package #:WIZARD)
 
-(defparameter *popups* nil)
-
-
 (restas:define-route search-page ("/search")
   (let ((session (hunchentoot:start-session)))
     (declare (ignore session))
@@ -139,13 +136,3 @@
        (mi 'tpl :title "Недостаточно прав" :perm :all
            :val (lambda ()
                   "Только залогиненные застройщики могут объявлять тендер!")))))
-
-
-
-(restas:define-route dialog ("/dialog")
-  (list
-   (mi 'tpl :title "dialog" :perm :all
-       :val (lambda ()
-              (FUNCALL (FIND-SYMBOL "DIALOG" 'TPL)
-                       (list :title "this is title"
-                             :content "1234324534564"))))))

@@ -19,7 +19,7 @@
   (let ((rs `(:file ,file :perm ,perm :name ,name)))
     `',rs))
 
-(defmacro def-pop ((title perm &key (top 100 top-p)  (left 100 left-p)  (height 100 height-p)  (width 200 width-p)) &body action)
+(defmacro def-pop ((title perm &key (height 100 height-p)  (width 200 width-p)) &body action)
   (let ((rs `(:popbtn ,title :perm ,perm)))
     (if top-p    (nconc rs `(:top    ,top)))
     (if left-p   (nconc rs `(:left   ,left)))
@@ -300,7 +300,7 @@
             (remhash key *supplier-resource-price-elt*)
             (hunchentoot:redirect (hunchentoot:request-uri*)))))
       ;; upload pricelist
-      (def-pop ("Загрузить прайс-лист" :self :top 1750 :left 280 :height 200 :width 700)
+      (def-pop ("Загрузить прайс-лист" :self :height 200 :width 700)
         (def-lin ("Добавление прайс-листа" :self supplier-resource-price-elt :clear)
           (def-upl (file :all "Прайс"))
           (def-btn ("Загрузить" :all)
@@ -322,7 +322,7 @@
         (def-btn ("Удалить" :owner :width 100)
           (del-inner-obj (caar (form-data)) *SUPPLIER-RESOURCE* (a-resources (gethash (cur-page-id) *USER*)))))
       ;; Добавление ресурса
-      (def-pop ("Добавить ресурс" :self :top 2000 :left 280 :height 400 :width 900)
+      (def-pop ("Добавить ресурс" :self :height 400 :width 900)
         (def-grd ("Добавление ресурса" :all resource (cons-hash-list *RESOURCE*) :height 240)
           (def-fld name :width 700)
           (def-btn ("Добавить ресурс" :all :width 120)
@@ -339,7 +339,7 @@
         (def-btn ("Удалить" :owner :width 100)
           (del-inner-obj (caar (form-data)) *SALE* (a-sales (gethash (cur-page-id) *USER*)))))
       ;; Добавление акции
-      (def-pop ("Добавить акцию" :self :top 2200 :left 280 :height 400 :width 900)
+      (def-pop ("Добавить акцию" :self :height 400 :width 900)
         (def-lin ("Добавление акции" :all sale :clear)
           (def-fld title)
           ;; (:fld date)
@@ -423,7 +423,7 @@
         (def-fld status :width 150)
         (def-fld all :width 200)))
     (def-lin ("Объявить новый тендер" :self tender :clear)
-      (def-pop ("Объявить тендер" :self :top 1000 :left 300 :height 200 :width 600)
+      (def-pop ("Объявить тендер" :self :height 200 :width 600)
         (def-lin ("Задайте название новому тендеру" :self tender :clear)
           (def-fld name :update :all)
           (def-btn ("Продолжить создание тендера" :all)
@@ -475,7 +475,7 @@
                              (a-resources (gethash (cur-page-id) *TENDER*))))
             (hunchentoot:redirect (hunchentoot:request-uri*)))))
       ;; Добавление ресурса
-      (def-pop ("Добавить ресурс" :owner :top 400 :left 280 :height 480 :width 800)
+      (def-pop ("Добавить ресурс" :owner :height 480 :width 800)
         (def-grd ("Выберите ресурсы" :all #|'(and :active :fair)|#  resource (cons-hash-list *RESOURCE*) :height 240)
           (def-fld name :xref "resource" :width 650)
           (def-btn ("Добавить к тендеру" :all :width 140)

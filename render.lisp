@@ -19,7 +19,7 @@
 
 (defclass wizard-render () ()) ;; default
 (defclass action-render () ()) ;; actions : none, tpl, grid, linear, announce, yamap, file.
-(defclass grid-render   () ()) ;; grids   : fld, btn, popbtn.
+(defclass grid-render   () ()) ;; grids   : fld, btn.
 (defclass linear-render () ()) ;; linears : fld, btn, popbtn, grid
 ;; TODO - проверка прав - в around-методах
 
@@ -28,21 +28,19 @@
 
 ;; RENDER DISPATCHER (ACTS)
 (defmethod restas:render-object ((designer wizard-render) (acts list))
-  (let* ((*popups*  (list (list :id "popupLogin" :title "Вход" :content (tpl:popuplogin) :left 720 :width 196)))
-         (personal  (let ((userid (hunchentoot:session-value 'userid)))
+  (let* ((personal  (let ((userid (hunchentoot:session-value 'userid)))
                       (if (null userid)
                           (tpl:loginform)
                           (tpl:logoutform (list :user (a-name (gethash userid *USER*))
                                                 :usertype (string-downcase (type-of (gethash userid *USER*)))
                                                 :userid userid))))))
-    (declare (special *popups*))
-    ;; Рендерить вложенные объекты надо до передачи в шаблон - чтобы работало *popups*!
+    ;; Рендерить вложенные объекты надо до передачи в шаблон, если есть необходимость в побочных эффектах,
+    ;; реализуемых через динамические переменные и влияющих на отображение других ключей шаблона (например *popups*)
     (let ((in-render (loop :for act :in acts :collect
                             (restas:render-object (mi 'action-render) act))))
       (tpl:root
        (list
         :mapkey         *mapkey*
-        :popups         *popups*
         :personal       personal
         :right          (if (eql 1 (length (request-list))) ;; main page
                             (tpl:right)
@@ -77,14 +75,13 @@
          :content (format nil "~A" (funcall (a-val obj))))))
 
 
-;; ACT: grid --> grid-render (fld, btn, popbtn)
+;; ACT: grid --> grid-render (fld, btn)
 (defmethod restas:render-object ((designer action-render) (obj grid))
   (let ((grid-id  (gensym "J"))
         (pager-id (gensym "P"))
         (col-titles)
         (col-models)
         (col-replace)) ;; <-- не используется, но возможно пригодится в будущем
-    (declare (special *popups*))
     (loop :for infld :in (a-fields obj) :collect
        (multiple-value-bind (col-title col-model)
            (restas:render-object (mi 'grid-render) infld) ;; <-dispatcher
@@ -231,30 +228,6 @@ function(){
   (call-next-method))
 
 
-;; POPBTN in GRID
-
-(defmethod restas:render-object ((designer grid-render) (obj popbtn))
-  (let ((in-action (a-action obj)))
-    (push
-     (list :id (a-name obj)
-           :title (a-title in-action)
-           :content (restas:render-object (mi 'action-render) in-action)
-           :left 200
-           :width 500)
-     *popups*))
-  (values
-   ""
-   `(("name"     . "")
-     ("index"    . "")
-     ("width"    . ,(a-width obj))
-     ("align"    . "center")
-     ("sortable" . nil)
-     ("editable" . nil))))
-
-(defmethod restas:render-object :around ((designer grid-render) (obj popbtn))
-  (check-perm-for-cur-user-with-dbg (a-perm obj) obj nil))
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; LINEAR-RENDER ;;;;;;;;;;;;;;
 
 
@@ -281,17 +254,10 @@ function(){
 
 
 (defmethod restas:render-object ((designer linear-render) (obj popbtn))
-  (let ((in-action (a-action obj)))
-    (push
-     (list :id (a-name obj)
-           :title (a-title in-action)
-           :content (restas:render-object (mi 'action-render) in-action)
-           :top (a-top obj)
-           :left (a-left obj)
-           :width (a-width obj)
-           :height (a-height obj))
-     *popups*))
-  (tpl:popbtnlin (list :popid (a-name obj)
+  (tpl:popbtnlin (list :id (a-name obj)
+                       :width (a-width obj)
+                       :height (a-height obj)
+                       :content (restas:render-object (mi 'action-render) (a-action obj))
                        :value (a-value obj))))
 
 (defmethod restas:render-object :around ((designer linear-render) (obj popbtn))

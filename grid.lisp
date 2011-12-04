@@ -1,8 +1,5 @@
 (in-package #:WIZARD)
 
-(defparameter *popups* nil)
-
-
 (defun json-assembly (cur-page total-page rows-per-page rows)
   "example call: (json-assembly 1 2 2 '( (1 \"one\" \"two\") (2 \"three\" \"fourth\")))"
   (json:encode-json-to-string

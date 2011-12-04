@@ -14,8 +14,41 @@
 
 
 {template loginform}
+  <div id="hidden_login" style="display:none">
+    <div class="enter_up">{\n}
+      <span><strong class="key">Авторизация</strong></span>
+      <form method="post" class="enter_form">
+        <input type="text" name="LOGIN" value="LOGIN" maxlength="64" />
+        <a href="#">Зарегистрироваться</a>
+        <input type="text" name="PASSWORD" value="PASSWORD" maxlength="64" />
+        <a href="#">Забыли пароль?</a>
+        <input type="submit" name="AUTH" value="Войти" style="background-color: #E0E0E0; width: 160px;" />
+      </form>
+    </div>
+  </div>
+
+  <script>
+  $(document).ready(function() {lb}
+    var $dialog = $('<div></div>')
+    .html($('#hidden_login').html())
+    .dialog({lb}
+      autoOpen: false,
+      title: 'Вход',
+      width: 240,
+      height: 240,
+      modal: true
+    {rb});
+    $('#opener_login').click(function() {lb}
+      $dialog.dialog('open');
+      return false;
+    {rb});
+  {rb});
+  </script>
+
+  <!-- input id="opener_{$id}" type="button" style="margin: 10px 0 10px 0;" value="{$value}" / -->
+
   <div class="enter">
-    <a class="key dot" href="#" onclick="ShowHide('popupLogin'); return false;">
+    <a id="opener_login" class="key dot" href="#">
       <span>Вход</span>
     </a>|
     <a href="/register">Регистрация</a>
@@ -172,7 +205,29 @@
 
 
 {template popbtnlin}
-  <input type="button" onclick="ShowHide('{$popid}');" style="margin: 10px 0 10px 0;" value="{$value}" />
+  <div id="hidden_{$id}" style="display:none">
+    {$content |noAutoescape}
+  </div>
+
+  <script>
+  $(document).ready(function() {lb}
+    var $dialog = $('<div></div>')
+    .html($('#hidden_{$id}').html())
+    .dialog({lb}
+      autoOpen: false,
+      title: '{$title |noAutoescape}',
+      width: {$width},
+      height: {$height},
+      modal: true
+    {rb});
+    $('#opener_{$id}').click(function() {lb}
+      $dialog.dialog('open');
+      return false;
+    {rb});
+  {rb});
+  </script>
+
+  <input id="opener_{$id}" type="button" style="margin: 10px 0 10px 0;" value="{$value}" />
 {/template}
 
 
@@ -199,65 +254,6 @@
   </table>
 {/template}
 
-
-{template dialog}
-
-<div id="poping" style="display:none">
-<p>this is inner <b>html</b></p>
-</div>
-
-<script>
-$(document).ready(function() {lb}
-  var $dialog = $('<div></div>')
-  .html($('#poping').html())
-  .dialog({lb}
-    autoOpen: false,
-    title: '{$title |noAutoescape}',
-    modal: true
-  {rb});
-  $('#opener').click(function() {lb}
-    $dialog.dialog('open');
-    return false;
-  {rb});
-{rb});
-</script>
-<button id="opener">Open the dialog</button>
-{/template}
-
-
-{template popup}
-  <div id="{$id}"{\n}
-       class="popupBox"{\n}
-       style="position: absolute; top: {$top}px; left: {$left}px; width: {$width}px; height: {$height}px;  display: none;{\n}
-              background-color: yellow; border: 1px dotted red; z-index: 1; padding: 20px;">{\n}
-    <div class="popupCancel">{\n}
-      <a href="#popupCancel" onclick="ShowHide('{$id}')">{\n}
-        <img alt="" src="/img/popups/popupCancel.gif" />{\n}
-      </a>{\n}
-    </div>{\n}
-
-    <div class="popupEnterLink">{\n}
-      <h3>{$title}</h3>{\n}
-    </div>{\n}
-
-    <div class="popupCenter">{\n}
-        {$content |noAutoescape}
-    </div>{\n}
-  </div>{\n}
-{/template}
-
-{template popuplogin}
-  <div class="enter_up">{\n}
-    <span><strong class="key">Авторизация</strong> (<a href="#" onclick="ShowHide('popupLogin'); return false;">Отменить</a>)</span>
-    <form method="post" class="enter_form">
-      <input type="text" name="LOGIN" value="LOGIN" maxlength="64" />
-      <a href="#">Зарегистрироваться</a>
-      <input type="text" name="PASSWORD" value="PASSWORD" maxlength="64" />
-      <a href="#">Забыли пароль?</a>
-      <input type="submit" name="AUTH" value="Войти" style="background-color: #E0E0E0; width: 160px;" />
-    </form>
-  </div>
-{/template}
 
 {template col}
 <div style="border: 1px solid #7F9DB9; padding: 3px 5px 3px 5px;

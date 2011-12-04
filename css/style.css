@@ -141,9 +141,6 @@ a.dot span {
 	background-color: #ededed;
 	border: 2px solid #284288;
 	padding: 10px 5px;
-	position: absolute;
-	top: 51px;
-	right: 0;
 	z-index: 1000;}
 .enter_up input, .enter_up button, .enter_up a{
 	display: block;
