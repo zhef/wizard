@@ -137,6 +137,17 @@
                                               :title "Новые технологии"
                                               :posts (posts-by-section "techno" 3)))))))
 
+  ;; Новости строительства
+  (def-plc (buildnews "/buildnews" :navpoint "Новости строительства")
+    (def-ann ("Новости строительства" post-item (remove-if-not #'(lambda (x)
+                                                                   (equal "techno" (a-section (cdr x))))
+                                                               (cons-hash-list *POST-ITEM*)))
+      (def-fld title)
+      (def-fld date)
+      (def-fld announce-photo)
+      (def-fld announce)))
+
+
   ;; Новость
   (def-plc (post "/post/:id")
     (def-pst ("%|title|%" post-item (gethash (cur-page-id) *POST-ITEM*))
@@ -151,20 +162,16 @@
 
   ;; Каталог ресурсов
   (def-plc (material "/material" :navpoint "Каталог ресурсов")
-    (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
-                                                      (a-child-categoryes
-                                                       (cdr (car (remove-if-not #'(lambda (x)
-                                                                                    (null (a-parent (cdr x))))
-                                                                                (cons-hash-list *CATEGORY*)))))))
+    (def-grd ("Группы" :all category (remove-if-not #'(lambda (x)
+                                                        (null (a-parent (cdr x))))
+                                                    (cons-hash-list *CATEGORY*)))
       (def-fld name :xref "category" :width 900)))
 
   ;; Строительная техника
   (def-plc (machine "/machine" :navpoint "Строительная техника")
-    (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
-                                                      (a-child-categoryes
-                                                       (cdr (cadr (remove-if-not #'(lambda (x)
-                                                                                     (null (a-parent (cdr x))))
-                                                                                 (cons-hash-list *CATEGORY*))))))
+    (def-grd ("Группы" :all category (remove-if-not #'(lambda (x)
+                                                        (null (a-parent (cdr x))))
+                                                    (cons-hash-list *CATEGORY*))
                        :height     400)
       (def-fld name :xref "category" :width 900)))
 

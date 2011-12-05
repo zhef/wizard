@@ -1,7 +1,7 @@
 (in-package #:wizard)
 
-(connect :user "root" :password "root" :database "ktopostavlyaet")
-;; (connect :user "root" :password "12" :database "ktopostavlyaet")
+;; (connect :user "root" :password "root" :database "ktopostavlyaet")
+(connect :user "root" :password "12" :database "ktopostavlyaet")
 (query "SET NAMES utf8")
 
 
@@ -29,7 +29,7 @@
                 :resource-type (if (equal 1 type) :material :machine)
                 :unit (gethash unit_id measures))))
     ;; Забираем категории
-    (with-query-select ("SELECT |:::| FROM `jos_gt_resource_group`"
+    (with-query-select ("SELECT |:::| FROM `jos_gt_resource_shgroup`"
                         ("id" "name" "type" "parent_id"))
       (setf (gethash id *CATEGORY*)
             (mi 'CATEGORY
@@ -44,7 +44,7 @@
                      (append-link (a-child-categoryes parent-category) category))))
              *CATEGORY*)
     ;; Забираем связи и связываем ресурсы с категориями и категории с ресурсами
-    (with-query-select ("SELECT |:::| FROM `jos_gt_resource_group_bind`"
+    (with-query-select ("SELECT |:::| FROM `jos_gt_resource_shgroup_bind`"
                         ("id" "group_id" "resource_id"))
       (let ((category (gethash group_id *CATEGORY*))
             (resource (gethash resource_id *RESOURCE*)))
