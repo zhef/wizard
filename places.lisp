@@ -652,5 +652,16 @@
   (def-plc (contacts "/contacts" :navpoint "Контакты")
     (def-tpl ("Контакты")
       (funcall (find-symbol "CONTACTS" 'tpl))))
+
+  ;; Помощь
+  (def-plc (help "/help" :navpoint "Помощь")
+    (def-tpl ("Помощь")
+      (funcall (find-symbol "HELP" 'tpl))))
+
+  ;; Мнение эксперта
+  (def-plc (expert "/expert")
+    (def-tpl ("Мнение эксперта")
+      (funcall (find-symbol "EXPERT" 'tpl))))
+
   )
 

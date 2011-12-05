@@ -767,7 +767,9 @@ If objs are of different classes the result is NIL."
   (closure-template:compile-template :common-lisp-backend #P"tpl/main.htm")
   (closure-template:compile-template :common-lisp-backend #P"tpl/about.htm")
   (closure-template:compile-template :common-lisp-backend #P"tpl/contacts.htm")
-  (closure-template:compile-template :common-lisp-backend #P"tpl/services.htm"))
+  (closure-template:compile-template :common-lisp-backend #P"tpl/services.htm")
+  (closure-template:compile-template :common-lisp-backend #P"tpl/help.htm")
+  (closure-template:compile-template :common-lisp-backend #P"tpl/expert.htm"))
 
 (defun re-path ()
   (restas:mount-submodule -css- (#:restas.directory-publisher)
