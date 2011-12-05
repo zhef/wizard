@@ -384,10 +384,18 @@
 
   ;; Список тендеров
   (def-plc (tenders "/tender" :navpoint "Тендеры")
-    (def-grd ("Тендеры" :all tender (cons-hash-list *TENDER*))
-      (def-fld name :xref "tender")
-      (def-fld status)
-      (def-fld owner)))
+    ;; (def-grd ("Тендеры" :all tender (cons-hash-list *TENDER*))
+    ;;   (def-fld name :xref "tender")
+    ;;   (def-fld status)
+    ;;   (def-fld owner))
+    (def-ann ("Тендеры" post-item (remove-if-not #'(lambda (x)
+                                                     (equal "techno" (a-section (cdr x))))
+                                                 (cons-hash-list *POST-ITEM*)))
+      (def-fld title)
+      (def-fld date)
+      (def-fld announce-photo)
+      (def-fld announce))
+    )
 
   ;; Страница тендера (поставщик может откликнуться)
   (def-plc (tender "/tender/:id")
