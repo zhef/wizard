@@ -19,10 +19,8 @@
   (let ((rs `(:file ,file :perm ,perm :name ,name)))
     `',rs))
 
-(defmacro def-pop ((title perm &key (top 100 top-p)  (left 100 left-p)  (height 100 height-p)  (width 200 width-p)) &body action)
+(defmacro def-pop ((title perm &key (height 100 height-p)  (width 200 width-p)) &body action)
   (let ((rs `(:popbtn ,title :perm ,perm)))
-    (if top-p    (nconc rs `(:top    ,top)))
-    (if left-p   (nconc rs `(:left   ,left)))
     (if height-p (nconc rs `(:height ,height)))
     (if width-p  (nconc rs `(:width  ,width)))
     (nconc rs `(:action ,@action))
@@ -45,16 +43,6 @@
   (let ((rs `(:tpl ,tpl)))
     (nconc rs `(:val ,@val))
     `',rs))
-  ;; `(mi 'tpl :title ,tpl :perm :all :val (lambda () ,@val)))
-
-;; test
-;; (print (macroexpand-1 '(def-tpl ("")
-;;                         (funcall (find-symbol "MAIN" 'tpl)
-;;                          (list :postblocks (list (list* :xrefall "/posts"
-;;                                                         :titleall "все новости"
-;;                                                         :title "Акции, скидки и предложения"
-;;                                                         :posts (posts-by-sales 3))))))))
-
 
 (defmacro def-map ((yamap) &body val)
   (let ((rs `(:yamap ,yamap)))
@@ -87,46 +75,6 @@
                  (nconc -navpoints- (list (list :link ,url :title ,navpoint))))))
      (nconc rs (list :actions (list 'quote (list ,@actions))))
      rs))
-  ;; `(let* ((-controllers- (list 'dymmy ("b1188" . ,(lambda () (WITH-OBJ-CREATE (*USER* 'SUPPLIER
-  ;;                                                                                     (LOGIN PASSWORD))
-  ;;                                                              (SETF (A-STATUS OBJ) :UNFAIR)
-  ;;                                                              (HUNCHENTOOT:REDIRECT (FORMAT NIL "/supplier/~A" ID)))))
-  ;;                              )))
-  ;;    (declare (special -controllers-)) ;; special for controllers
-  ;;    (restas:define-route ,(intern (format nil "~A-PAGE" (symbol-name name))) (,url)
-  ;;      (list ,@actions))
-  ;;    (restas:define-route ,(intern (format nil "~A-CTRS" (symbol-name name))) ("/" :method :post)
-  ;;      (let ((session (hunchentoot:start-session))
-  ;;            (acts (list -controllers-)))
-  ;;                   ;; @,(loop :for item :in (cdr -controllers-) :collect
-  ;;                    ;; (cons ,(car item) ,(lambda () ,(cdr item))))
-  ;;        (declare (ignore session))
-  ;;        (activate acts)))
-  ;;    ))
-
-
-;; test
-;; (def-plc (main "/" :navpoint "Главная")
-;;   (def-tpl ("")
-;;     (funcall (find-symbol "MAIN" 'tpl)
-;;              (list :postblocks (list (list* :xrefall "/posts"
-;;                                             :titleall "все новости"
-;;                                             :title "Акции, скидки и предложения"
-;;                                             :posts (posts-by-sales 3)))))))
-
-;; (print (macroexpand-1 '(def-plc (main "/" :navpoint "Главная")
-;;                         (def-tpl ("")
-;;                           (funcall (find-symbol "MAIN" 'tpl)
-;;                                    (list :postblocks (list (list* :xrefall "/posts"
-;;                                                                   :titleall "все новости"
-;;                                                                   :title "Акции, скидки и предложения"
-;;                                                                   :posts (posts-by-sales 3))))))
-;;                         (def-tpl ("")
-;;                           (funcall (find-symbol "MAIN" 'tpl)
-;;                                    (list :postblocks (list (list* :xrefall "/posts"
-;;                                                                   :titleall "все новости"
-;;                                                                   :title "Акции, скидки и предложения"
-;;                                                                   :posts (posts-by-sales 3)))))))))
 
 (defmacro def-asm (&body places)
   "TODO: -ajax-data-set-"
@@ -201,44 +149,42 @@
   (def-plc (anal "/analytics" :navpoint "Аналитика")
     (def-nop ("Аналитика")))
 
-  ;; ;; Каталог ресурсов
-  ;; (def-plc (material "/material" :navpoint "Каталог ресурсов")
-  ;;   (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
-  ;;                                                     (a-child-categoryes
-  ;;                                                      (cdr (car (remove-if-not #'(lambda (x)
-  ;;                                                                                   (null (a-parent (cdr x))))
-  ;;                                                                               (cons-hash-list *CATEGORY*)))))))
-  ;;     (def-fld name :xref "category" :width 900)))
+  ;; Каталог ресурсов
+  (def-plc (material "/material" :navpoint "Каталог ресурсов")
+    (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
+                                                      (a-child-categoryes
+                                                       (cdr (car (remove-if-not #'(lambda (x)
+                                                                                    (null (a-parent (cdr x))))
+                                                                                (cons-hash-list *CATEGORY*)))))))
+      (def-fld name :xref "category" :width 900)))
 
-  ;; ;; Строительная техника
-  ;; (def-plc (machine "/machine" :navpoint "Строительная техника")
-  ;;   (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
-  ;;                                                     (a-child-categoryes
-  ;;                                                      (cdr (cadr (remove-if-not #'(lambda (x)
-  ;;                                                                                    (null (a-parent (cdr x))))
-  ;;                                                                                (cons-hash-list *CATEGORY*))))))
-  ;;                      :height     400)
-  ;;     (def-fld name :xref "category" :width 900)))
+  ;; Строительная техника
+  (def-plc (machine "/machine" :navpoint "Строительная техника")
+    (def-grd ("Группы" :all category (cons-inner-objs *CATEGORY*
+                                                      (a-child-categoryes
+                                                       (cdr (cadr (remove-if-not #'(lambda (x)
+                                                                                     (null (a-parent (cdr x))))
+                                                                                 (cons-hash-list *CATEGORY*))))))
+                       :height     400)
+      (def-fld name :xref "category" :width 900)))
 
 
-  ;; ;; Каталог ресурсов - содержимое категории
-  ;; (def-plc (category "/category/:id")
-  ;;   (def-lin ("Группа" :all category :clear)
-  ;;     (def-grd ("Подгруппы" :all category (cons-inner-objs *CATEGORY* (a-child-categoryes (gethash (cur-page-id) *CATEGORY*))))
-  ;;       (def-fld name :xref "category" :width 900))
-  ;;     (def-grd ("Ресурсы группы" :all resource (remove-if-not #'(lambda (x)
-  ;;                                                                 (equal (a-category (cdr x))
-  ;;                                                                        (gethash (cur-page-id) *CATEGORY*)))
-  ;;                                                             (cons-hash-list *RESOURCE*)))
-  ;;       (def-fld name :xref "resource" :width 900))))
+  ;; Каталог ресурсов - содержимое категории
+  (def-plc (category "/category/:id")
+    (def-lin ("Группа" :all category :clear)
+      (def-grd ("Подгруппы" :all category (cons-inner-objs *CATEGORY* (a-child-categoryes (gethash (cur-page-id) *CATEGORY*))))
+        (def-fld name :xref "category" :width 900))
+      (def-grd ("Ресурсы группы" :all resource (cons-inner-objs *RESOURCE*
+                                                                (a-resources (gethash (cur-page-id) *CATEGORY*))))
+        (def-fld name :xref "resource" :width 900))))
 
-  ;; ;; Страница ресурса
-  ;; (def-plc (resource "/resource/:id")
-  ;;   (def-lin ("Ресурс" :all resource (gethash (cur-page-id) *RESOURCE*))
-  ;;     (def-fld name)
-  ;;     (def-fld category)
-  ;;     (def-fld resource-type)
-  ;;     (def-fld unit)))
+
+  ;; Страница ресурса
+  (def-plc (resource "/resource/:id")
+    (def-lin ("Ресурс" :all resource (gethash (cur-page-id) *RESOURCE*))
+      (def-fld name)
+      (def-fld resource-type)
+      (def-fld unit)))
 
 
   ;; Список поставщиков
@@ -300,7 +246,7 @@
             (remhash key *supplier-resource-price-elt*)
             (hunchentoot:redirect (hunchentoot:request-uri*)))))
       ;; upload pricelist
-      (def-pop ("Загрузить прайс-лист" :self :top 1750 :left 280 :height 200 :width 700)
+      (def-pop ("Загрузить прайс-лист" :self :height 200 :width 700)
         (def-lin ("Добавление прайс-листа" :self supplier-resource-price-elt :clear)
           (def-upl (file :all "Прайс"))
           (def-btn ("Загрузить" :all)
@@ -322,7 +268,7 @@
         (def-btn ("Удалить" :owner :width 100)
           (del-inner-obj (caar (form-data)) *SUPPLIER-RESOURCE* (a-resources (gethash (cur-page-id) *USER*)))))
       ;; Добавление ресурса
-      (def-pop ("Добавить ресурс" :self :top 2000 :left 280 :height 400 :width 900)
+      (def-pop ("Добавить ресурс" :self :height 400 :width 900)
         (def-grd ("Добавление ресурса" :all resource (cons-hash-list *RESOURCE*) :height 240)
           (def-fld name :width 700)
           (def-btn ("Добавить ресурс" :all :width 120)
@@ -339,7 +285,7 @@
         (def-btn ("Удалить" :owner :width 100)
           (del-inner-obj (caar (form-data)) *SALE* (a-sales (gethash (cur-page-id) *USER*)))))
       ;; Добавление акции
-      (def-pop ("Добавить акцию" :self :top 2200 :left 280 :height 400 :width 900)
+      (def-pop ("Добавить акцию" :self :height 400 :width 900)
         (def-lin ("Добавление акции" :all sale :clear)
           (def-fld title)
           ;; (:fld date)
@@ -423,7 +369,7 @@
         (def-fld status :width 150)
         (def-fld all :width 200)))
     (def-lin ("Объявить новый тендер" :self tender :clear)
-      (def-pop ("Объявить тендер" :self :top 1000 :left 300 :height 200 :width 600)
+      (def-pop ("Объявить тендер" :self :height 200 :width 600)
         (def-lin ("Задайте название новому тендеру" :self tender :clear)
           (def-fld name :update :all)
           (def-btn ("Продолжить создание тендера" :all)
@@ -475,7 +421,7 @@
                              (a-resources (gethash (cur-page-id) *TENDER*))))
             (hunchentoot:redirect (hunchentoot:request-uri*)))))
       ;; Добавление ресурса
-      (def-pop ("Добавить ресурс" :owner :top 400 :left 280 :height 480 :width 800)
+      (def-pop ("Добавить ресурс" :owner :height 480 :width 800)
         (def-grd ("Выберите ресурсы" :all #|'(and :active :fair)|#  resource (cons-hash-list *RESOURCE*) :height 240)
           (def-fld name :xref "resource" :width 650)
           (def-btn ("Добавить к тендеру" :all :width 140)
