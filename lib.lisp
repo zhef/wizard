@@ -832,5 +832,5 @@ If objs are of different classes the result is NIL."
 ;; (passwd)
 
 
-(defparameter *dbg* t)
+(defparameter *dbg* nil)
 

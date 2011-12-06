@@ -217,12 +217,19 @@
                                      :contacts contacts))
                 nil))))))
 
-  ;; ;; Эксперты
+  ;; Эксперты
   (loop :for i :from 1 :to 9 :do
      (push-hash *USER* 'EXPERT
        :name (format nil "Эксперт-~A" i)
        :login (format nil "exp~A" i)
-       :password (format nil "exp~A" i))))
+       :password (format nil "exp~A" i)))
+
+  ;; Застройщик
+  (push-hash *USER* 'BUILDER
+    :name "builder"
+    :login "builder"
+    :password "builder"
+  ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; TENDERS
 

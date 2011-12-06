@@ -89,7 +89,7 @@
   (def-plc (main "/" :navpoint "Главная")
     (def-tpl ("")
       (funcall (find-symbol "MAIN" 'tpl)
-               (list :postblocks (list (list* :xrefall "/posts"
+               (list :postblocks (list (list* :xrefall "/buildnews"
                                               :titleall "все новости"
                                               :title "Новости строительной сферы"
                                               :posts (posts-by-section "news" 3))
@@ -128,7 +128,7 @@
   (def-plc (posts "/posts" :navpoint "Новости")
     (def-tpl ("Новости")
       (funcall (find-symbol "POSTPAGE" 'tpl)
-               (list :postblocks (list (list* :xrefall "/posts"
+               (list :postblocks (list (list* :xrefall "/buildnews"
                                               :titleall "все новости"
                                               :title "Новости строительной сферы"
                                               :posts (posts-by-section "news" 3))
@@ -138,7 +138,7 @@
                                               :posts (posts-by-section "techno" 3)))))))
 
   ;; Новости строительства
-  (def-plc (buildnews "/buildnews" :navpoint "Новости строительства")
+  (def-plc (buildnews "/buildnews")
     (def-ann ("Новости строительства" post-item (remove-if-not #'(lambda (x)
                                                                    (equal "techno" (a-section (cdr x))))
                                                                (cons-hash-list *POST-ITEM*)))
@@ -160,16 +160,16 @@
   (def-plc (anal "/analytics" :navpoint "Аналитика")
     (def-nop ("Аналитика")))
 
-  ;; Каталог ресурсов
-  (def-plc (material "/material" :navpoint "Каталог ресурсов")
-    (def-grd ("Группы" :all category (remove-if-not #'(lambda (x)
+  ;; Каталог материалов
+  (def-plc (material "/material" :navpoint "Каталог материалов")
+    (def-grd ("Каталог материалов" :all category (remove-if-not #'(lambda (x)
                                                         (null (a-parent (cdr x))))
                                                     (cons-hash-list *CATEGORY*)))
       (def-fld name :xref "category" :width 900)))
 
   ;; Строительная техника
   (def-plc (machine "/machine" :navpoint "Строительная техника")
-    (def-grd ("Группы" :all category (remove-if-not #'(lambda (x)
+    (def-grd ("Строительная техника" :all category (remove-if-not #'(lambda (x)
                                                         (null (a-parent (cdr x))))
                                                     (cons-hash-list *CATEGORY*))
                        :height     400)
@@ -391,18 +391,19 @@
 
   ;; Список тендеров
   (def-plc (tenders "/tender" :navpoint "Тендеры")
+    (def-nop ("Тендеры")))
     ;; (def-grd ("Тендеры" :all tender (cons-hash-list *TENDER*))
     ;;   (def-fld name :xref "tender")
     ;;   (def-fld status)
     ;;   (def-fld owner))
-    (def-ann ("Тендеры" post-item (remove-if-not #'(lambda (x)
-                                                     (equal "techno" (a-section (cdr x))))
-                                                 (cons-hash-list *POST-ITEM*)))
-      (def-fld title)
-      (def-fld date)
-      (def-fld announce-photo)
-      (def-fld announce))
-    )
+    ;; (def-ann ("Тендеры" post-item (remove-if-not #'(lambda (x)
+    ;;                                                  (equal "techno" (a-section (cdr x))))
+    ;;                                              (cons-hash-list *POST-ITEM*)))
+    ;;   (def-fld title)
+    ;;   (def-fld date)
+    ;;   (def-fld announce-photo)
+    ;;   (def-fld announce))
+
 
   ;; Страница тендера (поставщик может откликнуться)
   (def-plc (tender "/tender/:id")
@@ -616,7 +617,7 @@
 
   ;; Календарь событий
   (def-plc (event "/event" :navpoint "Календарь событий")
-    (def-ann ("Анонсы" post-item (remove-if-not #'(lambda (x)
+    (def-ann ("Календарь событий" post-item (remove-if-not #'(lambda (x)
                                                     (equal "ivent" (a-section (cdr x))))
                                                 (cons-hash-list *POST-ITEM*)))
       (def-fld title)
