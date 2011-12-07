@@ -308,20 +308,21 @@
 
 
 {template postannounce}
-  <table border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px;">
+  <table class="news_list" border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px;">
     <tr>
       <td>
       <td width="1">
         {$date}
       </td>
-        <a href="/post/{$id}"><h2>{$title |noAutoescape}</h2></a>
+      <td>
+ 	    <h2><a href="/post/{$id}">{$title |noAutoescape}</a></h2>
       </td>
     </tr>
     <tr>
-      <td colspan="2">{$photoannounce  |noAutoescape}</td>
-    </tr>
-    <tr>
-      <td colspan="2">{$announce  |noAutoescape}</td>
+      <td colspan="2">
+      	{$photoannounce  |noAutoescape}
+		{$announce  |noAutoescape}
+     </td>
     </tr>
   </table>
 {/template}
