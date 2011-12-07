@@ -122,7 +122,7 @@
       (def-btn  ("Зарегистрироваться" :all :width 120)
         (with-obj-create (*USER* 'SUPPLIER (login password email name inn ogrn juridical-address actual-address contact-person contact-phone))
           (setf (a-status obj) :unfair)
-          (hunchentoot:redirect (format nil "/supplier/~A" id))))))
+          (redirect (format nil "/supplier/~A" id))))))
 
   ;; Новости
   (def-plc (posts "/posts" :navpoint "Новости")
@@ -158,7 +158,27 @@
 
   ;; Аналитика
   (def-plc (anal "/analytics" :navpoint "Аналитика")
-    (def-nop ("Аналитика")))
+    (def-grd ("Ресурс" :all resource (cons-hash-list *RESOURCE*))
+      (def-fld name :width 850)
+      (def-btn ("Отчет" :all :width 70)
+        (redirect (format nil "/analform/~A" (get-btn-key (caar (form-data))))))))
+    ;; (def-nop ("Аналитика")))
+  ;; http://83.68.35.37/component/analytics?task=gengraph&begin=01-12-2007&end=16-11-2011&pt=0&scale=1&resourceid=40397
+
+  (def-plc (analform "/analform/:id")
+    (def-tpl ("Форма аналитики")
+      (funcall (find-symbol "ANALFORM" 'tpl)
+               (list :id (cur-page-id)
+                     :resource (a-name (gethash (cur-page-id) *RESOURCE*))
+                     :result (if (null (hunchentoot:get-parameter "resourceid"))
+                                 ""
+                                 (format nil "<img src=\"http://83.68.35.37/component/analytics?~A\" />"
+                                         (format nil "task=gengraph&begin=~A&end=~A&pt=~A&scale=~A&resourceid=~A"
+                                                 (hunchentoot:get-parameter "begin")
+                                                 (hunchentoot:get-parameter "end")
+                                                 (hunchentoot:get-parameter "pt")
+                                                 (hunchentoot:get-parameter "scale")
+                                                 (hunchentoot:get-parameter "resourceid"))))))))
 
   ;; Каталог материалов
   (def-plc (material "/material" :navpoint "Каталог материалов")
@@ -227,11 +247,11 @@
           (with-obj-save obj
             NAME JURIDICAL-ADDRESS ACTUAL-ADDRESS CONTACTS EMAIL SITE HEADS INN KPP OGRN BANK-NAME
             BIK CORRESP-ACCOUNT CLIENT-ACCOUNT ADDRESSES CONTACT-PERSON contact-phone contact-email)
-          (hunchentoot:redirect (hunchentoot:request-uri*))))
+          (redirect (hunchentoot:request-uri*))))
       (def-btn  ("Отправить заявку на добросовестность" '(and :self :unfair))
         (progn
           (setf (a-status (gethash (cur-page-id) *USER*)) :request)
-          (hunchentoot:redirect (hunchentoot:request-uri*))))
+          (redirect (hunchentoot:request-uri*))))
       ;; affiliates
       (def-grd ("Адреса филиалов и магазинов" :all supplier-affiliate
                                               (cons-inner-objs *supplier-affiliate* (a-affiliates (gethash (cur-page-id) *user*))))
@@ -251,7 +271,7 @@
                   (remove-if #'(lambda (x) (equal x hobj))
                              (a-price-elts (cur-user))))
             (remhash key *supplier-resource-price-elt*)
-            (hunchentoot:redirect (hunchentoot:request-uri*)))))
+            (redirect (hunchentoot:request-uri*)))))
       ;; upload pricelist
       (def-pop ("Загрузить прайс-лист" :self :height 200 :width 700)
         (def-lin ("Добавление прайс-листа" :self supplier-resource-price-elt :clear)
@@ -267,7 +287,7 @@
                      :unit  (nth 2 src)
                      :price (nth 3 src)
                      :date  (decode-date (get-universal-time)))))
-              (hunchentoot:redirect (hunchentoot:request-uri*))))))
+              (redirect (hunchentoot:request-uri*))))))
       ;; resources
       (def-grd ("Ресурсы для конкурсов" :all supplier-resource
                                         (cons-inner-objs *SUPPLIER-RESOURCE* (a-resources (gethash (cur-page-id) *USER*))))
@@ -285,7 +305,7 @@
                 :owner     owner
                 :resource  resource
                 :price     0)
-              (hunchentoot:redirect (hunchentoot:request-uri*))))))
+              (redirect (hunchentoot:request-uri*))))))
       ;; sales
       (def-grd ("Акции" :all sale (cons-inner-objs *SALE* (a-sales (gethash (cur-page-id) *USER*))))
         (def-fld title :width 800 :xref "sale")
@@ -307,7 +327,7 @@
               (add-inner-obj *SALE* 'SALE (a-sales owner)
                 :owner     owner
                 :title     (form-fld title))
-              (hunchentoot:redirect (hunchentoot:request-uri*))))))
+              (redirect (hunchentoot:request-uri*))))))
                                         ; offers
       (def-grd ("Список заявок на тендеры" :logged offer (cons-inner-objs *OFFER* (a-offers (gethash (cur-page-id) *USER*))))
         (def-fld tender :xref "offer" :width 680)
@@ -369,7 +389,7 @@
                 (progn
                   (with-obj-save (gethash (cur-page-id) *USER*)
                     NAME JURIDICAL-ADDRESS INN KPP OGRN BANK-NAME BIK CORRESP-ACCOUNT CLIENT-ACCOUNT RATING)
-                  (hunchentoot:redirect (hunchentoot:request-uri*))))
+                  (redirect (hunchentoot:request-uri*))))
       ;; tenders
       (def-grd ("Тендеры застройщика" :all tender (cons-inner-objs *TENDER* (a-tenders (gethash (cur-page-id) *USER*))))
         (def-fld name :xref "tender" :width 550)
@@ -387,7 +407,7 @@
                 ;; Связываем с владельцем
                 (append-link (a-tenders owner) obj)
                 ;; Редирект
-                (hunchentoot:redirect (format nil "/tender/~A" id)))))))))
+                (redirect (format nil "/tender/~A" id)))))))))
 
   ;; Список тендеров
   (def-plc (tenders "/tender" :navpoint "Тендеры")
@@ -421,7 +441,7 @@
         (let ((obj (gethash (cur-page-id) *TENDER*)))
           (with-obj-save obj
             name all claim analize interview result)
-          (hunchentoot:redirect (hunchentoot:request-uri*))))
+          (redirect (hunchentoot:request-uri*))))
       ;; resources
       (def-grd ("Ресурсы тендера" :all tender-resource (cons-inner-objs *TENDER-RESOURCE* (a-resources (gethash (cur-page-id) *TENDER*))))
         (def-fld resource :xref "tender-resource" :width 400)
@@ -435,7 +455,7 @@
                   (remove-if #'(lambda (x)
                                  (equal x etalon))
                              (a-resources (gethash (cur-page-id) *TENDER*))))
-            (hunchentoot:redirect (hunchentoot:request-uri*)))))
+            (redirect (hunchentoot:request-uri*)))))
       ;; Добавление ресурса
       (def-pop ("Добавить ресурс" :owner :height 480 :width 800)
         (def-grd ("Выберите ресурсы" :all #|'(and :active :fair)|#  resource (cons-hash-list *RESOURCE*) :height 240)
@@ -449,7 +469,7 @@
                 (setf (a-tender obj) tender)
                 (setf (a-resource obj) resource)
                 (append-link (a-resources tender) elt)
-                (hunchentoot:redirect (format nil "/tender-resource/~A" id)))))))
+                (redirect (format nil "/tender-resource/~A" id)))))))
       ;; documents
       (def-grd ("Документы тендера" :all document (cons-inner-objs *DOCUMENT* (a-documents (gethash (cur-page-id) *TENDER*))))
         (def-fld name)
@@ -508,13 +528,13 @@
               (setf (a-tender obj) (gethash (cur-page-id) *TENDER*))
               (setf (a-status obj) :open)
               (append-link (a-offers (gethash (cur-page-id) *TENDER*)) offer)
-              (hunchentoot:redirect (format nil "/offer/~A" id))))))
+              (redirect (format nil "/offer/~A" id))))))
       (def-pop ("Отменить тендер" :all #|:owner|#)
         (def-lin ("Действительно отменить?" :all #|:owner|# tender :clear)
           (def-btn ("Подтверждаю отмену" :all)
             (progn
               (setf (a-status (gethash (cur-page-id) *TENDER*)) :cancelled)
-              (hunchentoot:redirect (hunchentoot:request-uri*))))))
+              (redirect (hunchentoot:request-uri*))))))
       ))
 
   ;; Ресурс тендера
@@ -534,12 +554,12 @@
           (setf (a-basic obj) (not (null (cdr (assoc "BASIC" (form-data) :test #'equal)))))
           (with-obj-save obj
             quantity price price-date comment)
-          (hunchentoot:redirect (hunchentoot:request-uri*)))))
+          (redirect (hunchentoot:request-uri*)))))
     (def-lin ("Вернуться к тендеру" :all tender-resource (gethash (cur-page-id) *TENDER-RESOURCE*))
       (def-btn ("Вернутся к тендеру" :all)
         (let* ((tender    (a-tender (gethash (cur-page-id) *TENDER-RESOURCE*)))
                (tender-id (caar (remove-if-not #'(lambda (x) (equal tender (cdr x))) (cons-hash-list *TENDER*)))))
-          (hunchentoot:redirect (format nil "/tender/~A" tender-id))))))
+          (redirect (format nil "/tender/~A" tender-id))))))
 
   ;; Заявки на тендер
   (def-plc (offers "/offers")
@@ -549,7 +569,7 @@
       (def-btn ("Страница заявки" :all :width 120)
         (to "/offer/~A" (caar (form-data))))
       (def-btn ("Страница тендера" :all :width 120)
-        (HUNCHENTOOT:REDIRECT
+        (REDIRECT
          (FORMAT NIL "/tender/~A" (caar (cons-inner-objs *tender* (list (a-tender (gethash (get-btn-key (caar (form-data))) *offer*))))))))))
 
   ;; Страница заявки на тендер
@@ -589,7 +609,7 @@
                   (setf (a-marked obj) nil)
                   (setf (a-rank obj) 0)
                   (append-link (a-resources offer) obj)
-                  (hunchentoot:redirect (format nil "/offer-resource/~A" id))))))))))
+                  (redirect (format nil "/offer-resource/~A" id))))))))))
 
   ;; Страница ресурса заявки
   (def-plc (offer-resource "/offer-resource/:id")
@@ -608,12 +628,12 @@
           (setf (a-marked obj) (not (null (cdr (assoc "MARKED" (form-data) :test #'equal)))))
           (with-obj-save obj
             quantity price price-result comment delivery delivery-price rank)
-          (hunchentoot:redirect (hunchentoot:request-uri*)))))
+          (redirect (hunchentoot:request-uri*)))))
     (def-lin ("Вернуться к заявке" :all offer-resource :clear)
       (def-btn ("Вернутся к заявке" :all)
         (let* ((offer    (a-offer (gethash (cur-page-id) *OFFER-RESOURCE*)))
                (offer-id (caar (remove-if-not #'(lambda (x) (equal offer (cdr x))) (cons-hash-list *OFFER*)))))
-          (hunchentoot:redirect (format nil "/offer/~A" offer-id))))))
+          (redirect (format nil "/offer/~A" offer-id))))))
 
   ;; Календарь событий
   (def-plc (event "/event" :navpoint "Календарь событий")

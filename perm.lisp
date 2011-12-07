@@ -8,8 +8,8 @@
        (return-from auth
          (progn
            (setf (hunchentoot:session-value 'userid) key)
-           (hunchentoot:redirect (hunchentoot:request-uri*))))))
-  (hunchentoot:redirect (hunchentoot:request-uri*)))
+           (redirect (hunchentoot:request-uri*))))))
+  (redirect (hunchentoot:request-uri*)))
 
 
 ;; Перед вызовом действия (даже если это показ поля) в процедуру проверки прав передается правило, субьект действия (пользователь)

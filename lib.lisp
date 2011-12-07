@@ -3,6 +3,19 @@
 
 (in-package #:WIZARD)
 
+;; gdestroytorg.ru
+(defparameter *dbg* nil)
+(defparameter *host* "http://gdestroytorg.ru")
+(defparameter *mapkey*  "AKd6p04BAAAAN6JBTQIAVVk3tt2BoBL03SxnV1Q883Tx2N8AAAAAAAAAAAAg4NNZvAEKtUxUl-gPDH65Ud3jMA==")
+(defparameter *db-password* "12")
+
+;; myip
+(defparameter *dbg* t)
+(defparameter *host* "")
+(defparameter *mapkey*  "AKOwoE4BAAAAzn_UAAQAmXdybST_B2x-mnLcto5q_tTa2B4AAAAAAAAAAAAtC7dNu632YaEJuBnHz1d5g8a1IQ==")
+(defparameter *db-password* "root")
+
+
 
 (defun decode-date (timestamp)
   (multiple-value-bind (second minute hour date month year)
@@ -14,9 +27,15 @@
             month
             year)))
 
-
 (defmacro err (var)
   `(error (format nil "ERR:[~A]" (bprint ,var))))
+
+(defun redirect (uri)
+  (hunchentoot:redirect (format nil "~A~A" *host* uri)))
+
+(defmacro to (format-str form-elt)
+  `(redirect
+    (format nil ,format-str (get-btn-key ,form-elt))))
 
 (defmacro with-query-select ((query-str fields) &body body)
   (let* ((fld-str (format nil "~{`~A`~^, ~}" fields))
@@ -83,7 +102,7 @@
                             (equal x ,hobj))
                         ,inner-lst))
        (remhash ,key ,hash)
-       (hunchentoot:redirect (hunchentoot:request-uri*)))))
+       (redirect (hunchentoot:request-uri*)))))
 
 (defmacro add-inner-obj (hash class inner-lst &body inits)
   (with-gensyms (obj id)
@@ -95,10 +114,6 @@
 
 (defmacro append-link (lst elt)
   `(setf ,lst (append ,lst (list ,elt))))
-
-(defmacro to (format-str form-elt)
-  `(hunchentoot:redirect
-    (format nil ,format-str (get-btn-key ,form-elt))))
 
 (defmacro bprint (var)
   `(subseq (with-output-to-string (*standard-output*)  (pprint ,var)) 1))
@@ -213,7 +228,7 @@
     (return-from activate
       (progn
         (hunchentoot:delete-session-value 'userid)
-        (hunchentoot:redirect (hunchentoot:request-uri*)))))
+        (redirect (hunchentoot:request-uri*)))))
   (with-output-to-string (*standard-output*)
     (format t "form-data: ")
     (print (form-data))
@@ -546,11 +561,6 @@ If objs are of different classes the result is NIL."
 
 ;; geo-coder
 
-;; gdestroytorg.ru
-(defparameter *mapkey*  "AKd6p04BAAAAN6JBTQIAVVk3tt2BoBL03SxnV1Q883Tx2N8AAAAAAAAAAAAg4NNZvAEKtUxUl-gPDH65Ud3jMA==")
-;; myip
-(defparameter *mapkey*  "AKOwoE4BAAAAzn_UAAQAmXdybST_B2x-mnLcto5q_tTa2B4AAAAAAAAAAAAtC7dNu632YaEJuBnHz1d5g8a1IQ==")
-
 (setf drakma:*drakma-default-external-format* :utf-8)
 
 (defun geo-coder (addr)
@@ -831,6 +841,4 @@ If objs are of different classes the result is NIL."
 
 ;; (passwd)
 
-
-(defparameter *dbg* nil)
 

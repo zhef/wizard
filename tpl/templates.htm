@@ -343,3 +343,56 @@
     </tr>
   </table>
 {/template}
+
+
+{template analform}
+  <form method="get">
+    {$resource}<br />
+    <input type="hidden" name="resourceid" value="{$id}" />
+    <table>
+      <tbody>
+        <tr class="even">
+          <td class="filter_type">За период:</td>
+          <td class="filter_input">
+            <span>с</span>
+            <input name="begin" id="date_begin" value="01-01-2011" class="editdatefield hasDatepicker" type="text">
+            <span>по</span>
+            <input name="end"   id="date_end" value="07-12-2011" class="editdatefield hasDatepicker" type="text">
+          </td>
+        </tr>
+        <tr style="display: none;" class="odd" id="filter_scale">
+          <td class="filter_type">Масштаб:</td>
+          <td class="filter_input">
+            <select name="scale" id="scale" size="1">
+              <option value="1" selected="selected">по месяцам</option>
+              <option value="3">по кварталам</option>
+              <option value="12">по годам</option>
+            </select>
+          </td>
+        </tr>
+        <tr class="even">
+          <td class="filter_type">Тип цены:</td>
+          <td class="filter_input">
+            <select name="pt" id="estimate" size="1">
+              <option value="1">сметная</option>
+              <option value="0">оптовая</option>
+            </select>
+          </td>
+        </tr>
+        <tr class="odd">
+          <td class="filter_type">Вид:</td>
+          <td class="filter_input">
+            <select id="viewtype" size="1">
+              <!-- option value="0">таблица</option -->
+              <option value="1">график</option>
+              <option value="2">столбчатая диаграмма</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <input type="submit" />
+    <br />
+    {$result |noAutoescape}
+  </form>
+{/template}

@@ -15,7 +15,7 @@
 ;;                                  (with-obj-save obj
 ;;                                    LOGIN
 ;;                                    PASSWORD)
-;;                                  (hunchentoot:redirect (hunchentoot:request-uri*))))
+;;                                  (redirect (hunchentoot:request-uri*))))
 ;;                          (:btn   "Кнопка всплывающего окна"
 ;;                           :perm  :all
 ;;                           :popup '(:linear            "Заголовок всплывающего окна"
@@ -30,7 +30,7 @@
 ;;                                                                 (with-obj-save obj
 ;;                                                                   LOGIN
 ;;                                                                   PASSWORD)
-;; (hunchentoot:redirect (hunchentoot:request-uri*)))))))))
+;; (redirect (hunchentoot:request-uri*)))))))))
 ;;    (:linear            "Создать аккаунт эксперта"
 ;;     :perm              :admin
 ;;     :entity            expert
@@ -45,7 +45,7 @@
 ;;                                    :login (cdr (assoc "LOGIN" (form-data) :test #'equal))
 ;;                                    :password (cdr (assoc "PASSWORD" (form-data) :test #'equal))
 ;;                                    :name (cdr (assoc "NAME" (form-data) :test #'equal)))
-;;                                  (hunchentoot:redirect (hunchentoot:request-uri*))))))
+;;                                  (redirect (hunchentoot:request-uri*))))))
 ;;    (:grid             "Эксперты"
 ;;     :perm              :admin
 ;;     :entity            expert
@@ -58,7 +58,7 @@
 ;;                           :perm :all
 ;;                           :act  (let ((key (get-btn-key (caar (form-data)))))
 ;;                                   (remhash key *USER*)
-;;                                   (hunchentoot:redirect (hunchentoot:request-uri*))))
+;;                                   (redirect (hunchentoot:request-uri*))))
 ;;                          (:btn "Страница эксперта"
 ;;                           :perm :all
 ;;                           :act (to "/expert/~A" (caar (form-data))))))
@@ -76,7 +76,7 @@
 ;;                           :perm :all
 ;;                           :act (let ((key (get-btn-key (caar (form-data)))))
 ;;                                  (setf (a-status (gethash key *USER*)) :fair)
-;;                                  (hunchentoot:redirect (hunchentoot:request-uri*))))))))
+;;                                  (redirect (hunchentoot:request-uri*))))))))
 
 ;; ;; Список экспертов
 ;; (:place                experts

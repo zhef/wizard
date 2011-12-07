@@ -1,7 +1,6 @@
 (in-package #:wizard)
 
-;; (connect :user "root" :password "root" :database "ktopostavlyaet")
-(connect :user "root" :password "12" :database "ktopostavlyaet")
+(connect :user "root" :password *db-password* :database "ktopostavlyaet")
 (query "SET NAMES utf8")
 
 
@@ -379,7 +378,7 @@
 (let ((o (push-hash *SALE* 'SALE
            :title     "Распродажа со складов \"ГипроРусь\""
            :owner     (gethash 2 *USER*)
-           :announce  "Беспрецендентное предложени - гипсокартон по цене туалетной бумаги. До 3000 листов в одни руки. Скидки постоянным покупателям. Самовывоз. Оплата по безналу.")))
+           :announce  "Беспрецендентное предложени - гипсокартон по низкой цене. До 3000 листов в одни руки. Скидки постоянным покупателям. Самовывоз. Оплата по безналу.")))
   (append-link (a-sales (gethash 2 *USER*)) o))
 
 

@@ -129,10 +129,11 @@
               (append (a-tenders owner)
                       (list tender)))
         ;; Редирект
-        (hunchentoot:redirect
+        (redirect
          (format nil "/tender/~A" id)))
       ;; else
       (list
        (mi 'tpl :title "Недостаточно прав" :perm :all
            :val (lambda ()
                   "Только залогиненные застройщики могут объявлять тендер!")))))
+
