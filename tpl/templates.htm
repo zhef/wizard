@@ -216,7 +216,7 @@
     .dialog({lb}
       autoOpen: false,
       title: '{$title |noAutoescape}',
-      width: {$width},
+      width:  {$width},
       height: {$height},
       modal: true
     {rb});
@@ -232,9 +232,10 @@
 
 
 {template frmobj}
-  <form method="post" enctype="multipart/form-data">
-    {$content |noAutoescape}
-  </form>
+  {\n}
+  <form method="post" enctype="multipart/form-data">{\n}
+    {$content |noAutoescape}{\n}
+  </form>{\n}
 {/template}
 
 

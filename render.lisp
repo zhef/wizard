@@ -141,6 +141,18 @@ function(){
   (check-perm-for-cur-user-with-dbg (a-perm obj) obj ""))
 
 
+;; ACT: popbtn
+(defmethod restas:render-object ((designer action-render) (obj popbtn)) ;; Только внутри action-render иначе будут вложенные теги <form>!
+  (tpl:popbtnlin (list :id (a-name obj)
+                       :width (a-width obj)
+                       :height (a-height obj)
+                       :content (restas:render-object (mi 'action-render) (a-action obj))
+                       :value (a-value obj))))
+
+(defmethod restas:render-object :around ((designer action-render) (obj popbtn))
+  (check-perm-for-cur-user-with-dbg (a-perm obj) obj ""))
+
+
 ;; ACT: announce
 (defmethod restas:render-object ((designer action-render) (obj announce))
   (format nil "~{~A~}"
@@ -166,12 +178,6 @@ function(){
 
 ;; ACT: yamap
 (defmethod restas:render-object ((designer action-render) (obj yamap))
-  ;; debug demonstation difference addrs
-  ;; (setf (a-mark-points obj)
-  ;;       (append (a-mark-points obj)
-  ;;               (list
-  ;;                (mi 'yapoint :title "1" :link "2" :descr "3" :coord (geo-coder "Санкт-Петербург Екатерининский проспект 4")))))
-  ;; (error (a-mark-points obj))
   (tpl:map (list :center (a-center-coord obj)
                  :placemarks (format nil "~{~A~}"
                                      (mapcar #'(lambda (point)
@@ -250,17 +256,6 @@ function(){
       (tpl:btnlin (list :name (a-name obj) :value (a-value obj))))
 
 (defmethod restas:render-object :around ((designer linear-render) (obj btn))
-  (check-perm-for-cur-user-with-dbg (a-perm obj) obj ""))
-
-
-(defmethod restas:render-object ((designer linear-render) (obj popbtn))
-  (tpl:popbtnlin (list :id (a-name obj)
-                       :width (a-width obj)
-                       :height (a-height obj)
-                       :content (restas:render-object (mi 'action-render) (a-action obj))
-                       :value (a-value obj))))
-
-(defmethod restas:render-object :around ((designer linear-render) (obj popbtn))
   (check-perm-for-cur-user-with-dbg (a-perm obj) obj ""))
 
 

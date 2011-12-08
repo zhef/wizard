@@ -1,3 +1,7 @@
+(mapcar #'(lambda (x)
+            (asdf:oos 'asdf:load-op x))
+        '(:cl-mysql :cl-store :restas :restas-directory-publisher :cl-json :cl-ppcre :cl-smtp :cl-mime :arnesi :closer-mop :drakma))
+
 (restas:define-module #:WIZARD
     (:use #:CL #:ITER #:cl-mysql #:alexandria #:anaphora #:ppcre))
 
@@ -9,11 +13,11 @@
 (defparameter *mapkey*  "AKd6p04BAAAAN6JBTQIAVVk3tt2BoBL03SxnV1Q883Tx2N8AAAAAAAAAAAAg4NNZvAEKtUxUl-gPDH65Ud3jMA==")
 (defparameter *db-password* "12")
 
-;; myip
-(defparameter *dbg* t)
-(defparameter *host* "")
-(defparameter *mapkey*  "AKOwoE4BAAAAzn_UAAQAmXdybST_B2x-mnLcto5q_tTa2B4AAAAAAAAAAAAtC7dNu632YaEJuBnHz1d5g8a1IQ==")
-(defparameter *db-password* "root")
+;; ;; myip
+;; (defparameter *dbg* t)
+;; (defparameter *host* "")
+;; (defparameter *mapkey*  "AKOwoE4BAAAAzn_UAAQAmXdybST_B2x-mnLcto5q_tTa2B4AAAAAAAAAAAAtC7dNu632YaEJuBnHz1d5g8a1IQ==")
+;; (defparameter *db-password* "root")
 
 
 
@@ -564,21 +568,19 @@ If objs are of different classes the result is NIL."
 (setf drakma:*drakma-default-external-format* :utf-8)
 
 (defun geo-coder (addr)
-  "0 0"
-  ;; (multiple-value-bind (body status headers ret-uri stream must-close reason)
-  ;;     (drakma:http-request "http://geocode-maps.yandex.ru/1.x/"
-  ;;                          :method :get
-  ;;                          :parameters `(("geocode" . ,addr)
-  ;;                                        ("key" . ,(format nil "~A" *mapkey*))
-  ;;                                        ("format" . "json")))
-  ;;   (declare (ignore status headers ret-uri stream must-close reason))
-  ;;   (let ((tree (json:decode-json-from-string
-  ;;                (sb-ext:octets-to-string body))))
-  ;;     ;; (print tree)
-  ;;     (if-it (maybecall tree #'car #'cdr #'car #'cdr #'cdr #'car #'cdr #'caar #'cdr #'fourth #'cdr #'car #'cdr)
-  ;;            (format nil "~{~A~^, ~}" (split-sequence:split-sequence #\Space it))
-  ;;            nil)))
-  )
+  (multiple-value-bind (body status headers ret-uri stream must-close reason)
+      (drakma:http-request "http://geocode-maps.yandex.ru/1.x/"
+                           :method :get
+                           :parameters `(("geocode" . ,addr)
+                                         ("key" . ,(format nil "~A" *mapkey*))
+                                         ("format" . "json")))
+    (declare (ignore status headers ret-uri stream must-close reason))
+    (let ((tree (json:decode-json-from-string
+                 (sb-ext:octets-to-string body))))
+      ;; (print tree)
+      (if-it (maybecall tree #'car #'cdr #'car #'cdr #'cdr #'car #'cdr #'caar #'cdr #'fourth #'cdr #'car #'cdr)
+             (format nil "~{~A~^, ~}" (split-sequence:split-sequence #\Space it))
+             nil))))
 
 
 ;; with-defclass

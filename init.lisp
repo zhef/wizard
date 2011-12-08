@@ -173,7 +173,6 @@
                                                      :bik bik*
                                                      :corresp-account correspondent_account*
                                                      :client-account sattlement_account*
-                                                     :addresses (format nil "~{~A ~}" divisions)
                                                      :status (if (equal 1 is_diligent)  :fair  :unfair)
                                                      :juridical-address juridical-address
                                                      :actual-address actual-address

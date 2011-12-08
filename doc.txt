@@ -328,3 +328,6 @@ http://weitz.de/hunchentoot/#acceptor-dispatch-request
 [17:39] Macro> а если (foo) вернёт число или строку - то нужно чтобы
 была строка или число напечатано
 [17:41] jsv> ~@[~a~]
+
+[2011-12-08 01:05] LinkFly> в SBCL переданные параметры можно получить
+так: SB-EXT:*POSIX-ARGV*

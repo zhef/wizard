@@ -66,7 +66,6 @@
       (bik                 "Банковский идентификационный код"  (:str))
       (corresp-account     "Корреспондентский счет"            (:str))
       (client-account      "Расчетный счет"                    (:str))
-      (addresses           "Адреса офисов и магазинов"         (:txt))
       (affiliates          "Адреса офисов и магазинов"         (:list-of-links supplier-affiliate))
       (contact-person      "Контактное лицо"                   (:str))
       (contact-phone       "Контактный телефон"                (:str))
