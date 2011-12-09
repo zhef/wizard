@@ -64,8 +64,8 @@
            ;; Mixed
            (:self      (destructuring-bind (root &optional obj-type id) ;; Залогиненный пользователь (subj) и просматриваемая страница (request-list)
                            (request-list)                     ;; указывают на один объект.
-                         (if (and (not (null obj-type))       ;; Этот вид прав не должен использоваться с ajax-объектамми, например grid,
-                                  (not (null id))             ;; так как requuest-list для них не указывает на объект!
+                         (if (and obj-type                    ;; Этот вид прав не должен использоваться с ajax-объектамми, например grid,
+                                  id             ;; так как requuest-list для них не указывает на объект!
                                   (equal id (format nil "~A" (parse-integer id :junk-allowed t)))
                                   (string= (string-upcase obj-type) (type-of (gethash (parse-integer id :junk-allowed t) *USER*)))
                                   (equal subj (gethash (parse-integer id :junk-allowed t) *USER*)))
@@ -77,8 +77,8 @@
                            nil))
                        ;; (destructuring-bind (root obj-type id)
                        ;;     (request-list)
-                       ;;   (if (and (not (null obj-type))
-                       ;;            (not (null id))
+                       ;;   (if (and obj-type
+                       ;;            id
                        ;;            (equal id (format nil "~A" (parse-integer id :junk-allowed t))))
                        ;;       (let ((hash (string-upcase (format nil "*~A*"  obj-type)))
                        ;;             (target))

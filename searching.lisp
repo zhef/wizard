@@ -29,7 +29,7 @@
        (loop :for supplier-resource :in (a-resources supplier) :collect
           (let ((resource (a-resource supplier-resource)))
             (unless (null resource)
-              (if (not (null (search text (string-downcase (string-trim '(#\Space #\Tab #\Newline) (a-name resource))))))
+              (if (search text (string-downcase (string-trim '(#\Space #\Tab #\Newline) (a-name resource))))
                   (progn
                     (push (cons id supplier) results)
                     (return)))))))
@@ -61,7 +61,7 @@
        (loop :for supplier-resource :in (a-resources supplier) :collect
           (let ((resource (a-resource supplier-resource)))
             (unless (null resource)
-              (if (not (null (search text (string-downcase (string-trim '(#\Space #\Tab #\Newline) (a-name resource))))))
+              (if (search text (string-downcase (string-trim '(#\Space #\Tab #\Newline) (a-name resource))))
                   (progn
                     (push (cons id supplier) results)
                     (return)))))))
