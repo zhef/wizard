@@ -207,7 +207,7 @@
   (setf *ajaxdataset* nil)
   (loop :for place :in *places* :do
      ;; *param-id-flag*
-     (setf *param-id-flag* (not (null (search "/:id" (getf place :url) :test #'equal))))
+     (setf *param-id-flag* (search "/:id" (getf place :url) :test #'equal))
      ;; clear *controllers*
      (setf *controllers* nil)
      ;; base route
