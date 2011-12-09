@@ -65,36 +65,31 @@
            (:self      (destructuring-bind (root &optional obj-type id) ;; Залогиненный пользователь (subj) и просматриваемая страница (request-list)
                            (request-list)                     ;; указывают на один объект.
                          (if (and obj-type                    ;; Этот вид прав не должен использоваться с ajax-объектамми, например grid,
-                                  id             ;; так как requuest-list для них не указывает на объект!
+                                  id                          ;; так как requuest-list для них не указывает на объект!
                                   (equal id (format nil "~A" (parse-integer id :junk-allowed t)))
                                   (string= (string-upcase obj-type) (type-of (gethash (parse-integer id :junk-allowed t) *USER*)))
                                   (equal subj (gethash (parse-integer id :junk-allowed t) *USER*)))
                              t
                              nil)))
-           (:owner     (if (and (slot-exists-p obj 'owner)    ;; Объект, над которым совершается действие имеет поле owner текущего пользователя
-                                (equal subj (a-owner obj)))
-                           t
-                           nil))
-                       ;; (destructuring-bind (root obj-type id)
-                       ;;     (request-list)
-                       ;;   (if (and obj-type
-                       ;;            id
-                       ;;            (equal id (format nil "~A" (parse-integer id :junk-allowed t))))
-                       ;;       (let ((hash (string-upcase (format nil "*~A*"  obj-type)))
-                       ;;             (target))
-                       ;;         (if (or (string= hash "*SUPPLIER*")
-                       ;;                 (string= hash "*BUILDER*")
-                       ;;                 (string= hash "*ADMIN*")
-                       ;;                 (string= hash "*EXPERT*"))
-                       ;;             (setf hash "*USER*"))
-                       ;;         (setf hash (intern hash :wizard))
-                       ;;         (setf target (gethash (parse-integer id :junk-allowed t) (symbol-value hash)))
-                       ;;         (if (and (slot-exists-p target 'owner)
-                       ;;                  (equal (a-owner target) subj))
-                       ;;             t
-                       ;;             nil))))
-           )
-         )
+           (:owner     (destructuring-bind (root &optional obj-type id) ;; Просматриваемая страница (request-list) указывает на объект, содержащий
+                           (request-list)                               ;; поле owner, который указывает на залогиненного пользователя (subj)
+                         (if (and obj-type
+                                  id
+                                  (equal id (format nil "~A" (parse-integer id :junk-allowed t))))
+                             (let ((hash (string-upcase (format nil "*~A*"  obj-type)))
+                                   (target))
+                               (if (or (string= hash "*SUPPLIER*")
+                                       (string= hash "*BUILDER*")
+                                       (string= hash "*ADMIN*")
+                                       (string= hash "*EXPERT*"))
+                                   (setf hash "*USER*"))
+                               (setf hash (intern hash :wizard))
+                               (setf target (gethash (parse-integer id :junk-allowed t) (symbol-value hash)))
+                               (if (and (slot-exists-p target 'owner)
+                                        (equal (a-owner target) subj))
+                                   t
+                                   nil)))))
+           ))
         (t (error (format nil "error perm predicate: ~A" perm)))))
 
 

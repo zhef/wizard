@@ -223,11 +223,13 @@
        :password (format nil "exp~A" i)))
 
   ;; Застройщик
-  (push-hash *USER* 'BUILDER
-    :name "builder"
-    :login "builder"
-    :password "builder"
-  ))
+  (setf (gethash 9999999 *USER*)
+        (mi 'BUILDER
+            :name "builder"
+            :login "builder"
+            :password "builder"
+            ))
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; TENDERS
 
