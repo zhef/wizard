@@ -1,6 +1,6 @@
-(mapcar #'(lambda (x)
-            (asdf:oos 'asdf:load-op x))
-        '(:cl-mysql :cl-store :restas :restas-directory-publisher :cl-json :cl-ppcre :cl-smtp :cl-mime :arnesi :closer-mop :drakma))
+;; (mapcar #'(lambda (x)
+;;             (asdf:oos 'asdf:load-op x))
+;;         '(:cl-mysql :cl-store :restas :restas-directory-publisher :cl-json :cl-ppcre :cl-smtp :cl-mime :arnesi :closer-mop :drakma))
 
 (restas:define-module #:WIZARD
     (:use #:CL #:ITER #:cl-mysql #:alexandria #:anaphora #:ppcre))
@@ -13,11 +13,11 @@
 (defparameter *mapkey*  "AKd6p04BAAAAN6JBTQIAVVk3tt2BoBL03SxnV1Q883Tx2N8AAAAAAAAAAAAg4NNZvAEKtUxUl-gPDH65Ud3jMA==")
 (defparameter *db-password* "12")
 
-;; myip
-(defparameter *dbg* t)
-(defparameter *host* "")
-(defparameter *mapkey*  "AKOwoE4BAAAAzn_UAAQAmXdybST_B2x-mnLcto5q_tTa2B4AAAAAAAAAAAAtC7dNu632YaEJuBnHz1d5g8a1IQ==")
-(defparameter *db-password* "root")
+;; ;; myip
+;; (defparameter *dbg* t)
+;; (defparameter *host* "")
+;; (defparameter *mapkey*  "AKOwoE4BAAAAzn_UAAQAmXdybST_B2x-mnLcto5q_tTa2B4AAAAAAAAAAAAtC7dNu632YaEJuBnHz1d5g8a1IQ==")
+;; (defparameter *db-password* "root")
 
 
 
