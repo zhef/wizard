@@ -41,6 +41,13 @@
   `(redirect
     (format nil ,format-str (get-btn-key ,form-elt))))
 
+(defmacro ent-to-mi (ent-list)
+  "Translate action to object"
+  `(let ((result (mi (intern (symbol-name (car ,ent-list))) :title (cadr ,ent-list))))
+     (loop :for key :in (cddr ,ent-list) :by #'cddr :do
+        (setf (slot-value result (intern (symbol-name key))) (getf ,ent-list key)))
+     result))
+
 (defmacro with-query-select ((query-str fields) &body body)
   (let* ((fld-str (format nil "~{`~A`~^, ~}" fields))
          (fld-sym (loop :for fld :in fields :collect (intern (string-upcase fld) (find-package "WIZARD")))))
@@ -602,45 +609,7 @@ If objs are of different classes the result is NIL."
      ;;                              (bprint (funcall (intern (format nil "A-~A" (symbol-name (closer-mop:slot-definition-name slot)))) obj)))))))
      ))
 
-;; CLASS ACTION - superclass for all actions (:none :linear :grid :tpl :map etc)
-(with-defclass (action ())
-  (title "")
-  (perm :all)
-  (val nil)
-  (entity nil)
-  (fields nil))
 
-
-(with-defclass (none (action)))
-
-(with-defclass (linear (action)))
-
-(with-defclass (grid (action))
-  (grid nil)
-  (param-id nil)
-  (height "180"))
-
-(with-defclass (yamap (action))
-  (center-coord "")
-  (mark-points nil))
-
-(with-defclass (tpl (action)))
-
-(with-defclass (announce (action)))
-
-(with-defclass (post (action))
-  (date "")
-  (announce-photo nil)
-  (announce "")
-  (text-photo nil)
-  (text ""))
-
-(with-defclass (file (action))
-  (value "")
-  (name ""))
-
-
-;; CLASS YAPOINT
 (with-defclass (yapoint ())
   (title "")
   (link  "")
@@ -652,37 +621,6 @@ If objs are of different classes the result is NIL."
   (update :all)
   (show   :all)
   (view   :all))
-
-;; CLASS FLD
-(with-defclass (fld ())
-  (name "")
-  (title "")
-  (typedata '(:str))
-  (width 200)
-  (xref nil)
-  (update nil)
-  (view nil)
-  (show nil))
-
-
-(with-defclass (btn ())
-  (name "")
-  (title "")
-  (width 200)
-  (value "")
-  (perm :all)
-  (act))
-
-(with-defclass (popbtn ())
-  (name "")
-  (title "")
-  (top 200)
-  (left 400)
-  (width 200)
-  (height 400)
-  (value "")
-  (perm :all)
-  (action ""))
 
 
 (defclass entity () ())

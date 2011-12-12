@@ -231,6 +231,14 @@
 {/template}
 
 
+{template blk}
+  <div style="margin: 15px; border: 1px solid red;">
+    {if $title}<h2>{$title}</h2>{/if}
+    {$contents |noAutoescape}
+  </div>
+{/template}
+
+
 {template frmobj}
   {\n}
   <form method="post" enctype="multipart/form-data">{\n}
@@ -289,6 +297,7 @@
 
 
 {template map}
+<h2>{$title}</h2>
 <script type="text/javascript">{\n}
     YMaps.jQuery(function () {lb}{\n}
         // Создает экземпляр карты и привязывает его к созданному контейнеру{\n}
