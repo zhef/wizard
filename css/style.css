@@ -145,7 +145,10 @@ a.dot span {
 	background-color: #ededed;
 	border: 2px solid #284288;
 	padding: 10px 5px;
-	z-index: 1000;}
+/*	position: absolute;
+	top: 51px;
+	right: 0;
+	z-index: 1000;*/}
 .enter_up input, .enter_up button, .enter_up a{
 	display: block;
 	clear: both;
@@ -191,6 +194,13 @@ strong.key {
 	text-decoration: none;
 	font-size: 1.2em;
 	cursor: pointer;}
+ .win {
+	display: inline-block;
+	height: 16px;
+	padding: 0 0 0 19px;
+	margin-top: 20px;
+	background: url(../img/icons/trophy_silver.png) no-repeat scroll top left;
+	color: #39548B;}
 .service_link a { margin: 2px 0 2px 13px;}
 .tools_menu a:hover {	text-decoration: underline;}
 a.favorite { background: url(../img/icons/star.png) no-repeat scroll left center;}
@@ -232,8 +242,13 @@ a.rating {	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -6
 .banner_left {
 	width: 220px;
 	height: 90px;
+<<<<<<< HEAD
 	margin-bottom: 15px;
 	background: #ddd url(../img/banners/center.png) no-repeat scroll center;}
+=======
+	margin-bottom: 15px;
+	background: #ddd url(../img/banners/left.png) no-repeat scroll center;}
+>>>>>>> 9fc24be... Обновлены файлы стилей (с учетом окна авторизации)
 .yellow h1, .tender_day h1 {color: #d31616; margin-bottom: 0px; font-weight: bold;}
 .tender_day a {
 	color: #0a58b2;
@@ -276,7 +291,7 @@ a.rating {	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -6
 	height: 90px;
 	margin: 0 auto 15px auto;
 	background: #fff url(../img/banners/center.png) no-repeat scroll center;}
-.banner_center, .banner_left, .banner_right {
+/*.banner_center, .banner_left, .banner_right {
     	position:relative;
 	-webkit-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 50px rgba(0, 0, 0, 0.1) inset;
        	   -moz-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 50px rgba(0, 0, 0, 0.1) inset;
@@ -295,9 +310,15 @@ a.rating {	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -6
             box-shadow:0 0 15px rgba(0,0,0,0.6);
     -moz-border-radius:100px / 10px;
          border-radius:100px / 10px;}
+<<<<<<< HEAD
 
 .search {
 	background: url(../img/search_block11.png) repeat-x scroll left center;
+=======
+*/
+.search {
+	background: url(../img/search_block11.png) repeat-x scroll left center;
+>>>>>>> 9fc24be... Обновлены файлы стилей (с учетом окна авторизации)
 	width: 97%;
 	color: #fff;
 	padding: 10px 10px 10px 10px;
@@ -305,7 +326,7 @@ a.rating {	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -6
 	position: relative;}
 .search input[type='text']{
 	height: 18px;
-	width: 54%;
+	width: 52%;
 	padding:0;
 	float: left;}
 .search select {
