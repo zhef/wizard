@@ -1,146 +1,5 @@
 (in-package #:wizard)
 
-
-;; (defmacro def~fld (name &key (update nil update-p) (show nil show-p) (view nil view-p) (xref nil xref-p)  (width 200 width-p))
-;;   (let ((rs `(:fld ,name)))
-;;     (if update-p (nconc rs `(:update ,update)))
-;;     (if view-p (nconc rs `(:view ,view)))
-;;     (if show-p (nconc rs `(:show ,show)))
-;;     (if xref-p (nconc rs `(:xref ,xref)))
-;;     (if width-p (nconc rs `(:width ,width)))
-;;     `',(ent-to-mi rs)))
-
-(defmacro def~fld (name &key (update nil update-p) (show nil show-p) (view nil view-p) (xref nil xref-p)  (width 200 width-p))
-  (let ((initargs))
-    (if update-p  (setf (getf initargs :update) update))
-    (if view-p    (setf (getf initargs :view) view))
-    (if show-p    (setf (getf initargs :show) show))
-    (if xref-p    (setf (getf initargs :xref) xref))
-    (if width-p   (setf (getf initargs :width) width))
-    `(mi '~fld :title ',name ,@initargs)))
-
-;; (defmacro def~btn ((title perm &key (width 200 width-p)) &body act)
-;;   (let ((rs `(:~btn ,title :perm ,perm)))
-;;     (if width-p (nconc rs `(:width ,width)))
-;;     (nconc rs `(:act ,@act))
-;;     `',(ent-to-mi rs)))
-
-(defmacro def~btn ((title perm &key (width 200 width-p)) &body act)
-  (let ((initargs))
-    (if width-p   (setf (getf initargs :width) width))
-    `(mi '~btn :title ,title :perm ,perm ,@initargs :act ',@act)))
-
-;; (defmacro def~upl ((file perm name))
-;;   (let ((rs `(:~upl ,file :perm ,perm :name ,name)))
-;;     `',(ent-to-mi rs)))
-
-(defmacro def~upl ((file perm name))
-  `(mi '~upl :title ',file :perm ,perm :name ,name))
-
-;; (defmacro def~pop ((title perm &key (height 100 height-p)  (width 200 width-p)) &body action)
-;;   (let ((rs `(:~pop ,title :perm ,perm)))
-;;     (if height-p (nconc rs `(:height ,height)))
-;;     (if width-p  (nconc rs `(:width  ,width)))
-;;     (nconc rs `(:action ,@action))
-;;     `',(ent-to-mi rs)))
-
-(defmacro def~pop ((title perm &key (height 100 height-p)  (width 200 width-p)) &body actions)
-  (let ((initargs))
-    (if height-p (setf (getf initargs :height) height))
-    (if width-p  (setf (getf initargs :width)  width))
-    `(mi '~pop :title ,title :perm ,perm ,@initargs :actions (list ,@actions))))
-
-;; (defmacro def~grd ((title perm entity val &key (height 100 height-p)) &body fields)
-;;   (let ((rs `(:~grd ,title :perm ,perm :entity ,entity :val ,val)))
-;;     (if height-p (nconc rs `(:height ,height)))
-;;     (nconc rs `(:fields ',(loop :for item :in fields :collect
-;;                              (eval (macroexpand-1 item)))))
-;;     `',(ent-to-mi rs)))
-
-(defmacro def~grd ((title perm entity val &key (height 100 height-p)) &body fields)
-  (let ((initargs))
-    (if height-p (setf (getf initargs :height) height))
-    `(mi '~grd :title ,title :perm ,perm :entity ',entity :val ',val ,@initargs :fields (list ,@fields))))
-
-;; (defmacro def~blk ((title perm) &body contents)
-;;   (let ((rs `(:~blk ,title :perm ,perm)))
-;;     (nconc rs `(:contents ',(loop :for item :in contents :collect
-;;                                (eval (macroexpand-1 item)))))
-;;     `',(ent-to-mi rs)))
-
-(defmacro def~blk ((title perm) &body contents)
-  `(mi '~blk :title ,title :perm ,perm :contents (list ,@contents)))
-
-;; (defmacro def~lin ((title perm entity val) &body fields)
-;;   (let ((rs `(:~lin ,title :perm ,perm :entity ,entity :val ,val)))
-;;     (nconc rs `(:fields ',(loop :for item :in fields :collect
-;;                              (eval (macroexpand-1 item)))))
-;;     `',(ent-to-mi rs)))
-
-(defmacro def~lin ((title perm entity val) &body fields)
-  `(mi '~lin :title ,title :perm ,perm :entity ',entity :val ',val :fields (list ,@fields)))
-
-;; (defmacro def-tpl ((tpl) &body val)
-;;   (let ((rs `(:tpl ,tpl)))
-;;     (nconc rs `(:val ,@val))
-;;     `',rs))
-
-(defmacro def~tpl ((tpl) &body val)
-  `(mi '~tpl :title ,tpl :val ',@val))
-
-;; (defmacro def~map ((yamap) &body val)
-;;   (let ((rs `(:~map ,yamap)))
-;;     (nconc rs `(:val ,@val))
-;;     `',(ent-to-mi rs)))
-
-(defmacro def~map ((yamap) &body val)
-  `(mi '~map :title ,yamap :val ',@val))
-
-;; (defmacro def~nop ((none))
-;;   (let ((rs `(:~nop ,none)))
-;;     `',(ent-to-mi rs)))
-
-(defmacro def~nop ((none))
-  `(mi '~nop :title ,none))
-
-;; (defmacro def~pst ((post entity val) &body fields)
-;;   (let ((rs `(:~pst ,post :entity ,entity :val ,val)))
-;;     (nconc rs `(:fields ',(loop :for item :in fields :collect
-;;                              (eval (macroexpand-1 item)))))
-;;     `',(ent-to-mi rs)))
-
-(defmacro def~pst ((post entity val) &body fields)
-  `(mi '~pst :title ,post :entity ',entity :val ',val :fields (list ,@fields)))
-
-;; (defmacro def~ann ((announce entity val) &body fields)
-;;   (let ((rs `(:~ann ,announce :entity ,entity :val ,val)))
-;;     (nconc rs `(:fields ',(loop :for item :in fields :collect
-;;                              (eval (macroexpand-1 item)))))
-;;     `',(ent-to-mi rs)))
-
-(defmacro def~ann ((announce entity val) &body fields)
-  `(mi '~ann :title ,announce :entity ',entity :val ',val :fields (list ,@fields)))
-
-
-(defmacro def~plc ((name url &key (navpoint nil navpoint-p)) &body actions)
-  "TODO: -controllers-"
-  `(let ((rs (list :place ',name :url ,url)))
-     ,(if navpoint-p
-          `(progn
-             (nconc rs (list :navpoint ,navpoint))
-             (if (boundp '-navpoints-) ;; if exists special var -navpoints- — save navpoint!
-                 (nconc -navpoints- (list (list :link ,url :title ,navpoint))))))
-     (nconc rs (list :actions (list 'quote (list ,@actions))))
-     rs))
-
-(defmacro def~asm (&body places)
-  "TODO: -ajax-data-set-"
-  `(let* ((-navpoints- (list 'dymmy)))
-     (declare (special -navpoints-)) ;; special for menu
-     (let ((-places- (list ,@(loop :for item :in places :collect item))))
-       (defparameter *places* (remove-if #'null -places-))
-       (defparameter *navpoints* (cdr -navpoints-)))))
-
 (def~asm
   ;; Главная страница
   (def~plc (main "/" :navpoint "Главная")
@@ -384,18 +243,15 @@
     (def~pop ("Добавить акцию" :self :height 300 :width 800)
       (def~lin ("Добавление акции" :all sale :clear)
         (def~fld title)
-        ;; (def~fld date)
-        ;; (def~fld announce-photo)
         (def~fld announce)
-        ;; (def~fld text-photo)
         (def~fld text)
-        ;; (:fld owner)
-        ;; (:fld resource)
         (def~btn ("Добавить акцию" :all)
           (let* ((owner (cur-user)))
             (add-inner-obj *SALE* 'SALE (a-sales owner)
               :owner     owner
-              :title     (form-fld title))
+              :title     (form-fld title)
+              :announce  (form-fld announce)
+              :text      (form-fld text))
             (redirect (hunchentoot:request-uri*))))))
     ;; offers
     (def~grd ("Список заявок на тендеры" :logged offer (cons-inner-objs *OFFER* (a-offers (gethash (cur-page-id) *USER*))))
@@ -405,11 +261,11 @@
       (def~btn ("Удалить заявку" :all :width 105)
         (del-inner-obj (caar (form-data)) *OFFER* (a-offers (gethash (cur-page-id) *USER*)))))
 
-    ;; -----
-    (def~blk (nil :all)
-      (def~lin ("Добавление акции" :all sale :clear)
-        (def~fld title)))
-    ;; -----
+    ;; ;; -----
+    ;; (def~blk (nil :all)
+    ;;   (def~lin ("Добавление акции" :all sale :clear)
+    ;;     (def~fld title)))
+    ;; ;; -----
 
     (def~map ("Адрес поставщика")
       (let* ((supp (gethash (cur-page-id) *USER*))
@@ -488,18 +344,18 @@
 
   ;; Список тендеров
   (def~plc (tenders "/tender" :navpoint "Тендеры")
-    (def~nop ("Тендеры")))
+    ;; (def~nop ("Тендеры")))
     ;; (def~grd ("Тендеры" :all tender (cons-hash-list *TENDER*))
     ;;   (def~fld name :xref "tender")
     ;;   (def~fld status)
     ;;   (def~fld owner))
-    ;; (def~ann ("Тендеры" post-item (remove-if-not #'(lambda (x)
-    ;;                                                  (equal "techno" (a-section (cdr x))))
-    ;;                                              (cons-hash-list *POST-ITEM*)))
-    ;;   (def~fld title)
-    ;;   (def~fld date)
-    ;;   (def~fld announce-photo)
-    ;;   (def~fld announce))
+    (def~ann ("Тендеры" post-item (remove-if-not #'(lambda (x)
+                                                     (equal "tenders" (a-section (cdr x))))
+                                                 (cons-hash-list *POST-ITEM*)))
+      (def~fld title)
+      (def~fld date)
+      (def~fld announce-photo)
+      (def~fld announce)))
 
 
   ;; Страница тендера (поставщик может откликнуться)

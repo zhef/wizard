@@ -330,18 +330,22 @@
 
 
 (defun get-post-items-from-dir (section)
-  (loop :for html-file :in (directory (path (format nil "~A/*.htm" section))) :collect
-     (let ((content  (read-file-into-string html-file))
-           (fmt-tpl  "(?s)<~A>(.*)</~A>")
-           (tags     '(title date announce-photo announce text-photo text))
-           (result   (mi 'post-item :section section)))
-       (loop :for tag :in tags :do
-          (let ((extract (extract (string-downcase (format nil fmt-tpl tag tag)) content)))
-            (setf extract (replace-all extract (string-downcase (format nil "<~A>" (symbol-name tag))) ""))
-            (setf extract (replace-all extract (string-downcase (format nil "</~A>" (symbol-name tag))) ""))
-            (setf (slot-value result tag)
-                  (string-trim '(#\Space #\Tab #\Newline) extract))))
-       result)))
+  (loop
+     :for html-file
+     :in  (sort (directory (path (format nil "~A/*.htm" section)))
+                (lambda (x y)
+                  (string-greaterp (pathname-name x) (pathname-name y))))
+     :collect (let ((content  (read-file-into-string html-file))
+                    (fmt-tpl  "(?s)<~A>(.*)</~A>")
+                    (tags     '(title date announce-photo announce text-photo text))
+                    (result   (mi 'post-item :section section)))
+                (loop :for tag :in tags :do
+                   (let ((extract (extract (string-downcase (format nil fmt-tpl tag tag)) content)))
+                     (setf extract (replace-all extract (string-downcase (format nil "<~A>" (symbol-name tag))) ""))
+                     (setf extract (replace-all extract (string-downcase (format nil "</~A>" (symbol-name tag))) ""))
+                     (setf (slot-value result tag)
+                           (string-trim '(#\Space #\Tab #\Newline) extract))))
+                result)))
 
 (defun posts ()
   (clrhash *POST-ITEM*)
@@ -356,7 +360,8 @@
                 (setf last-id (+ 1 last-id)))
             (append (get-post-items-from-dir "ivent")
                     (get-post-items-from-dir "techno")
-                    (get-post-items-from-dir "news")))))
+                    (get-post-items-from-dir "news")
+                    (get-post-items-from-dir "tenders")))))
 
 (posts)
 (categoryes-and-resources)
