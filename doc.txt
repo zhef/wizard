@@ -331,3 +331,6 @@ http://weitz.de/hunchentoot/#acceptor-dispatch-request
 
 [2011-12-08 01:05] LinkFly> в SBCL переданные параметры можно получить
 так: SB-EXT:*POSIX-ARGV*
+
+http://gq.net.ru/2009/12/16/git-history-rewrite/ - Редактирование
+истории GIT
