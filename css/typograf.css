@@ -1,9 +1,9 @@
 p, blockquote, th, td {
 	margin-bottom: 1.3em;
-	font-size: 1.2em;
-	line-height: 1.3em;
-	color: #404040;
-	font-family: Arial;}
+	font-size: 1.1em;
+	line-height: 1.4em;
+	color: #404040;}
+p b, p strong {font-size: 1.0em; color: #555;}
 p i, p u, p strong, td i, td u, td strong { font-size: 1.0em;}
 blockquote {
 	text-indent: 0.8em;
@@ -18,8 +18,7 @@ blockquote strong.name {display: block; font-size: 1.1em;}
 td {
 	padding: 5px 10px;
 	line-height: 1.3em;	
-	border: 0px solid #F1F1F1;
-	background-color: #fff;}
+	border: 0px solid #F1F1F1;}
 .blue_th th, .red_th th {
 	padding: 6px;
 	color: #fff;
@@ -32,18 +31,18 @@ td {
 .blue_th .zebra { background-color: #fbe8ca;}
 /*----------------------- Заголовки --------------------------*/
 h1, h2 {font-size: 2.0em;}
-h1, h2, h3, h4, h5,h6 {font-family: 'Cuprum', arial, serif; font-weight: normal;}
+h1, h2, h3, h4, h5,h6 {font-weight: normal;}
 h1 {color: #d00707;}
 #content h2 { 
-	font-size: 1.8em; 
+	font-size: 1.5em; 
 	color: #414141;   
 	line-height: 20px; 	
 	padding-bottom: 6px;
 	margin-bottom: 12px;
 	background: url(../img/line2.gif) repeat-x scroll bottom;}
-h3 { font-size: 1.6em; color: #414141; margin-bottom: 10px;}
-h4 { font-size: 1.5em; color: #414141; margin-bottom: 10px;}
-h5, h6 { font-size: 1.4em; color: #414141; margin-bottom: 8px;}
+h3 { font-size: 1.4em; color: #414141; margin-bottom: 10px;}
+h4 { font-size: 1.3em; color: #414141; margin-bottom: 10px;}
+h5, h6 { font-size: 1.2em; color: #414141; margin-bottom: 8px;}
 
 
 /*----------------------- Списки --------------------------*/
@@ -73,16 +72,13 @@ a[href$=".rdf"], a[href^="aim:"] {
   margin:-2px 0;
   background-repeat: no-repeat;
   background-position: right center;}
-a[href^="http:"]          { background-image: url(../img/icons/external.png);} 
 a[href^="mailto:"]        { background-image: url(../img/icons/email.png); }
-a[href^="http:"]:visited  { background-image: url(../img/icons/visited.png); }
 a[href$=".pdf"]   { background-image: url(../img/icons/pdf.png); }  
 a[href$=".doc"]   { background-image: url(../img/icons/doc.png); }  
 a[href$=".xls"]   { background-image: url(../img/icons/xls.png); }  
 a[href$=".rss"], 
 a[href$=".rdf"]   { background-image: url(../img/icons/feed.png); }
 a[href^="aim:"]   { background-image: url(../img/icons/im.png); }
-a[href^="http://gdestroytorg.ru"] { background:none; padding:0; margin:0;}
 a.right {
 	display: inline-block;
 	float: right;
@@ -103,8 +99,8 @@ a.right {
 #content .right {float: right;}
 #content .news_list h2, #content .euro h2 {margin-bottom: 0;}
 td h3 {
-	font-size: 1.1em; 
-	line-height: 14px; 
+	font-size: 1.0em; 
+	line-height: 1.2em; 
 	font-weight: bold;
 	margin-bottom: 1px;}
 .news_list td img {
@@ -151,4 +147,3 @@ span.data {display: block;}
 .up {color: #64a705;}
 .down {color: #d00707;}
 .raiting_company {width: 45%;}
-.center {text-align: center;}
