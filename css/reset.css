@@ -34,13 +34,11 @@ input { vertical-align: middle;}
 span.right {
 	display: block;
 	float: right;
-	position: relative;
-	z-index: 9000;}
+	position: relative;}
 span.left {
 	display: block;
 	float: left;
-	position: relative;
-	z-index: 9000;}
+	position: relative;}
 #content .right {
 	position: relative;	
 	display: block;

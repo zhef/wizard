@@ -59,7 +59,8 @@ em.tl, em.tr, em.bl, em.br { position: absolute; font-size: 1px; }
 .corners em.br { right: -8px; bottom: -8px; }
 .corners h1 {
 	font-size: 1.4em;
-	padding: 5px 0;}
+	padding: 5px 0;
+	font-weight: bold;}
 
 /* ------------- Header elements -------------------*/
 .banner_top {
@@ -242,13 +243,8 @@ a.rating {	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -6
 .banner_left {
 	width: 220px;
 	height: 90px;
-<<<<<<< HEAD
-	margin-bottom: 15px;
-	background: #ddd url(../img/banners/center.png) no-repeat scroll center;}
-=======
-	margin-bottom: 15px;
+	margin: 0 auto 15px auto;
 	background: #ddd url(../img/banners/left.png) no-repeat scroll center;}
->>>>>>> 9fc24be... Обновлены файлы стилей (с учетом окна авторизации)
 .yellow h1, .tender_day h1 {color: #d31616; margin-bottom: 0px; font-weight: bold;}
 .tender_day a {
 	color: #0a58b2;
@@ -310,15 +306,9 @@ a.rating {	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -6
             box-shadow:0 0 15px rgba(0,0,0,0.6);
     -moz-border-radius:100px / 10px;
          border-radius:100px / 10px;}
-<<<<<<< HEAD
-
-.search {
-	background: url(../img/search_block11.png) repeat-x scroll left center;
-=======
 */
 .search {
 	background: url(../img/search_block11.png) repeat-x scroll left center;
->>>>>>> 9fc24be... Обновлены файлы стилей (с учетом окна авторизации)
 	width: 97%;
 	color: #fff;
 	padding: 10px 10px 10px 10px;
@@ -353,10 +343,10 @@ a.rating {	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -6
 	width: 220px;
 	height: 285px;
 	background: #ddd url(../img/banners/right.png) no-repeat scroll center;
-	margin-bottom: 15px;}
+	margin: 0 auto 15px auto;}
 
-.gray h1, .expert h1 {color: #39548b; margin-bottom: 0px; font-weight: bold;}
-.green h1 {color: #d31616; margin-bottom: 0px; font-weight: bold;}
+.gray h1, .expert h1 {color: #39548b; margin-bottom: 0px;}
+.green h1 {color: #d31616; margin-bottom: 0px;}
 .expert img {
 	float: left;
 	border: 2px solid #ccc;
