@@ -360,7 +360,8 @@
                 (setf last-id (+ 1 last-id)))
             (append (get-post-items-from-dir "ivent")
                     (get-post-items-from-dir "techno")
-                    (get-post-items-from-dir "news")))))
+                    (get-post-items-from-dir "news")
+                    (get-post-items-from-dir "tenders")))))
 
 (posts)
 (categoryes-and-resources)
