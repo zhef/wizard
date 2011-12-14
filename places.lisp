@@ -243,18 +243,15 @@
     (def~pop ("Добавить акцию" :self :height 300 :width 800)
       (def~lin ("Добавление акции" :all sale :clear)
         (def~fld title)
-        ;; (def~fld date)
-        ;; (def~fld announce-photo)
         (def~fld announce)
-        ;; (def~fld text-photo)
         (def~fld text)
-        ;; (:fld owner)
-        ;; (:fld resource)
         (def~btn ("Добавить акцию" :all)
           (let* ((owner (cur-user)))
             (add-inner-obj *SALE* 'SALE (a-sales owner)
               :owner     owner
-              :title     (form-fld title))
+              :title     (form-fld title)
+              :announce  (form-fld announce)
+              :text      (form-fld text))
             (redirect (hunchentoot:request-uri*))))))
     ;; offers
     (def~grd ("Список заявок на тендеры" :logged offer (cons-inner-objs *OFFER* (a-offers (gethash (cur-page-id) *USER*))))
@@ -264,11 +261,11 @@
       (def~btn ("Удалить заявку" :all :width 105)
         (del-inner-obj (caar (form-data)) *OFFER* (a-offers (gethash (cur-page-id) *USER*)))))
 
-    ;; -----
-    (def~blk (nil :all)
-      (def~lin ("Добавление акции" :all sale :clear)
-        (def~fld title)))
-    ;; -----
+    ;; ;; -----
+    ;; (def~blk (nil :all)
+    ;;   (def~lin ("Добавление акции" :all sale :clear)
+    ;;     (def~fld title)))
+    ;; ;; -----
 
     (def~map ("Адрес поставщика")
       (let* ((supp (gethash (cur-page-id) *USER*))
