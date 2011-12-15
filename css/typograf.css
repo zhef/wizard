@@ -65,9 +65,8 @@ a:active, a:focus { text-decoration: none; color: #284288;}
 #content table td h3 a:visited {color: #1a3d9b;}
 #content table td h3 a:hover {color: #1a3d9b;}
 code, pre { color: #c33;}
-a[href^="http:"], a[href^="mailto:"], a[href^="http:"]:visited, 
-a[href$=".pdf"], a[href$=".doc"], a[href$=".xls"], a[href$=".rss"], 
-a[href$=".rdf"], a[href^="aim:"] {
+a[href^="mailto:"], a[href^="http:"]:visited, a[href$=".pdf"], a[href$=".doc"], 
+a[href$=".xls"], a[href$=".rss"], a[href$=".rdf"], a[href^="aim:"] {
   padding:2px 18px 2px 0;
   margin:-2px 0;
   background-repeat: no-repeat;
