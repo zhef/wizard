@@ -219,27 +219,32 @@ a.rating {	background: url(../img/icons/tools_ico2.gif) no-repeat scroll left -6
 #menu, #menu ul {padding: 0; list-style: none outside none; margin: 0 0 20px 0;}
 #menu ul {margin: 10px 10px 0 2px; border-left: 4px solid #284288;}
 #menu li {
-	padding: 8px 4px 8px 10px;
+	padding: 5px 4px 5px 10px;
 	color: #d00707;
 	font-size: 1.3em;
 	line-height: 1.1em;
 	font-weight: 900;
-	border-bottom: 0px dotted #e4e4e4;}
-/*#menu li:hover {
-	background-color: #f4f4f4;
+	margin-bottom: 5px;}
+#menu li:hover {	
+	background-color: #39548B;
 	-moz-border-radius: 6px;
-	-webkit-border-radius: 68px;
+	-webkit-border-radius: 6px;
+	-khtml-border-radius: 6px;
 	border-radius: 6px;}
-#menu .active_child li:hover {background-color: #fff;}*/
-#menu li.active_child {
-	background-color: #fff;
-	border: 0px solid #284288;}
+#menu li.active_child {	
+	background: url(../img/search_block11.png) repeat-x scroll left center;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	-khtml-border-radius: 6px;
+	border-radius: 6px;}
+#menu li.active_child a, #menu li:hover a{
+	color: #fff}
 #menu a, #menu li:hover ul li a {
 	color: #646464;
 	text-decoration: none;
 	font-size: 0.9em;
 	font-weight: 900;}
-#menu li:hover a, #menu a:hover, #menu li ul li:hover a, #menu li ul li a:hover {color: #284288;}
+
 .banner_left {
 	width: 220px;
 	height: 90px;
@@ -404,10 +409,10 @@ a.button:hover span {background: url(../img/button2.png) no-repeat scroll bottom
 #footer ul li a {display: inline-block; color: #284288; padding: 5px;}
 #footer ul li a:hover {color: #fff; background-color: #d00707;}
 #footer .copyright {padding: 3px 20px;}
+.partners_block {padding-left: 1px;}
 .partners_block img {
 	margin: 3px;
 	text-align: center;
 	border: 2px solid #CCC;
 	width: 54px; 
-	height: 54px;
-}
+	height: 54px;}
