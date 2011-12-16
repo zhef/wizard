@@ -108,3 +108,13 @@
 ;; (perm-check '(or :logged (and :admin :supplier)) (gethash 0 *USER*) 'nine)
 ;; (check-perm '(or :logged (and :admin :supplier)) (gethash 0 *USER*) 'nine)
 ;; (check-perm :admin (gethash 1 *USER*) 'nine)
+
+;(defun check-perm (perm subj obj)
+;  (let ((rs (eval (perm-check perm subj obj))))
+;    (safe-write (path "perm-log.txt")
+;                (format nil "~A ~A | subj: ~A; obj: ~A~%"
+;                        (if rs "✔" "✘")
+;                        perm
+;                        subj
+;                        obj))
+;    rs))
