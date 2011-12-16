@@ -219,13 +219,17 @@
     ;; resources
     (def~blk (nil :self)
       (def~grd ("Ресурсы для конкурсов" :all supplier-resource
-                                        (cons-inner-objs *SUPPLIER-RESOURCE* (a-resources (gethash (cur-page-id) *USER*))))
+                                        (remove-if #'(lambda (x)
+                                                         (null (a-resource (cdr x))))
+                                                     (cons-inner-objs *SUPPLIER-RESOURCE* (a-resources (gethash (cur-page-id) *USER*)))))
         (def~fld resource :width 800)
         (def~btn ("Удалить" :all :width 100)
           (del-inner-obj (caar (form-data)) *SUPPLIER-RESOURCE* (a-resources (gethash (cur-page-id) *USER*))))))
     (def~blk (nil '(not :self))
       (def~grd ("Ресурсы для конкурсов" :all supplier-resource
-                                        (cons-inner-objs *SUPPLIER-RESOURCE* (a-resources (gethash (cur-page-id) *USER*))))
+                                        (remove-if #'(lambda (x)
+                                                       (null (a-resource (cdr x))))
+                                                   (cons-inner-objs *SUPPLIER-RESOURCE* (a-resources (gethash (cur-page-id) *USER*)))))
         (def~fld resource :width 900)))
     ;; Добавление ресурса
     (def~pop ("Добавить ресурс" :self :height 400 :width 900)
