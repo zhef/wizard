@@ -212,20 +212,20 @@
       (def~fld  date  :width 150))
     ;; upload pricelist
     (def~pop ("Загрузить прайс-лист" :self :height 200 :width 700)
-      (def~lin ("Добавление прайс-листа" :self supplier-resource-price-elt :clear)
-        (def~upl (file :all "Прайс"))
-        (def~btn ("Загрузить" :all)
-          (progn
-            (awhen (car (hunchentoot:post-parameter "FILE"))
-              (loop :for src :in (xls-processor it) :do
-                 (add-inner-obj *supplier-resource-price-elt* 'supplier-resource-price-elt
-                     (a-price-elts (cur-user))
-                   :owner (cur-user)
-                   :name  (nth 1 src)
-                   :unit  (nth 2 src)
-                   :price (nth 3 src)
-                   :date  (decode-date (get-universal-time)))))
-            (redirect (hunchentoot:request-uri*))))))
+        (def~lin ("Добавление прайс-листа" :self supplier-resource-price-elt :clear)
+            (def~upl (file :all "Прайс"))
+          (def~btn ("Загрузить" :all)
+              (progn
+                (awhen (car (hunchentoot:post-parameter "FILE"))
+                  (loop :for src :in (xls-processor it) :do
+                     (add-inner-obj *supplier-resource-price-elt* 'supplier-resource-price-elt
+                                    (a-price-elts (cur-user))
+                                    :owner (cur-user)
+                                    :name  (nth 1 src)
+                                    :unit  (nth 2 src)
+                                    :price (nth 3 src)
+                                    :date  (decode-date (get-universal-time)))))
+                (redirect (hunchentoot:request-uri*))))))
     ;; resources
     (def~grd ("Ресурсы для конкурсов" :self supplier-resource
                                       (remove-if #'(lambda (x)
@@ -430,18 +430,29 @@
               (append-link (a-resources tender) obj)
               (redirect (hunchentoot:request-uri*)))))))
     ;; documents
-    (def~grd ("Документы тендера" :owner document (cons-inner-objs *DOCUMENT* (a-documents (gethash (cur-page-id) *TENDER*))))
-      (def~fld name :xref "/document/~A" :width 550)
+    (def~grd ("Документы тендера" :owner tender-document (cons-inner-objs *TENDER-DOCUMENT* (a-documents (gethash (cur-page-id) *TENDER*))))
+      (def~fld name :xref "document" :width 550)
       (def~btn ("Удалить из тендера" :all :width 150)
         (let* ((tender    (a-tender document)))
           ;; Удаляем этот документ из тендера и из документов
-          (del-inner-obj (caar (last (form-data))) *DOCUMENT* (a-documents tender)))))
-    (def~grd ("Документы тендера" '(not :owner) document (cons-inner-objs *DOCUMENT* (a-documents (gethash (cur-page-id) *TENDER*))))
-      (def~fld name :xref "/document/~A" :width 550))
-    (def~pop ("Добавить документ" :owner)
-      (def~lin ("Загрузка документа" :all #|'(and :active :fair)|# document :clear)
-        (def~btn ("Загрузить документ (пока не активно)" :all)
-          (err "upload-document"))))
+          (del-inner-obj (caar (last (form-data))) *TENDER-DOCUMENT* (a-documents tender)))))
+    (def~grd ("Документы тендера" '(not :owner) tender-document (cons-inner-objs *TENDER-DOCUMENT* (a-documents (gethash (cur-page-id) *TENDER*))))
+      (def~fld name :xref "document" :width 550))
+    (def~pop ("Загрузить новый документ" :owner  #|'(and :active :fair)|#  :height 200 :width 700)
+      (def~lin ("Добавление документа" :all tender-document :clear)
+        (def~fld name :width 500)
+        (def~upl (file :all "Документ"))
+        (def~btn ("Загрузить" :all)
+          (progn
+            (awhen (hunchentoot:post-parameter "FILE")
+              (with-obj-create (*TENDER-DOCUMENT* 'TENDER-DOCUMENT (name))
+                (copy-file (format nil "~A" (car it)) (format nil "tender-documents/~A" id))
+                (setf (a-filename obj) id)
+                (setf (a-origin obj) (format nil "~A" (cadr it)))
+                (let ((tender (gethash (cur-page-id) *TENDER*)))
+                  (append-link (a-documents tender) obj)
+                  (setf (a-tender obj) tender))))
+            (redirect (hunchentoot:request-uri*))))))
     ;; ;; suppliers
     ;; (def~grd ("Поставщики ресурсов" :all supplier
     ;;                                 (let ((tender-resources   (mapcar #'a-resource (a-resources (gethash (cur-page-id) *TENDER*))))

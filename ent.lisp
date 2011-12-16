@@ -235,7 +235,7 @@
       (winner              "Победитель тендера"         (:link supplier))
       (price               "Рекомендуемая стоимость"    (:num)) ;; вычисляется автоматически на основании заявленных ресурсов
       (resources           "Ресурсы"                    (:list-of-links tender-resource))
-      (documents           "Документы"                  (:list-of-links document)) ;; закачка и удаление файлов
+      (documents           "Документы"                  (:list-of-links tender-document)) ;; закачка и удаление файлов
       (suppliers           "Поставщики"                 (:list-of-links supplier)) ;; строится по ресурсам автоматически при создании тендера
       (offers              "Заявки"                     (:list-of-links offer)))
      :perm
@@ -301,11 +301,12 @@
 
 
     ;; Связанные с тендерами документы
-    (:entity               document
-     :container            document
+    (:entity               tender-document
+     :container            tender-document
      :fields
      ((name                "Название"                   (:str))
-      (filename            "Имя файла"                  (:str))
+      (origin              "Оригинальное имя файла"     (:str))
+      (filename            "Имя файла в директории"     (:str))
       (tender              "Тендер"                     (:link tender)))
      :perm
      (:view                :all
