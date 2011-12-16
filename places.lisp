@@ -368,7 +368,7 @@
       ;; (def~fld claim)
       ;; (def~fld analize)
       ;; (def~fld interview)
-      (def~fld result)
+      ;; (def~fld result)
       (def~btn ("Сохранить" :owner)
         (let ((obj (gethash (cur-page-id) *TENDER*)))
           (with-obj-save obj
