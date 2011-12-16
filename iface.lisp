@@ -8,12 +8,12 @@
     (when view    (setf (getf initargs :view) view))
     (when show    (setf (getf initargs :show) show))
     (when xref    (setf (getf initargs :xref) xref))
-    (setf (getf initargs :width) width)
+    (when width   (setf (getf initargs :width) width))
     `(mi '~fld :title ',name ,@initargs)))
 
 (defmacro def~btn ((title perm &key (width 200)) &body act)
   (let (initargs)
-    (setf (getf initargs :width) width)
+    (when width   (setf (getf initargs :width) width))
     `(mi '~btn :title ,title :perm ,perm ,@initargs :act ',@act)))
 
 (defmacro def~upl ((file perm name)) ; эту удалить, а следующие 2 раскомментировать
@@ -23,13 +23,13 @@
 
 (defmacro def~pop ((title perm &key (height 100)  (width 200)) &body actions)
   (let (initargs)
-    (setf (getf initargs :height) height
-          (getf initargs :width)  width)
+    (when height  (setf (getf initargs :height) height))
+    (when width   (setf (getf initargs :width)  width))
     `(mi '~pop :title ,title :perm ,perm ,@initargs :actions (list ,@actions))))
 
 (defmacro def~grd ((title perm entity val &key (height 100)) &body fields)
   (let (initargs)
-    (setf (getf initargs :height) height)
+    (when height  (setf (getf initargs :height) height))
     `(mi '~grd :title ,title :perm ,perm :entity ',entity :val ',val ,@initargs :fields (list ,@fields))))
 
 (defmacro def~blk ((title perm) &body contents)
@@ -63,7 +63,7 @@
             `(progn
                (nconc rs (list :navpoint ,navpoint))
                (when (boundp '-navpoints-) ;; if exists special var -navpoints- — save navpoint!
-                   (nconc -navpoints- (list (list :link ,url :title ,navpoint))))))
+                 (nconc -navpoints- (list (list :link ,url :title ,navpoint))))))
      (nconc rs (list :actions (list 'quote (list ,@actions))))
      rs))
 
