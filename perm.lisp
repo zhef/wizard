@@ -30,7 +30,8 @@
   (cond ((consp     perm)
          (loop :for item :in perm :collect (perm-check item subj obj)))
         ((or (equal perm 'or)
-             (equal perm 'and))
+             (equal perm 'and)
+             (equal perm 'not))
          perm)
         ((keywordp perm)
          (ecase perm
