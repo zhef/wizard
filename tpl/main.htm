@@ -7,6 +7,7 @@
     <td>{$date}</td>
     <td>
       <h3>{$title}</h3>
+      {$photoannounce  |noAutoescape}
       <a href="{$xref}">
         {$announce}
       </a>
@@ -17,8 +18,8 @@
 {template postblock}
   <div class="news_law">
     <a href="{$xrefall}" class="right">{$titleall |noAutoescape}</a>
-    <h2><img src="img/icons/rss.png" alt="" style="margin: 3px 5px 0 0;"/>{$title |noAutoescape}</h2>
-    <table>
+    <h2><img src="img/icons/rss2.png" alt="" style="margin: 3px 5px 0 0;"/>{$title |noAutoescape}</h2>
+    <table class="news_list">
       {foreach $elt in $posts}
         {call postelt data="$elt" /}
       {/foreach}

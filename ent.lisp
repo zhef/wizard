@@ -99,7 +99,7 @@
       (announce-photo      "Фото в анонсе"              (:img))
       (announce            "Анонс"                      (:str))
       (text-photo          "Фото в тексте"              (:img))
-      (text                "Текст"                      (:str))
+      (text                "Текст"                      (:txt))
       (owner               "Поставщик"                  (:link supplier))
       (resource            "Ресурс"                     (:link supplier-resource)))
      :perm
