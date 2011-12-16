@@ -69,7 +69,7 @@ em.tl, em.tr, em.bl, em.br { position: absolute; font-size: 1px; }
 	margin: 0 auto;
 	border-left: 2px solid #fff;
 	border-right: 2px solid #fff;
-	background: url(../img/banners/top.png) no-repeat scroll center;}
+	background: url(../img/banners/top.gif) no-repeat scroll center;}
 .logo {
 	width: 30%;
 	min-width: 270px;
