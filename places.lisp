@@ -376,10 +376,9 @@
       (def~fld announce-photo)
       (def~fld announce)))
 
-
   ;; Страница тендера (поставщик может откликнуться)
   (def~plc (tender "/tender/:id")
-    (def~lin ("Тендер" :all tender (gethash (cur-page-id) *TENDER*))
+    (def~lin ("Тендер" :all tender (aif (gethash (cur-page-id) *TENDER*) it (error 'condition-404-Not-Found :text "Tender Not Found")))
       (def~fld name)
       (def~fld status)
       ;; (def~fld owner)
@@ -393,6 +392,7 @@
           (with-obj-save obj
             name all claim analize interview result)
           (redirect (hunchentoot:request-uri*)))))
+
     ;; resources
     (def~grd ("Ресурсы тендера" :owner tender-resource (cons-inner-objs *TENDER-RESOURCE* (a-resources (gethash (cur-page-id) *TENDER*))))
       (def~fld resource :xref "tender-resource" :width 400)
@@ -431,13 +431,13 @@
               (redirect (hunchentoot:request-uri*)))))))
     ;; documents
     (def~grd ("Документы тендера" :owner tender-document (cons-inner-objs *TENDER-DOCUMENT* (a-documents (gethash (cur-page-id) *TENDER*))))
-      (def~fld name :xref "document" :width 550)
+      (def~fld name #|:xref "document"|# :width 550)
       (def~btn ("Удалить из тендера" :all :width 150)
         (let* ((tender    (a-tender document)))
-          ;; Удаляем этот документ из тендера и из документов
           (del-inner-obj (caar (last (form-data))) *TENDER-DOCUMENT* (a-documents tender)))))
     (def~grd ("Документы тендера" '(not :owner) tender-document (cons-inner-objs *TENDER-DOCUMENT* (a-documents (gethash (cur-page-id) *TENDER*))))
-      (def~fld name :xref "document" :width 550))
+      (def~fld name #|:xref "document"|# :width 550))
+    ;; upload document
     (def~pop ("Загрузить новый документ" :owner  #|'(and :active :fair)|#  :height 200 :width 700)
       (def~lin ("Добавление документа" :all tender-document :clear)
         (def~fld name :width 500)
@@ -453,42 +453,37 @@
                   (append-link (a-documents tender) obj)
                   (setf (a-tender obj) tender))))
             (redirect (hunchentoot:request-uri*))))))
-    ;; ;; suppliers
-    ;; (def~grd ("Поставщики ресурсов" :all supplier
-    ;;                                 (let ((tender-resources   (mapcar #'a-resource (a-resources (gethash (cur-page-id) *TENDER*))))
-    ;;                                       (all-suppliers      (remove-if-not #'(lambda (x)
-    ;;                                                                              (equal (type-of (cdr x)) 'SUPPLIER))
-    ;;                                                                          (cons-hash-list *USER*)))
-    ;;                                       (supplier-resources (mapcar #'(lambda (x)
-    ;;                                                                       (cons (a-resource (cdr x)) (a-owner (cdr x))))
-    ;;                                                                   (cons-hash-list *SUPPLIER-RESOURCE*)))
-    ;;                                       (result)
-    ;;                                       (rs))
-    ;;                                   (loop :for tr :in tender-resources :do
-    ;;                                      (loop :for sr :in supplier-resources :do
-    ;;                                         (when (equal tr (car sr))
-    ;;                                           (push (cdr sr) result))))
-    ;;                                   (setf result (remove-duplicates result))
-    ;;                                   (loop :for rd :in result :do
-    ;;                                      (loop :for as :in all-suppliers :do
-    ;;                                         (if (equal rd (cdr as))
-    ;;                                             (push as rs))))
-    ;;                                   rs))
-    ;;   (def~fld name)
-    ;;   (def~fld email)
-    ;;   (def~fld inn)
-    ;;   (def~btn ("Отправить приглашение" :all :width 145)
-    ;;     (err "send-offer-to-supplier-from-tender"))
-    ;;   (def~btn ("Страница поставщика" :all :width 145)
-    ;;     (to "/supplier/~A"  (caar (last (form-data)))))
-    ;;   (def~btn ("Добавить своего поставщика" :all)
-    ;;     (err "add-supplier-to-tender")))
-    ;; ;; oferts
-    ;; (def~grd ("Заявки на тендер" :all offer (cons-inner-objs *OFFER* (a-offers (gethash (cur-page-id) *TENDER*))))
-    ;;   (def~fld owner)
-    ;;   (def~fld status)
-    ;;   (def~btn ("Просмотр заявки" :all :width 140)
-    ;;     (to "/offer/~A"  (caar (last (form-data))))))
+    ;; suppliers
+    (def~grd ("Поставщики ресурсов" :all supplier
+                                    (let ((tender-resources   (remove-duplicates (mapcar #'a-resource (a-resources (gethash (cur-page-id) *TENDER*)))))
+                                          (all-suppliers      (remove-if-not #'(lambda (x)
+                                                                                 (equal (type-of (cdr x)) 'SUPPLIER))
+                                                                             (cons-hash-list *USER*)))
+                                          (supplier-resources (mapcar #'(lambda (x)
+                                                                          (cons (a-resource (cdr x)) (a-owner (cdr x))))
+                                                                      (cons-hash-list *SUPPLIER-RESOURCE*)))
+                                          (result)
+                                          (rs))
+                                      (loop :for tr :in tender-resources :do
+                                         (loop :for sr :in supplier-resources :do
+                                            (when (equal tr (car sr))
+                                              (push (cdr sr) result))))
+                                      (setf result (remove-duplicates result))
+                                      (loop :for rd :in result :do
+                                         (loop :for as :in all-suppliers :do
+                                            (if (equal rd (cdr as))
+                                                (push as rs))))
+                                      rs))
+      (def~fld name :xref "supplier")
+      (def~fld email)
+      (def~fld inn))
+    ;; ;; Добавление своего поставщика [DEFER]
+    ;; (def~btn ("Добавить своего поставщика" :all)
+    ;;   (err "add-supplier-to-tender"))
+    ;; oferts
+    (def~grd ("Заявки на тендер" :all offer (cons-inner-objs *OFFER* (a-offers (gethash (cur-page-id) *TENDER*))))
+      (def~fld owner :xref "offer")
+      (def~fld status))
     ;; ;; create offer
     ;; (def~pop ("Ответить заявкой на тендер" :supplier)
     ;;   (def~lin ("Вы хотите участвовать в этом тендере?" :all #|'(and :active :fair)|# resource (cons-hash-list *RESOURCE*))
@@ -507,6 +502,7 @@
     ;;         (setf (a-status (gethash (cur-page-id) *TENDER*)) :cancelled)
     ;;         (redirect (hunchentoot:request-uri*))))))
     )
+
 
   ;; Ресурс тендера
   (def~plc (tender-resource "/tender-resource/:id")

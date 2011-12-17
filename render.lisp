@@ -1,5 +1,14 @@
 (in-package :wizard)
 
+(define-condition condition-404-Not-Found (error)
+  ((text
+    :initarg :text
+    :accessor text))
+  (:report (lambda (condition stream)
+             (format stream "404 Not Found :: [~a]"
+                     (text condition)))))
+
+
 (defmacro check-perm-for-cur-user-with-dbg (perm obj &body if-not-dbg)
   `(if (check-perm ,perm (cur-user) ,obj)
        (call-next-method)
@@ -50,9 +59,24 @@
         :searchstring   (aif (hunchentoot:post-parameter "searchstring") it "")
         :content        (format nil "~{~A~}" in-render))))))
 
-;; before start-session
-(defmethod restas:render-object :before ((designer wizard-render) (acts list))
-  (hunchentoot:start-session))
+
+;; RENDER DISPATCHER :AROUND (ACTS) - error handling
+(defmethod restas:render-object :around ((designer wizard-render) (acts list))
+  (block 404-return-message
+    (handler-bind ((condition-404-Not-Found
+                    #'(lambda (c)
+                        (invoke-restart 'restart-404-Not-Found (text c)))))
+      (restart-case (progn
+                      (hunchentoot:start-session) ;; before start-session
+                      (call-next-method))
+        (restart-404-Not-Found (message)
+          (return-from 404-return-message
+            (progn
+              (setf (hunchentoot:content-type*) "text/html; charset=utf-8")
+              (setf (hunchentoot:return-code*) 404)
+              ;; TODO: Научить hunch вместе с 404-ым кодом отдавать произвольное сообщение
+              message
+              )))))))
 
 
 ;; ACT: default (error)
