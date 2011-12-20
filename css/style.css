@@ -45,12 +45,13 @@
 
 /* -------------------------- Corners------------------------------ */
 .corners {margin-bottom: 15px;}
-.tender_day, .search, .expert, .yellow, .gray, .green, .blue { position: relative; overflow: hidden; padding: 5px 10px;}
+.tender_day, .search, .expert, .yellow, .gray, .green, .blue, .red { position: relative; overflow: hidden; padding: 5px 10px;}
 .yellow, .tender_day { background-color: #fbe8ca; }
 .menu_li { background-color: #d00707; }
 .fuchsia_light { background-color: #f0e7e7;}
-.gray, .expert { background-color: #f1f1f1; }
+.gray, .expert { background-color: #f1f1f1;}
 .green { background-color: #e2f2cb; }
+.red {  background: url(../img/search_block11.png) repeat-x scroll left center;}
 em.tl, em.tr, em.bl, em.br { position: absolute; font-size: 1px; }
 .corners em.tl, .corners em.tr, .corners em.bl, .corners em.br { width: 16px; height: 16px; background: url(../img/corners/corners-8.png); }
 .corners em.tl { left: -8px; top: -8px; }
@@ -69,16 +70,17 @@ em.tl, em.tr, em.bl, em.br { position: absolute; font-size: 1px; }
 	margin: 0 auto;
 	border-left: 2px solid #fff;
 	border-right: 2px solid #fff;
-	background: url(../img/banners/top.gif) no-repeat scroll center;}
+	background: url(../img/banners/top.png) no-repeat scroll center;}
 .logo {
 	width: 30%;
-	min-width: 270px;
-	max-width: 270px;
-	height: 59px;
+	min-width: 225px;
+	max-width: 225px;
+	height: 85px;
 	position: relative;
 	float: left;
-	top: 39px;
-	background: url(../img/logo5.png) no-repeat scroll;}
+	top: 5px;
+	left: 15px;
+	background: url(../img/logo.png) no-repeat scroll;}
 span.service_link {
 	display: inline-block;
 	position: relative;
