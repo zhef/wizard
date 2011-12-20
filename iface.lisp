@@ -1,8 +1,7 @@
 (in-package #:wizard)
 
-(defmacro def~fld (name &key update show view xref (width 200)) ; эту удалить, а следующие 2 раскомментировать
-;;(defmacro def~fld ((name &key update show view xref (width 200)) &body body)
-;;  (declare (ignore body))
+(defmacro def~fld ((name &key update show view xref (width 200)) &body body)
+  (declare (ignore body))
   (let (initargs)
     (when update  (setf (getf initargs :update) update))
     (when view    (setf (getf initargs :view) view))
@@ -16,9 +15,8 @@
     (when width   (setf (getf initargs :width) width))
     `(mi '~btn :title ,title :perm ,perm ,@initargs :act ',@act)))
 
-(defmacro def~upl ((file perm name)) ; эту удалить, а следующие 2 раскомментировать
-;;(defmacro def~upl ((file perm name) &body body)
-;;  (declare (ignore body))
+(defmacro def~upl ((file perm name) &body body)
+  (declare (ignore body))
   `(mi '~upl :title ',file :perm ,perm :name ,name))
 
 (defmacro def~pop ((title perm &key (height 100)  (width 200)) &body actions)
@@ -44,9 +42,8 @@
 (defmacro def~map ((yamap) &body val)
   `(mi '~map :title ,yamap :val ',@val))
 
-(defmacro def~nop ((none)) ; эту удалить, а следующие 2 раскомментировать
-;;(defmacro def~nop ((none) &body body)
-;;  (declare (ignore body))
+(defmacro def~nop ((none) &body body)
+  (declare (ignore body))
   `(mi '~nop :title ,none))
 
 (defmacro def~pst ((post entity val) &body fields)
