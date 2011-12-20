@@ -110,7 +110,6 @@
                        :height     400)
       (def~fld name :xref "category" :width 900)))
 
-
   ;; Каталог ресурсов - содержимое категории
   (def~plc (category "/category/:id")
     (def~lin ("Группа" :all category :clear)
