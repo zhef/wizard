@@ -14,6 +14,45 @@ blockquote {
 	margin: 0 auto 15px auto;
 	background-color: #fbe8ca;}
 blockquote strong.name {display: block; font-size: 1.1em;}
+dl, dt, dd {
+	font-size: 1.1em;
+	line-height: 1.3em;}
+dd, dt {	padding: 5px 10px;}
+dl {overflow: hidden;}
+dt {
+	float: left;
+	margin-right: 4px;
+	clear: left;
+	color: #555555;
+	font-weight: normal;}
+dl.table_display {
+	width: 100%;
+	margin: 20px auto;}
+dd {
+	background-color: #f4f4f4;
+	margin-bottom: 3px;}
+dl input, dl textarea { width: 99%;}
+.table_display dt {width: 30%; text-align: right;}
+.table_display dd dl dt{
+	width: 100%; 
+	text-align: left; 
+	padding: 3px 0; 
+	font-size: 0.9em;
+	line-height: 1.0em;}
+.table_display dd dl dt a { 
+	color: #39548B; 
+	font-size: 0.9em;
+	line-height: 1.0em;}
+.table_display dd {
+	float: left;
+	width: 60%;}
+.table_display dd dl dd {
+	width: 100%; 
+	padding: 2px 0; 
+	margin-bottom: 7px; 
+	color: #555555; 
+	font-size: 0.9em;
+	line-height: 1.0em;}
 #content table {margin: 0 auto 15px auto; clear: both;}
 td {
 	padding: 5px 10px;
@@ -31,7 +70,6 @@ td {
 .blue_th .zebra { background-color: #fbe8ca;}
 /*----------------------- Заголовки --------------------------*/
 h1, h2 {font-size: 2.0em;}
-h1, h2, h3, h4, h5,h6 {font-weight: normal;}
 h1 {color: #d00707;}
 #content h2 { 
 	font-size: 1.5em; 
@@ -50,7 +88,6 @@ ul {list-style: disc inside; margin: 5px 0 15px 10px;}
 ol {list-style: decimal inside; margin: 5px 0 15px 10px;}
 ul ul, ul ol, ol ul, ol ol {margin-bottom: 0;}
 #content ul li, #content ol li { margin: 0 0 5px 0;}
-dt { font-weight: bold; }
 ol.blue_li, ul.blue_li {color: #284288; font-weight: bold;}
 ol.blue_li span, ul.blue_li span {color: #414141; font-weight: normal; font-family: Arial; font-size: 1.2em;}
 ol.red_li, ul.red_li {color: #d00707; font-weight: bold;}

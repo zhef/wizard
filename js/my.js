@@ -41,3 +41,25 @@ function bookmark(a){
     else alert("Нажмите CTRL+D, чтобы добавить страницу в Избранное.");
     return false;
 }
+
+function createDialog(){
+    $('#chat_div').dialog({
+                  autoOpen: true,
+          buttons: {
+                  'Ok': function() {
+                      $(this).dialog('destroy');
+                  },
+                  'Cancel': function() {
+                      $(this).dialog('destroy');
+                  }
+              }
+          });
+};
+$('#chat').click(function(evtObj){
+      createDialog();
+      evtObj.preventDefault();
+  $.get($(this).attr('href'), {}, function(data){
+       $('#chat_div').html(data);
+               createDialog();
+  },'html');
+});
