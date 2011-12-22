@@ -1,6 +1,6 @@
 (in-package #:wizard)
 
-(connect :user "root" :password *db-password* :database "ktopostavlyaet")
+(connect :user "root" :password *db-password* :database "ktopostavlyaet_upd")
 (query "SET NAMES utf8")
 
 
