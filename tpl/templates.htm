@@ -18,9 +18,9 @@
     <div class="enter_up">{\n}
       <span><strong class="key">Авторизация</strong></span>
       <form method="post" class="enter_form">
-        <input type="text" name="LOGIN" value="LOGIN" maxlength="64" />
+        <input type="text" name="LOGIN" value="Логин" maxlength="64" onfocus="if(this.value=='Логин') this.value='';" onblur="if(this.value=='') this.value='Логин';"/>
         <a href="#">Зарегистрироваться</a>
-        <input type="text" name="PASSWORD" value="PASSWORD" maxlength="64" />
+        <input type="text" name="PASSWORD" value="Пароль" maxlength="64" onfocus="if(this.value=='Пароль') this.value='';" onblur="if(this.value=='') this.value='Пароль';"/>
         <a href="#">Забыли пароль?</a>
         <input type="submit" name="AUTH" value="Войти" style="background-color: #E0E0E0; width: 160px;" />
       </form>
@@ -232,7 +232,8 @@
 
 
 {template blk}
-  <div style="margin: 15px; border: 1px solid red;">
+  <!-- style="margin: 15px; border: 1px solid red;" -->
+  <div>
     {if $title}<h2>{$title}</h2>{/if}
     {$contents |noAutoescape}
   </div>
@@ -318,9 +319,9 @@
 
 
 {template postannounce}
-  <table class="news_list" border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px;">
+  <table class="news_list" border="0" cellspacing="3" cellpadding="3" style="margin: 10px 0px 10px 0px; width: 97%;">
     <tr>
-      <td style=" text-align: center; font-style: italic;">
+      <td style=" text-align: left; font-style: italic; width: 60px; ">
         {$date}
       </td>
       <td>

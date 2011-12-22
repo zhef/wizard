@@ -16,9 +16,10 @@
 {/template}
 
 {template postblock}
-  <div class="news_law">
+  <div class="news_list">
+  	<a href="#" class="right"><img src="img/icons/rss2.png" alt="" style="margin: 0 5px 0 0;"/></a>
     <a href="{$xrefall}" class="right">{$titleall |noAutoescape}</a>
-    <h2><img src="img/icons/rss2.png" alt="" style="margin: 3px 5px 0 0;"/>{$title |noAutoescape}</h2>
+    <h2>{$title |noAutoescape}</h2>
     <table class="news_list">
       {foreach $elt in $posts}
         {call postelt data="$elt" /}

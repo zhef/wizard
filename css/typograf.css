@@ -1,9 +1,9 @@
 p, blockquote, th, td {
 	margin-bottom: 1.3em;
-	font-size: 1.2em;
-	line-height: 1.3em;
-	color: #404040;
-	font-family: Arial;}
+	font-size: 1.1em;
+	line-height: 1.4em;
+	color: #404040;}
+p b, p strong {font-size: 1.0em; color: #555;}
 p i, p u, p strong, td i, td u, td strong { font-size: 1.0em;}
 blockquote {
 	text-indent: 0.8em;
@@ -14,12 +14,50 @@ blockquote {
 	margin: 0 auto 15px auto;
 	background-color: #fbe8ca;}
 blockquote strong.name {display: block; font-size: 1.1em;}
+dl, dt, dd {
+	font-size: 1.1em;
+	line-height: 1.3em;}
+dd, dt {	padding: 5px 10px;}
+dl {overflow: hidden;}
+dt {
+	float: left;
+	margin-right: 4px;
+	clear: left;
+	color: #555555;
+	font-weight: normal;}
+dl.table_display {
+	width: 100%;
+	margin: 20px auto;}
+dd {
+	background-color: #f4f4f4;
+	margin-bottom: 3px;}
+dl input, dl textarea { width: 99%;}
+.table_display dt {width: 30%; text-align: right;}
+.table_display dd dl dt{
+	width: 100%; 
+	text-align: left; 
+	padding: 3px 0; 
+	font-size: 0.9em;
+	line-height: 1.0em;}
+.table_display dd dl dt a { 
+	color: #39548B; 
+	font-size: 0.9em;
+	line-height: 1.0em;}
+.table_display dd {
+	float: left;
+	width: 60%;}
+.table_display dd dl dd {
+	width: 100%; 
+	padding: 2px 0; 
+	margin-bottom: 7px; 
+	color: #555555; 
+	font-size: 0.9em;
+	line-height: 1.0em;}
 #content table {margin: 0 auto 15px auto; clear: both;}
 td {
 	padding: 5px 10px;
 	line-height: 1.3em;	
-	border: 0px solid #F1F1F1;
-	background-color: #fff;}
+	border: 0px solid #F1F1F1;}
 .blue_th th, .red_th th {
 	padding: 6px;
 	color: #fff;
@@ -32,18 +70,17 @@ td {
 .blue_th .zebra { background-color: #fbe8ca;}
 /*----------------------- Заголовки --------------------------*/
 h1, h2 {font-size: 2.0em;}
-h1, h2, h3, h4, h5,h6 {font-family: 'Cuprum', arial, serif; font-weight: normal;}
 h1 {color: #d00707;}
 #content h2 { 
-	font-size: 1.8em; 
+	font-size: 1.5em; 
 	color: #414141;   
 	line-height: 20px; 	
 	padding-bottom: 6px;
 	margin-bottom: 12px;
 	background: url(../img/line2.gif) repeat-x scroll bottom;}
-h3 { font-size: 1.6em; color: #414141; margin-bottom: 10px;}
-h4 { font-size: 1.5em; color: #414141; margin-bottom: 10px;}
-h5, h6 { font-size: 1.4em; color: #414141; margin-bottom: 8px;}
+h3 { font-size: 1.4em; color: #414141; margin-bottom: 10px;}
+h4 { font-size: 1.3em; color: #414141; margin-bottom: 10px;}
+h5, h6 { font-size: 1.2em; color: #414141; margin-bottom: 8px;}
 
 
 /*----------------------- Списки --------------------------*/
@@ -51,7 +88,6 @@ ul {list-style: disc inside; margin: 5px 0 15px 10px;}
 ol {list-style: decimal inside; margin: 5px 0 15px 10px;}
 ul ul, ul ol, ol ul, ol ol {margin-bottom: 0;}
 #content ul li, #content ol li { margin: 0 0 5px 0;}
-dt { font-weight: bold; }
 ol.blue_li, ul.blue_li {color: #284288; font-weight: bold;}
 ol.blue_li span, ul.blue_li span {color: #414141; font-weight: normal; font-family: Arial; font-size: 1.2em;}
 ol.red_li, ul.red_li {color: #d00707; font-weight: bold;}
@@ -66,23 +102,19 @@ a:active, a:focus { text-decoration: none; color: #284288;}
 #content table td h3 a:visited {color: #1a3d9b;}
 #content table td h3 a:hover {color: #1a3d9b;}
 code, pre { color: #c33;}
-a[href^="http:"], a[href^="mailto:"], a[href^="http:"]:visited, 
-a[href$=".pdf"], a[href$=".doc"], a[href$=".xls"], a[href$=".rss"], 
-a[href$=".rdf"], a[href^="aim:"] {
+a[href^="mailto:"], a[href^="http:"]:visited, a[href$=".pdf"], a[href$=".doc"], 
+a[href$=".xls"], a[href$=".rss"], a[href$=".rdf"], a[href^="aim:"] {
   padding:2px 18px 2px 0;
   margin:-2px 0;
   background-repeat: no-repeat;
   background-position: right center;}
-a[href^="http:"]          { background-image: url(../img/icons/external.png);} 
 a[href^="mailto:"]        { background-image: url(../img/icons/email.png); }
-a[href^="http:"]:visited  { background-image: url(../img/icons/visited.png); }
 a[href$=".pdf"]   { background-image: url(../img/icons/pdf.png); }  
 a[href$=".doc"]   { background-image: url(../img/icons/doc.png); }  
 a[href$=".xls"]   { background-image: url(../img/icons/xls.png); }  
 a[href$=".rss"], 
 a[href$=".rdf"]   { background-image: url(../img/icons/feed.png); }
 a[href^="aim:"]   { background-image: url(../img/icons/im.png); }
-a[href^="http://gdestroytorg.ru"] { background:none; padding:0; margin:0;}
 a.right {
 	display: inline-block;
 	float: right;
@@ -103,8 +135,8 @@ a.right {
 #content .right {float: right;}
 #content .news_list h2, #content .euro h2 {margin-bottom: 0;}
 td h3 {
-	font-size: 1.1em; 
-	line-height: 14px; 
+	font-size: 1.0em; 
+	line-height: 1.2em; 
 	font-weight: bold;
 	margin-bottom: 1px;}
 .news_list td img {
@@ -151,4 +183,3 @@ span.data {display: block;}
 .up {color: #64a705;}
 .down {color: #d00707;}
 .raiting_company {width: 45%;}
-.center {text-align: center;}
