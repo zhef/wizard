@@ -49,7 +49,8 @@
             (resource (gethash resource_id *RESOURCE*)))
         (if (or (null category)
                 (null resource))
-            (format t "link category [~A] and resource [~A] not exists" group_id resource_id)
+            ;; (format t "~%link category [~A] and resource [~A] not exists" group_id resource_id)
+            nil
             ;; else
             (progn
               (append-link (a-resources category) resource)

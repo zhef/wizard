@@ -31,6 +31,14 @@
             month
             year)))
 
+(defun parse-date (datestring)
+  "Date is YYYY-MM-DD, returns universal time."
+  (unless (string-equal date "")
+    (apply #'encode-universal-time
+           (append '(0 0 0)
+                   (nreverse (mapcar #'parse-integer
+                                     (ppcre:split "-" date)))))))
+
 (defmacro err (var)
   `(error (format nil "ERR:[~A]" (bprint ,var))))
 
