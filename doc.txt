@@ -334,3 +334,7 @@ http://weitz.de/hunchentoot/#acceptor-dispatch-request
 
 http://gq.net.ru/2009/12/16/git-history-rewrite/ - Редактирование
 истории GIT
+
+emacs:help
+C-h r m dired
+C-h i d m dired-x

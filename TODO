@@ -8,6 +8,22 @@
 В зависимости от статуса некоторые поля могут редактироваться поставщиком или застройщиком (уточнить какие именно и как)
 Заявка закрывается вместе с тендером, когда выбираются победившие и проигравшие заявки.
 
+* STARTОбновить базу категорий и ресурсов
+* DELEGATED Репликация базы (Вася)
+  Таблицы:
+  jos_gt_measure_unit
+  jos_gt_resource_code
+  jos_gt_resource_duplicate
+  jos_gt_resource_group_bind
+  jos_gt_resource_group
+  jos_gt_resource_price_level
+  jos_gt_resource_price
+  jos_gt_resource_shgroup_bind
+  jos_gt_resource_shgroup
+  jos_gt_resource
+* DELEGATED Бэкап всех таблиц базы (Вася)
+* START Перевести проект на github:wizardGST
+* START Внедрить систему учета рабочего времени OrgMode
 * START [#A]  Административная кнопка для обновления шаблонов
   Чтобы мне не дергать каждый раз из консоли
 * TODO [#A] Починить сортировку новостей на главной странице
