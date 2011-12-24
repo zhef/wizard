@@ -97,20 +97,13 @@
 
   ;; Каталог материалов
   (def~plc (material "/material" :navpoint "Каталог материалов")
-    (def~grd ("Каталог материалов" :all category (cons-inner-objs *category* (a-child-categoryes (gethash 9317 *category*)))
-                                   ;; (remove-if-not #'(lambda (x)
-                                   ;;                      (null (a-parent (cdr x))))
-                                   ;;                  (cons-hash-list *CATEGORY*))
-                                   )
+    (def~grd ("Каталог материалов" :all category (cons-inner-objs *category* (a-child-categoryes (gethash 9317 *category*))))
       (def~fld (name :xref "category" :width 900))))
 
   ;; Строительная техника
   (def~plc (machine "/machine" :navpoint "Строительная техника")
     (def~grd ("Строительная техника" :all category (cons-inner-objs *category* (a-child-categoryes (gethash 9318 *category*)))
-                                     ;; (remove-if-not #'(lambda (x)
-                                     ;;                    (null (a-parent (cdr x))))
-                                     ;;                (cons-hash-list *CATEGORY*))
-                       :height     400)
+                                     :height     400)
       (def~fld (name :xref "category" :width 900))))
 
   ;; Каталог ресурсов - содержимое категории
