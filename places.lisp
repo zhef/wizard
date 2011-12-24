@@ -97,7 +97,7 @@
 
   ;; Каталог материалов
   (def~plc (material "/material" :navpoint "Каталог материалов")
-    (def~grd ("Каталог материалов" :all category (a-child-categoryes (gethash 9317 *category*))
+    (def~grd ("Каталог материалов" :all category (cons-inner-objs *category* (a-child-categoryes (gethash 9317 *category*)))
                                    ;; (remove-if-not #'(lambda (x)
                                    ;;                      (null (a-parent (cdr x))))
                                    ;;                  (cons-hash-list *CATEGORY*))
@@ -106,7 +106,7 @@
 
   ;; Строительная техника
   (def~plc (machine "/machine" :navpoint "Строительная техника")
-    (def~grd ("Строительная техника" :all category (a-child-categoryes (gethash 9318 *category*))
+    (def~grd ("Строительная техника" :all category (cons-inner-objs *category* (a-child-categoryes (gethash 9318 *category*)))
                                      ;; (remove-if-not #'(lambda (x)
                                      ;;                    (null (a-parent (cdr x))))
                                      ;;                (cons-hash-list *CATEGORY*))
