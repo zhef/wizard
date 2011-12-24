@@ -107,7 +107,7 @@
   ;; Очистка
   (clrhash *USER*)
   ;; Нулевой - админ
-  (push-hash *USER* 'ADMIN :login "admin" :password "admin")
+  (push-hash *USER* 'ADMIN :login "admin" :password "admin" :name "admin")
   ;;
   (let ((hash-city    (make-hash-table :test #'equal))
         (company_type (make-hash-table :test #'equal)))

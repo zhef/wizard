@@ -11,7 +11,8 @@
      :container            user
      :fields
      ((login               "Логин"                      (:str))
-      (password            "Пароль"                     (:pswd)))
+      (password            "Пароль"                     (:pswd))
+      (name                "ФИО"                        (:str)))
      :perm
      (:view                :self
       :update              :self))

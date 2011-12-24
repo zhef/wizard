@@ -95,6 +95,25 @@
                                                  (hunchentoot:get-parameter "scale")
                                                  (hunchentoot:get-parameter "resourceid"))))))))
 
+  ;; Административная страница
+  (def~plc (admin "/admin")
+    (def~lin ("Сделать ЭТО" :admin category :clear)
+      (def~btn ("Сделать ЭТО" :all)
+        (let* ((output (with-output-to-string (*standard-output*)
+                         (let* ((proc (sb-ext:run-program "/usr/bin/git" (list "pull") :wait nil :output :stream)))
+                           (with-open-stream (in (sb-ext:process-output proc))
+                             (loop :for i from 1 do
+                                (tagbody loop-body
+                                   (handler-case
+                                       (let ((in-string (read-line in)))
+                                         (format t "~A" in-string)
+                                         ;; ...
+                                         )
+                                     (END-OF-FILE () (return i)))))))
+                         )))
+          (print output)
+          (asdf:oos 'asdf:load-op :wizard)))))
+
   ;; Каталог материалов
   (def~plc (material "/material" :navpoint "Каталог материалов")
     (def~grd ("Каталог материалов" :all category (cons-inner-objs *category* (a-child-categoryes (gethash 9317 *category*))))
