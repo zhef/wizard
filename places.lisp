@@ -113,8 +113,7 @@
                          )))
           (print output)
           (re-tpl)
-          (re-load))
-        "ok.")))
+          (re-load)))))
 
   ;; Каталог материалов
   (def~plc (material "/material" :navpoint "Каталог материалов")
