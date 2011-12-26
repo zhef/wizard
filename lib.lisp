@@ -14,11 +14,11 @@
 (defparameter *db-password* "12")
 
 ;; myip
-(defparameter *dbg* t)
-(defparameter *host* "")
-(defparameter *mapkey*  "AKOwoE4BAAAAzn_UAAQAmXdybST_B2x-mnLcto5q_tTa2B4AAAAAAAAAAAAtC7dNu632YaEJuBnHz1d5g8a1IQ==")
-(defparameter *db-password* "root")
-(defparameter *map-disabled* t)
+;; (defparameter *dbg* t)
+;; (defparameter *host* "")
+;; (defparameter *mapkey*  "AKOwoE4BAAAAzn_UAAQAmXdybST_B2x-mnLcto5q_tTa2B4AAAAAAAAAAAAtC7dNu632YaEJuBnHz1d5g8a1IQ==")
+;; (defparameter *db-password* "root")
+;; (defparameter *map-disabled* t)
 
 
 (defun decode-date (timestamp)
