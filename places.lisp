@@ -112,7 +112,9 @@
                                      (END-OF-FILE () (return i)))))))
                          )))
           (print output)
-          (asdf:oos 'asdf:load-op :wizard)))))
+          (re-tpl)
+          (re-load))
+        "ok")))
 
   ;; Каталог материалов
   (def~plc (material "/material" :navpoint "Каталог материалов")
