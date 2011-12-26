@@ -7,19 +7,39 @@
 
 (in-package #:WIZARD)
 
-;; gdestroytorg.ru
+
 (defparameter *dbg* nil)
 (defparameter *host* "http://gdestroytorg.ru")
 (defparameter *mapkey*  "AKd6p04BAAAAN6JBTQIAVVk3tt2BoBL03SxnV1Q883Tx2N8AAAAAAAAAAAAg4NNZvAEKtUxUl-gPDH65Ud3jMA==")
 (defparameter *db-password* "12")
 
-;; myip
-;; (defparameter *dbg* t)
-;; (defparameter *host* "")
-;; (defparameter *mapkey*  "AKOwoE4BAAAAzn_UAAQAmXdybST_B2x-mnLcto5q_tTa2B4AAAAAAAAAAAAtC7dNu632YaEJuBnHz1d5g8a1IQ==")
-;; (defparameter *db-password* "root")
-;; (defparameter *map-disabled* t)
 
+(defun get-username (&aux (pid (sb-posix:getpid)))
+  (sb-posix:passwd-name
+   (sb-posix:getpwuid
+    (sb-posix:stat-uid
+     (sb-posix:stat (format nil "/proc/~A" pid))))))
+
+(when (string= "rigidus" (get-username))
+  (defparameter *dbg* t)
+  (defparameter *host* "")
+  (defparameter *mapkey*  "AKOwoE4BAAAAzn_UAAQAmXdybST_B2x-mnLcto5q_tTa2B4AAAAAAAAAAAAtC7dNu632YaEJuBnHz1d5g8a1IQ==")
+  (defparameter *db-password* "root")
+  (defparameter *map-disabled* t))
+
+
+(let ((path '(:RELATIVE "wizard")))
+  (setf asdf:*central-registry*
+        (remove-duplicates (append asdf:*central-registry*
+                                   (list (merge-pathnames
+                                          (make-pathname :directory path)
+                                          (user-homedir-pathname))))
+                           :test #'equal)))
+
+(defparameter *basedir*  (format nil "/home/~A/wizard/" (get-username)))
+
+(defun path (relative)
+  (merge-pathnames relative *basedir*))
 
 (defun decode-date (timestamp)
   (multiple-value-bind (second minute hour date month year)
@@ -136,26 +156,6 @@
 
 (defmacro bprint (var)
   `(subseq (with-output-to-string (*standard-output*)  (pprint ,var)) 1))
-
-
-(defun get-username (&aux (pid (sb-posix:getpid)))
-  (sb-posix:passwd-name
-   (sb-posix:getpwuid
-    (sb-posix:stat-uid
-     (sb-posix:stat (format nil "/proc/~A" pid))))))
-
-(let ((path '(:RELATIVE "wizard")))
-  (setf asdf:*central-registry*
-        (remove-duplicates (append asdf:*central-registry*
-                                   (list (merge-pathnames
-                                          (make-pathname :directory path)
-                                          (user-homedir-pathname))))
-                           :test #'equal)))
-
-(defparameter *basedir*  (format nil "/home/~A/wizard/" (get-username)))
-
-(defun path (relative)
-  (merge-pathnames relative *basedir*))
 
 (defun cur-user-id ()
   "get current logged user id as string"
@@ -706,9 +706,9 @@ If objs are of different classes the result is NIL."
                             :title (a-title elt)
                             :announce (a-announce elt)
                             :xref (format nil "/post/~A" (car x)))))
-                (last (reverse (remove-if-not #'(lambda (x)
-                                                  (equal section (a-section (cdr x))))
-                                              (cons-hash-list *POST-ITEM*)) count)))))
+                (last (remove-if-not #'(lambda (x)
+                                         (equal section (a-section (cdr x))))
+                                     (reverse (cons-hash-list *POST-ITEM*))) count))))
 
 (defun posts-by-sales (count)
   (list (mapcar #'(lambda (x)
