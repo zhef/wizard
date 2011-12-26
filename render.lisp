@@ -30,7 +30,7 @@
 (defclass action-render () ()) ;; actions : none, tpl, grid, linear, announce, yamap, file.
 (defclass grid-render   () ()) ;; grids   : fld, btn.
 (defclass linear-render () ()) ;; linears : fld, btn, popbtn, grid
-;; TODO - проверка прав - в around-методах
+
 
 
 (setf *default-render-method* (mi 'wizard-render))

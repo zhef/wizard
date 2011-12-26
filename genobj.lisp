@@ -1,45 +1,46 @@
 (in-package #:WIZARD)
 
-
-(with-defclass (action ())
+(with-defclass (~act ())
   (title "")
   (perm :all)
   (val nil)
   (entity nil)
   (fields nil))
 
-(with-defclass (none (action)))
 
-(with-defclass (tpl (action)))
+(with-defclass (~nop (~act)))
 
-(with-defclass (grid (action))
+(with-defclass (~lin (~act)))
+
+(with-defclass (~grd (~act))
   (grid nil)
   (param-id nil)
   (height "180"))
 
-(with-defclass (blk (action))
+(with-defclass (~blk (~act))
   (contents nil))
 
-(with-defclass (linear (action)))
+(with-defclass (~tpl (~act)))
 
-(with-defclass (announce (action)))
+(with-defclass (~ann (~act)))
 
-(with-defclass (post (action))
+(with-defclass (~pst (~act))
   (date "")
   (announce-photo nil)
   (announce "")
   (text-photo nil)
   (text ""))
 
-(with-defclass (yamap (action))
-  (center-coord "")
-  (mark-points nil))
-
-(with-defclass (file (action))
+(with-defclass (~upl (~act))
   (value "")
   (name ""))
 
-(with-defclass (fld ())
+(with-defclass (~map (~act))
+  (center-coord "")
+  (mark-points nil))
+
+
+(with-defclass (~fld ())
   (name "")
   (title "")
   (typedata '(:str))
@@ -49,7 +50,7 @@
   (view nil)
   (show nil))
 
-(with-defclass (btn ())
+(with-defclass (~btn ())
   (name "")
   (title "")
   (width 200)
@@ -57,7 +58,7 @@
   (perm :all)
   (act))
 
-(with-defclass (popbtn ())
+(with-defclass (~pop ())
   (name "")
   (title "")
   (top 200)

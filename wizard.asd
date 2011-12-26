@@ -17,10 +17,11 @@
   :serial        t
   :components   ((:file "lib")
                  (:file "ent")
-                 (:file "obj")
+                 (:file "genobj")
                  (:file "iface")
                  (:file "places")
                  (:file "gen")
+                 (:file "obj")
                  (:file "grid")
                  (:file "searching")
                  (:file "grid-fltr")
