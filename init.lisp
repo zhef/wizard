@@ -401,7 +401,7 @@
 ;; (restas:mount-submodule -static- (#:restas.directory-publisher)
 ;;   (restas.directory-publisher:*directory* (path "static/")))
 
-(restas:start '#:wizard :port 8081)
+(restas:start '#:wizard :port 8081 #|:address "localhost"|#)
 
 (restas:debug-mode-on)
 
