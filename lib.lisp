@@ -152,7 +152,8 @@
                                           (user-homedir-pathname))))
                            :test #'equal)))
 
-(defparameter *basedir*  (format nil "/home/~A/wizard/" (get-username)))
+;(defparameter *basedir*  (format nil "/home/~A/wizard/" (get-username)))
+(defparameter *basedir*  (format nil "/home/~A/git/wizard/" (get-username)))
 
 (defun path (relative)
   (merge-pathnames relative *basedir*))

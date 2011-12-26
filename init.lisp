@@ -401,7 +401,9 @@
 ;; (restas:mount-submodule -static- (#:restas.directory-publisher)
 ;;   (restas.directory-publisher:*directory* (path "static/")))
 
-(restas:start '#:wizard :port 8081)
+;; зря я что ли патч посылал?
+(restas:start '#:wizard :port 8081 :address "localhost")
+;(restas:start '#:wizard :port 8081)
 
 (restas:debug-mode-on)
 
