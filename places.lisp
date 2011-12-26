@@ -96,7 +96,7 @@
                                                  (hunchentoot:get-parameter "resourceid"))))))))
 
   ;; Административная страница
-  (def~plc (admin "/admin")
+  (def~plc (admin "/admin/:id")
     (def~lin ("Сделать ЭТО" :admin category :clear)
       (def~btn ("Сделать ЭТО" :all)
         (let* ((output (with-output-to-string (*standard-output*)
