@@ -706,9 +706,9 @@ If objs are of different classes the result is NIL."
                             :title (a-title elt)
                             :announce (a-announce elt)
                             :xref (format nil "/post/~A" (car x)))))
-                (last (remove-if-not #'(lambda (x)
-                                         (equal section (a-section (cdr x))))
-                                     (cons-hash-list *POST-ITEM*)) count))))
+                (last (reverse (remove-if-not #'(lambda (x)
+                                                  (equal section (a-section (cdr x))))
+                                              (cons-hash-list *POST-ITEM*)) count)))))
 
 (defun posts-by-sales (count)
   (list (mapcar #'(lambda (x)
