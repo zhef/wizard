@@ -203,29 +203,33 @@
   </form>
 {/template}
 
+    /* var $dialog = $('<div></div>') */
+    /* .html($('#hidden_{$id}').html()) */
+    /* .dialog({lb} */
+/* $dialog.dialog('open');{\n} */
 
 {template popbtnlin}
   <div id="hidden_{$id}" style="display:none">
     {$content |noAutoescape}
   </div>
 
-  <script>
-  $(document).ready(function() {lb}
-    var $dialog = $('<div></div>')
-    .html($('#hidden_{$id}').html())
-    .dialog({lb}
-      autoOpen: false,
-      title: '{$title |noAutoescape}',
-      width:  {$width},
-      height: {$height},
-      modal: true
-    {rb});
-    $('#opener_{$id}').click(function() {lb}
-      $dialog.dialog('open');
-      return false;
-    {rb});
-  {rb});
-  </script>
+
+
+  <script>{\n}
+  $(document).ready(function() {lb}{\n}
+    $('#hidden_{$id}').dialog({lb}{\n}
+      autoOpen: false,{\n}
+      title: '{$title |noAutoescape}',{\n}
+      width:  {$width},{\n}
+      height: {$height},{\n}
+      modal: true{\n}
+    {rb});{\n}
+    $('#opener_{$id}').click(function() {lb}{\n}
+      $('#hidden_{$id}').dialog('open');{\n}
+      return false;{\n}
+    {rb});{\n}
+  {rb});{\n}
+  </script>{\n}
 
   <input id="opener_{$id}" type="button" style="margin: 10px 0 10px 0;" value="{$value}" />
 {/template}
